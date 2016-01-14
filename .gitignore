@@ -61,3 +61,6 @@ target/
 
 # Other
 *~
+
+# Project specific
+data/templates/*
