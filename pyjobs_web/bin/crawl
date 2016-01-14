@@ -3,7 +3,10 @@
 # -*- coding: utf-8 -*-
 from pyjobs_crawlers.run import start_crawlers
 import os
+from crawlers import PyJobsWebConnector
+
 
 if __name__ == '__main__':
     os.environ['SCRAPY_SETTINGS_MODULE'] = 'pyjobs_crawlers.settings'
-    start_crawlers()
+    connector = PyJobsWebConnector()
+    start_crawlers(connector=connector, processes=5)
