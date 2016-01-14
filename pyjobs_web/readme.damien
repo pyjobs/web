@@ -1,0 +1,17 @@
+cd /home/damien/proj/pyjobs
+source venv2.7/bin/activate
+cd pyjobsweb
+
+et là :
+
+scrapy runspider afpy
+scrapy crawl afpy
+scrapy crawl lolix
+scrapy crawl remixjobs
+
+gearbox serve --reload
+=> site accessible sur http://localhost:8887/jobs
+
+http://gitlab.algoo.fr:10080/algoo/pyjobs.git
+
+
