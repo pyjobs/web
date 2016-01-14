@@ -22,3 +22,8 @@ While developing you may want the server to reload after changes in package file
     $ gearbox serve --reload --debug
 
 Then you are ready to go.
+
+Update job database with crawls
++++++++++++++++++++++++++++++++
+
+Execute ``bin/crawl``.
