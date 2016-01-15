@@ -6,6 +6,7 @@ from pyjobs_crawlers import Connector
 from pyjobsweb.model.data import Job
 from pyjobsweb.model import DBSession, Log
 import transaction
+from sqlalchemy.orm.exc import NoResultFound
 
 __all__ = ('helpers', 'app_globals')
 
@@ -78,3 +79,12 @@ class PyJobsWebConnector(Connector):
 
         DBSession.add(log)
         transaction.commit()
+
+    def get_most_recent_job_date(self, source):
+        try:
+            return model.DBSession.query(model.data.Job.publication_datetime)\
+                .order_by(model.data.Job.publication_datetime.desc())\
+                .limit(1)\
+                .one()[0] #  First element is publication_datetime datetime value
+        except NoResultFound:
+            return datetime.datetime(1970, 1, 1, 0, 0, 0)
