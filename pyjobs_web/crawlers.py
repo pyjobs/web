@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import datetime
 import sqlalchemy
 from pyjobsweb import model
 from pyjobs_crawlers import Connector
 from pyjobsweb.model.data import Job
-from pyjobsweb.model import DBSession
+from pyjobsweb.model import DBSession, Log
 import transaction
 
 __all__ = ('helpers', 'app_globals')
@@ -63,3 +64,17 @@ class PyJobsWebConnector(Connector):
             .query(model.data.Job) \
             .filter(model.data.Job.url == job_url) \
             .count()
+
+    def log(self, source, action, more=None):
+        if more is not None:
+            message = '%s: %s (%s)' % (source, action, more)
+        else:
+            message = '%s: %s' % (source, action)
+
+        log = Log()
+        log.source = source
+        log.message = message
+        log.datetime = datetime.datetime.now()
+
+        DBSession.add(log)
+        transaction.commit()
