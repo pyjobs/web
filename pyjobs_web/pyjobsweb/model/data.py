@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from pyjobs_crawlers import get_sources
 from sqlalchemy import Column, Text, String, Integer, DateTime
 
 from pyjobsweb.model import DeclarativeBase, metadata, DBSession
@@ -15,39 +15,7 @@ class Source(object):
     REMIXJOBS_PYTHON = 'remixjobs-python'
 
 
-class JobSource(object):
-    def __init__(self, id, label, url, logo_url):
-        self.logo_url = logo_url
-        self.label = label
-        self.id = id
-        self.url = url
-
-SOURCES = {
-    'afpy': JobSource(
-        'afpy',
-        'AFPY',
-        'http://www.afpy.org',
-        'http://www.afpy.org/logo.png'
-    ),
-    'remixjobs': JobSource(
-        'remixjobs',
-        'RemixJobs',
-        'https://remixjobs.com/',
-        'https://remixjobs.com/images/press/logos/logo2-450-140.png'
-    ),
-    'lolix': JobSource(
-        'lolix',
-        'Lolix',
-        'http://fr.lolix.org/',
-        'http://fr.lolix.org/img/lolix/offer.png'
-    ),
-    'linuxjobs': JobSource(
-        'linuxjobs',
-        'LinuxJobs',
-        'https://www.linuxjobs.fr/',
-        'https://pbs.twimg.com/profile_images/649599776573403140/vaMrmib1_400x400.png'
-    ),
-}
+SOURCES = get_sources()
 
 
 class Tag2(object):
