@@ -69,9 +69,9 @@ class PyJobsWebConnector(Connector):
 
     def log(self, source, action, more=None):
         if more is not None:
-            message = '%s: %s (%s)' % (source, action, more)
+            message = '%s (%s)' % (action, more)
         else:
-            message = '%s: %s' % (source, action)
+            message = action
 
         log = Log()
         log.source = source
