@@ -55,9 +55,6 @@ class PyJobsWebConnector(Connector):
         DBSession.add(job)
         transaction.commit()
 
-        # FUTURE: Bots have to be enable in config
-        self._github_bot.run()
-
     def job_exist(self, job_url):
         """
 
