@@ -18,7 +18,6 @@ class PyJobsWebConnector(Connector):
         engine = sqlalchemy.engine.create_engine('postgres://pyjobs:pyjobs@localhost/pyjobs')
         engine.connect()
         model.init_model(engine)
-        self._github_bot = GitHubBot()
 
     def add_job(self, job_item):
         """
