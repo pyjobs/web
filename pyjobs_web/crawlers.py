@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import sqlalchemy
+from pyjobsweb.bot.github import GitHubBot
 from pyjobsweb import model
 from pyjobs_crawlers import Connector
 from pyjobsweb.model.data import Job
@@ -17,6 +18,7 @@ class PyJobsWebConnector(Connector):
         engine = sqlalchemy.engine.create_engine('postgres://pyjobs:pyjobs@localhost/pyjobs')
         engine.connect()
         model.init_model(engine)
+        self._github_bot = GitHubBot()
 
     def add_job(self, job_item):
         """
@@ -52,6 +54,9 @@ class PyJobsWebConnector(Connector):
 
         DBSession.add(job)
         transaction.commit()
+
+        # FUTURE: Bots have to be enable in config
+        self._github_bot.run()
 
     def job_exist(self, job_url):
         """

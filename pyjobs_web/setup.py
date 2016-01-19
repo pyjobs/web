@@ -44,7 +44,8 @@ install_requires = [
     "repoze.who",
     "tw2.forms",
     "tgext.admin >= 0.6.1",
-    "WebHelpers2"
+    "WebHelpers2",
+    "GitPython==1.0.1"
 ]
 
 if py_version != (3, 2):

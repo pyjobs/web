@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+
+# -*- coding: utf-8 -*-
+from pyjobsweb.bot.github import GitHubBot
+
+
+if __name__ == '__main__':
+    # TODO - B.S. - 20160118: Récup les bots de la config et le lancer
+    github_bot = GitHubBot()
+    github_bot.run()
