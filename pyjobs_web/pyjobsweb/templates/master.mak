@@ -43,8 +43,7 @@
 
 <%def name="footer()">
   <footer class="footer hidden-xs hidden-sm">
-    <a class="pull-right" href="http://www.turbogears.org"><img style="vertical-align:middle;" src="${tg.url('/img/under_the_hood_blue.png')}" alt="TurboGears 2" /></a>
-    <p>Copyright &copy; ${getattr(tmpl_context, 'project_name', 'TurboGears2')} ${h.current_year()}</p>
+    <p>Copyright &copy; ${getattr(tmpl_context, 'project_name', 'Algoo')} ${h.current_year()}</p>
   </footer>
 </%def>
 
@@ -76,16 +75,16 @@
 
     % if tg.auth_stack_enabled:
       <ul class="nav navbar-nav navbar-right">
-        <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/recruteurs')}">Recruteurs</a></li>
-        <li class="${('', 'active')[page=='about']}"><a href="${tg.url('/candidats')}">Candidats</a></li>
-        <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/recruteurs')}">Sources</a></li>
-        <li class="${('', 'active')[page=='data']}"><a href="${tg.url('/about')}">A propos</a></li>
-      % if not request.identity:
-        <li><a href="${tg.url('/login')}">Login</a></li>
-      % else:
-        <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
-        <li><a href="${tg.url('/admin')}">Admin</a></li>
-      % endif
+##         <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/recruteurs')}">Recruteurs</a></li>
+##         <li class="${('', 'active')[page=='about']}"><a href="${tg.url('/candidats')}">Candidats</a></li>
+        <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/sources')}">Sources</a></li>
+##         <li class="${('', 'active')[page=='data']}"><a href="${tg.url('/about')}">A propos</a></li>
+##       % if not request.identity:
+##         <li><a href="${tg.url('/login')}">Login</a></li>
+##       % else:
+##         <li><a href="${tg.url('/logout_handler')}">Logout</a></li>
+##         <li><a href="${tg.url('/admin')}">Admin</a></li>
+##       % endif
       </ul>
     % endif
     </div>

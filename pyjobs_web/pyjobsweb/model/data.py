@@ -2,13 +2,15 @@
 from pyjobs_crawlers import get_sources
 from sqlalchemy import Column, Text, String, Integer, DateTime
 
-from pyjobsweb.model import DeclarativeBase, metadata, DBSession
+from pyjobsweb.model import DeclarativeBase
 from datetime import datetime
 from babel.dates import format_date, format_timedelta
+
 
 class Status(object):
     INITIAL_CRAWL_OK = 'initial-crawl-ok'
     PUBLISHED = 'published'
+
 
 class Source(object):
     AFPY_JOBS = 'afpy-jobs'
@@ -34,6 +36,7 @@ class Tag2(object):
             u'télétravail': 'job-remote',
         }
         return css[tagname]
+
 
 class Job(DeclarativeBase):
 

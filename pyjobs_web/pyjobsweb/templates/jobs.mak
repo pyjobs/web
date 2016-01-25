@@ -19,7 +19,7 @@
 </%def>
 
 <%def name="title()">
-Learning TurboGears 2.3: Quick guide to the Quickstart pages.
+    PyJobs: Le job qu'il vous faut en python
 </%def>
 
     <div class="row">
