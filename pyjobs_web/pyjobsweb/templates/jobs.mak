@@ -59,41 +59,15 @@ ${job_pagination()}
 
     % for job in jobs:
 
-        <!-- Modal -->
-        <div class="modal" id="modal-job-${job.id}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">${job.title}</h4>
-              </div>
-              <div class="modal-body">
-                  <ul>
-                      <li>${job.company}</li>
-                      <li>${job.address}</li>
-                  </ul>
-                  <hr/>
-                  ${job.description|n}
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div class="row">
             <div class="col-md-12">
                 <div id="job-post-${job.id}" class="job-item ${loop.cycle('row-even', 'row-odd')}" style="border-top: 1px dotted #DDD; padding: 1em 1em 3em 1em;">
                     <div class="row" id="job-post-head-${job.id}">
                         <div class="col-md-9">
                             <h2 style="margin-top: 0; padding-top: 0; font-size: 1.7em;">
-                                <a style="color: #555; font-weight: bold;" data-toggle="modal" data-target="#modal-job-${job.id}" >${job.title}</a>
-
-                                <!-- TODO: TurboGears "url" helper ? -->
-                                <a href="/job/${job.id}/${h.slugify(job.title)}">
-                                    JOB PAGE
+                                <a style="color: #555; font-weight: bold;"
+                                   href="/job/${job.id}/${h.slugify(job.title)}">
+                                    ${job.title}
                                 </a>
 
                                 % for tag in job.condition_tags:
