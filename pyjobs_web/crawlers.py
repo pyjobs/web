@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import datetime
 import sqlalchemy
-from pyjobsweb.bot.github import GitHubBot
 from pyjobsweb import model
-from pyjobs_crawlers import Connector
+from pyjobs_crawlers.run import Connector
 from pyjobsweb.model.data import Job
 from pyjobsweb.model import DBSession, Log
 import transaction

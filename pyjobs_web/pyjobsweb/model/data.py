@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pyjobs_crawlers import get_sources
+from pyjobs_crawlers.tools import get_sources
 from sqlalchemy import Column, Text, String, Integer, DateTime
 
 from pyjobsweb.model import DeclarativeBase
