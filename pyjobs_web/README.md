@@ -1,6 +1,6 @@
-# Installation and setup
+## Installation and setup
 
-## Dependencies
+### Dependencies
 
 Pyjobs_web require some OS dependencies (to build project python libs), for a debian-like you can install them with ``apt-get``:
 
@@ -8,7 +8,7 @@ Pyjobs_web require some OS dependencies (to build project python libs), for a de
 apt-get install python python-dev python-pip git libpq-dev libxml2-dev libxslt1-dev libffi-dev
 ```
 
-## Pyjobs Web
+### Pyjobs Web
 
 **Note**: For production environment, create ``production.ini`` configuration file from copying ``development.ini`` and replace ``development.ini`` by ``production.ini`` in following instructions.
 
@@ -47,6 +47,8 @@ Create the project database for any model classes defined::
 
     $ gearbox setup-app -c development.ini
 
+### Run PyJobs Web
+
 Start the paste http server::
 
     $ gearbox serve -c development.ini
@@ -57,6 +59,6 @@ While developing you may want the server to reload after changes in package file
 
 Then you are ready to go.
 
-# Update job database with crawls
+## Update job database with crawls
 
 Run ``gearbox crawl`` command. It will be run [PyJobs Crawlers](https://github.com/pyjobs/crawlers) and feed PyJobs Web database.
