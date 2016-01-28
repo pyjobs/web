@@ -81,7 +81,11 @@ setup(
         ],
         'gearbox.plugins': [
             'turbogears-devtools = tg.devtools'
+        ],
+        'gearbox.commands': [
+            'crawl = pyjobsweb.commands.crawl:CrawlCommand'
         ]
     },
-    zip_safe=False
+    zip_safe=False,
+    requires=['gearbox']
 )
