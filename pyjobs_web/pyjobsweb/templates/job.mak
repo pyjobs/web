@@ -1,6 +1,19 @@
 <%inherit file="local:templates.master"/>
 
-<h1>
+<%def name="head_content()">
+    <link rel="canonical" href="${h.get_job_url(job.id, job.title, absolute=True)}" />
+</%def>
+
+% if request.params.get('previous'):
+    <a href="${request.params.get('previous')}"
+       title="Retour à la page de listes"
+       class="btn btn-default btn-xs">
+        retour
+    </a>
+% endif
+
+
+<h1 class="job">
     ${job.title}
 
     % for tag in job.alltags:
@@ -35,3 +48,10 @@
 <p>
     ${job.description|n}
 </p>
+
+<a title="Page d'origine de l'annonce"
+   class="btn btn-primary btn-lg centered-block job-source-link"
+   href="${job.url}"
+    target="_blank">
+    Voir l'annonce d'origine
+</a>

@@ -48,10 +48,13 @@ class RootController(BaseController):
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
-    def index(self):
+    def index(self, source=None):
 
         jobs = DBSession.query(Job) \
             .order_by(Job.publication_datetime.desc())
+
+        if source is not None:
+            jobs = jobs.filter(Job.source == source)
 
         return dict(
             sources=SOURCES,
@@ -59,10 +62,11 @@ class RootController(BaseController):
         )
 
     @expose()
-    def rss(self, limit=50):
+    def rss(self, limit=50, source=None):
         """
         RSS feed of jobs
-        :param limit:
+        :param source: source name
+        :param limit: number of displayed jobs
         :return: RSS feed content
         """
         feed = feedgenerator.Rss201rev2Feed(
@@ -78,6 +82,9 @@ class RootController(BaseController):
             .order_by(Job.publication_datetime.desc()) \
             .limit(limit)
 
+        if source is not None:
+            jobs = jobs.filter(Job.source == source)
+
         for job in jobs:
             feed.add_item(
                     title=job.title,
@@ -91,7 +98,7 @@ class RootController(BaseController):
         return feed.writeString('utf-8')
 
     @expose('pyjobsweb.templates.job')
-    def job(self, job_id, job_title=None):
+    def job(self, job_id, job_title=None, previous=None):
         """
         Job detail page
         :param job_id: Job identifier
@@ -104,7 +111,7 @@ class RootController(BaseController):
             pass  # TODO: TubroGears 404 ?
         return dict(
                 job=job,
-                sources=SOURCES,
+                sources=SOURCES
         )
 
     @expose('pyjobsweb.templates.index')

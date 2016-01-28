@@ -86,3 +86,18 @@ body {
     font-size: 3em;
     border-bottom-width: 0px;
 }
+
+.centered-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.job-source-link {
+    width: 250px;
+    margin-top: 25px;
+}
+
+h1.job {
+    margin-top: 0px;
+}

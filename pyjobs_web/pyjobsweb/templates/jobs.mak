@@ -70,7 +70,7 @@ ${job_pagination()}
                         <div class="col-md-9">
                             <h2 style="margin-top: 0; padding-top: 0; font-size: 1.7em;">
                                 <a style="color: #555; font-weight: bold;"
-                                   href="/job/${job.id}/${h.slugify(job.title)}">
+                                   href="${h.get_job_url(job.id, job.title, previous=request.url)}">
                                     ${job.title}
                                 </a>
 
