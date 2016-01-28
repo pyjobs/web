@@ -96,6 +96,7 @@ body {
 .job-source-link {
     width: 250px;
     margin-top: 25px;
+    clear: both;
 }
 
 h1.job {

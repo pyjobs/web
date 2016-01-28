@@ -45,9 +45,9 @@
 
 </p>
 
-<p>
+<div class="job-description">
     ${job.description|n}
-</p>
+</div>
 
 <a title="Page d'origine de l'annonce"
    class="btn btn-primary btn-lg centered-block job-source-link"
