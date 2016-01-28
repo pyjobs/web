@@ -79,7 +79,7 @@ ${job_pagination()}
                                 % endfor
 
                                 <br/>
-                                <div style="color: #999;">${job.company}</div>
+                                <span style="color: #999;">${job.company}</span>
                             </h2>
                         </div>
 
