@@ -27,10 +27,14 @@
             <div class="page-header">
                 <h1>
                     Le job qu'il vous faut &mdash; en python
-                    <div class="btn-group pull-right" role="group">
-                        <button type="button" class="btn btn-default"><i class="fa fa-3x fa-twitter" style="color: #55ACEE;"></i></button>
-                        <button type="button" class="btn btn-warning"><i class="fa fa-3x fa-rss"></i></button>
-                    </div>
+                    <span class="btn-group pull-right" role="group">
+##                         <button type="button" class="btn btn-default">
+##                             <i class="fa fa-3x fa-twitter" style="color: #55ACEE;"></i>
+##                         </button>
+                        <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" class="btn btn-warning">
+                            <i class="fa fa-3x fa-rss"></i>
+                        </a>
+                    </span>
 
                 </h1>
 ##                 <h2>

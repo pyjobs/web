@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
+from pyjobsweb.lib.helpers import slugify
 from pyjobsweb.model.data import Job, SOURCES
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -15,6 +16,7 @@ from pyjobsweb.controllers.secure import SecureController
 from pyjobsweb.model import DBSession
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 from tgext.admin.controller import AdminController
+import webhelpers.feedgenerator as feedgenerator
 
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.controllers.error import ErrorController
@@ -55,6 +57,38 @@ class RootController(BaseController):
             sources=SOURCES,
             jobs=jobs
         )
+
+    @expose()
+    def rss(self, limit=50):
+        """
+        RSS feed of jobs
+        :param limit:
+        :return: RSS feed content
+        """
+        feed = feedgenerator.Rss201rev2Feed(
+            title=u"PyJobs: Le job qu'il vous faut en python",
+            # TODO - B.S. - 20160128: Adresse du site dynamique ? Depuis config ?
+            link=u"http://www.pyjobs.fr/",
+            description=u"Agrégation de jobs python",
+            language=u"fr",
+            feed_url=u"http://www.pyjobs.fr/rss?limit=%s" % limit
+        )
+
+        jobs = DBSession.query(Job) \
+            .order_by(Job.publication_datetime.desc()) \
+            .limit(limit)
+
+        for job in jobs:
+            feed.add_item(
+                    title=job.title,
+                    link=job.url,
+                    description=job.description,
+                    pubdate=job.publication_datetime,
+                    # TODO - B.S. - 20160128: Adresse du site dynamique ? Depuis config ?
+                    unique_id="http://www.pyjobs.fr/job/%d/%s" % (job.id, slugify(job.title))
+            )
+
+        return feed.writeString('utf-8')
 
     @expose('pyjobsweb.templates.job')
     def job(self, job_id, job_title=None):
