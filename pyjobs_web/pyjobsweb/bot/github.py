@@ -121,8 +121,8 @@ class GitHubBot(object):
         """
         repo_index = self._repo.index
         repo_index.add([self._jobs_file_path])
-        # TODO - B.S. - 20160118: Le mail est ok ?
-        author = Actor("PyJobs GitHub bot", "pyjobs-github-bot@algoo.fr")
+        # TODO - B.S. - 20160118: From config
+        author = Actor("pyjobs", "contact@pyjobs.fr")
         repo_index.commit(message, author=author, committer=author)
 
     def _pull(self):
