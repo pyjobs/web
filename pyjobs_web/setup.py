@@ -83,9 +83,10 @@ setup(
             'turbogears-devtools = tg.devtools'
         ],
         'gearbox.commands': [
-            'crawl = pyjobsweb.commands.crawl:CrawlCommand'
+            'crawl = pyjobsweb.commands.crawl:CrawlCommand',
+            'bots = pyjobsweb.commands.bots:BotsCommand'
         ]
     },
     zip_safe=False,
-    requires=['gearbox']
+    requires=['gearbox', 'paste', 'webtest', 'webtest']
 )

@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
 import datetime
+
 import sqlalchemy
-from pyjobsweb import model
-from pyjobs_crawlers.run import Connector
-from pyjobsweb.model.data import Job
-from pyjobsweb.model import DBSession, Log
 import transaction
+from pyjobs_crawlers.run import Connector
 from sqlalchemy.orm.exc import NoResultFound
+from tg import config
+
+from pyjobsweb import model
+from pyjobsweb.model import DBSession, Log
+from pyjobsweb.model.data import Job
 
 __all__ = ('helpers', 'app_globals')
 
 
 class PyJobsWebConnector(Connector):
     def __init__(self):
-        # TODO - B.S. - 20160114: Centraliser la config postgres
-        engine = sqlalchemy.engine.create_engine('postgres://pyjobs:pyjobs@localhost/pyjobs')
+        engine = sqlalchemy.engine.create_engine(config.get('sqlalchemy.url'))
         engine.connect()
         model.init_model(engine)
 

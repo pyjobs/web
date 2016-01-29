@@ -7,12 +7,9 @@ from os.path import expanduser
 from pyjobsweb import model
 from mako.template import Template
 import codecs
+from tg import config
 
 home = expanduser("~")
-# TODO - B.S. - 20160114: Centraliser la config postgres
-engine = sqlalchemy.engine.create_engine('postgres://pyjobs:pyjobs@localhost/pyjobs')
-engine.connect()
-model.init_model(engine)
 
 
 class GitHubBot(object):
@@ -26,10 +23,14 @@ class GitHubBot(object):
     _jobs_template_file_path = os.path.dirname(os.path.realpath(__file__)) + '/github_jobs.mak'
     _jobs_message_file_path = os.path.dirname(os.path.realpath(__file__)) + '/github_commit_message.mak'
     _jobs_file_path = _repository_path + '/README.md'
-    _last_jobs_count = 20
+    _last_jobs_count = 50
     _deployment_key_file_path = home + '.ssh/id_rsa.pub'
     
     def __init__(self):
+        engine = sqlalchemy.engine.create_engine(config.get('sqlalchemy.url'))
+        engine.connect()
+        model.init_model(engine)
+
         self._repo = None
         self._check_repository_directory()
         self._check_repository()
