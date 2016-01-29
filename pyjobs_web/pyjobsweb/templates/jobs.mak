@@ -85,7 +85,15 @@ ${job_pagination()}
 
                         <div class="col-md-3">
                             <div class="text-right">
-                                <span style="font-size: 1.5em; font-weight: bold; color: #777;">${job.published}</span><br/>
+                                <span style="font-size: 1.5em; font-weight: bold; color: #777;">
+                                    ${job.published}
+                                    % if job.publication_datetime_is_fake:
+                                        <span class="warning" title="Cette date n'est peut-être pas fiable">
+                                             &#9888;
+                                        </span>
+                                    % endif
+                                </span>
+                                <br/>
                                 <a href="${sources[job.source].url}" style="color: #AAA; font-weight: bold;">
                                     ${sources[job.source].label}<br/>
                                     <img style="max-height: 32px;" src="${sources[job.source].logo_url}" alt="${sources[job.source].label}"/>

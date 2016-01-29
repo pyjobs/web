@@ -36,7 +36,7 @@ class PyJobsWebConnector(Connector):
 
         job = Job()
         attributes = ['title', 'description', 'company', 'address', 'company_url',
-                      'publication_datetime']
+                      'publication_datetime', 'publication_datetime_is_fake']
 
         # Populate job attributes if item contain it
         for attribute in attributes:

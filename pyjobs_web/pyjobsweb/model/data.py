@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyjobs_crawlers.tools import get_sources
-from sqlalchemy import Column, Text, String, Integer, DateTime
+from sqlalchemy import Column, Text, String, Integer, DateTime, Boolean
 
 from pyjobsweb.model import DeclarativeBase
 from datetime import datetime
@@ -56,6 +56,7 @@ class Job(DeclarativeBase):
     tags = Column(Text(), nullable=False, default='')  # JSON
 
     publication_datetime = Column(DateTime)
+    publication_datetime_is_fake = Column(Boolean)
 
     crawl_datetime = Column(DateTime)
 
