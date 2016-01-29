@@ -86,6 +86,6 @@ class PyJobsWebConnector(Connector):
                 .filter(model.data.Job.source == source)\
                 .order_by(model.data.Job.publication_datetime.desc())\
                 .limit(1)\
-                .one()[0] #  First element is publication_datetime datetime value
+                .one()[0]  # First element is publication_datetime datetime value
         except NoResultFound:
             return datetime.datetime(1970, 1, 1, 0, 0, 0)
