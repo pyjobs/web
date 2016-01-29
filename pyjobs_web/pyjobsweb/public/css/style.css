@@ -102,3 +102,27 @@ body {
 h1.job {
     margin-top: 0px;
 }
+
+#sources ul.fields li {
+    color: black;
+    display: inline;
+    font-size: 0.9em;
+    font-weight: normal;
+    margin: 0 5px 0 0;
+    padding: 5px;
+    text-align: center;
+    width: 19%;
+}
+
+#sources ul.fields li.collected {
+    background-color: #3c763d;
+}
+
+#sources ul.fields li.not-collected {
+    background-color: #ce8483;
+}
+
+#sources article.source h2 a {
+    text-decoration: none;
+    color: inherit;
+}

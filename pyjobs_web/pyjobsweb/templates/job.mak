@@ -29,6 +29,11 @@
 
     <span class="published">
         ${job.published}
+        % if job.publication_datetime_is_fake:
+            <span class="warning" title="Cette date n'est peut-être pas fiable">
+                 &#9888;
+            </span>
+        % endif
     </span>
 
     -

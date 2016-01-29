@@ -22,6 +22,15 @@ from pyjobsweb.lib.base import BaseController
 from pyjobsweb.controllers.error import ErrorController
 
 __all__ = ['RootController']
+existing_fields = (
+    'title',
+    'publication_datetime',
+    'company',
+    'company_url',
+    'address',
+    'description',
+    'tags',
+)
 
 
 class RootController(BaseController):
@@ -112,6 +121,13 @@ class RootController(BaseController):
         return dict(
                 job=job,
                 sources=SOURCES
+        )
+
+    @expose('pyjobsweb.templates.sources')
+    def sources(self):
+        return dict(
+                sources=SOURCES,
+                existing_fields=existing_fields
         )
 
     @expose('pyjobsweb.templates.index')
