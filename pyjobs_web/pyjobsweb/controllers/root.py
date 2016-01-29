@@ -4,7 +4,7 @@ from pyjobsweb.lib.helpers import slugify
 from pyjobsweb.model.data import Job, SOURCES
 from sqlalchemy.orm.exc import NoResultFound
 
-from tg import expose, flash, require, url, lurl
+from tg import expose, flash, require, url, lurl, config
 from tg import request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg.decorators import paginate
@@ -69,10 +69,10 @@ class RootController(BaseController):
         :param limit: number of displayed jobs
         :return: RSS feed content
         """
+        site_url = config.get('site.domain_base_url')
         feed = feedgenerator.Rss201rev2Feed(
             title=u"PyJobs: Le job qu'il vous faut en python",
-            # TODO - B.S. - 20160128: Adresse du site dynamique ? Depuis config ?
-            link=u"http://www.pyjobs.fr/",
+            link=site_url,
             description=u"Agrégation de jobs python",
             language=u"fr",
             feed_url=u"http://www.pyjobs.fr/rss?limit=%s" % limit
@@ -86,13 +86,13 @@ class RootController(BaseController):
             jobs = jobs.filter(Job.source == source)
 
         for job in jobs:
+            job_slug = slugify(job.title)
             feed.add_item(
                     title=job.title,
                     link=job.url,
                     description=job.description,
                     pubdate=job.publication_datetime,
-                    # TODO - B.S. - 20160128: Adresse du site dynamique ? Depuis config ?
-                    unique_id="http://www.pyjobs.fr/job/%d/%s" % (job.id, slugify(job.title))
+                    unique_id="%s/job/%d/%s" % (site_url, job.id, job_slug)
             )
 
         return feed.writeString('utf-8')
