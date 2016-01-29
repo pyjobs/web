@@ -83,6 +83,7 @@ class PyJobsWebConnector(Connector):
     def get_most_recent_job_date(self, source):
         try:
             return model.DBSession.query(model.data.Job.publication_datetime)\
+                .filter(model.data.Job.source == source)\
                 .order_by(model.data.Job.publication_datetime.desc())\
                 .limit(1)\
                 .one()[0] #  First element is publication_datetime datetime value
