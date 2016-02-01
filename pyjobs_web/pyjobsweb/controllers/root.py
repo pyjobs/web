@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
-from pyjobsweb.lib.helpers import slugify
-from pyjobsweb.model.data import Job, SOURCES
-from sqlalchemy.orm.exc import NoResultFound
 
-from tg import expose, flash, require, url, lurl, config
+import webhelpers.feedgenerator as feedgenerator
+from sqlalchemy.orm.exc import NoResultFound
+from tg import expose, flash, require, lurl, config
+from tg import predicates
 from tg import request, redirect, tmpl_context
-from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg.decorators import paginate
 from tg.exceptions import HTTPFound
-from tg import predicates
+from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tgext.admin.controller import AdminController
+from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 
 from pyjobsweb import model
-from pyjobsweb.controllers.secure import SecureController
-from pyjobsweb.model import DBSession
-from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
-from tgext.admin.controller import AdminController
-import webhelpers.feedgenerator as feedgenerator
-
-from pyjobsweb.lib.base import BaseController
 from pyjobsweb.controllers.error import ErrorController
+from pyjobsweb.controllers.secure import SecureController
+from pyjobsweb.lib.base import BaseController
+from pyjobsweb.lib.helpers import slugify
+from pyjobsweb.lib.stats import StatsQuestioner
+from pyjobsweb.model import DBSession
+from pyjobsweb.model.data import Job, SOURCES
 
 __all__ = ['RootController']
 existing_fields = (
@@ -128,6 +128,36 @@ class RootController(BaseController):
         return dict(
                 sources=SOURCES,
                 existing_fields=existing_fields
+        )
+
+    @expose('pyjobsweb.templates.stats')
+    def stats(self, since_months=3):
+
+        stats_questioner = StatsQuestioner(DBSession)
+        date_from, date_to = StatsQuestioner.get_month_period(int(since_months))
+
+        by_months = stats_questioner.by_complete_period(
+            period=StatsQuestioner.PERIOD_MONTH,
+            date_from=date_from,
+            date_to=date_to,
+        ).all()
+        months = StatsQuestioner.extract(by_months, StatsQuestioner.FIELD_DATE)
+        stats_month = StatsQuestioner.extract_stats(query_result=by_months)
+
+        by_weeks = stats_questioner.by_complete_period(
+            StatsQuestioner.PERIOD_WEEK,
+            date_from=date_from,
+            date_to=date_to,
+        ).all()
+        weeks = StatsQuestioner.extract(by_weeks, StatsQuestioner.FIELD_DATE)
+        stats_weeks = StatsQuestioner.extract_stats(query_result=by_weeks)
+
+        return dict(
+            sources=SOURCES,
+            stats_month=stats_month,
+            stats_week=stats_weeks,
+            months=months,
+            weeks=weeks
         )
 
     @expose('pyjobsweb.templates.index')
