@@ -40,7 +40,7 @@
                 <a href="https://github.com/pyjobs/crawlers"
                    target="_blank"
                    class="btn btn-success improve">
-                    Améliorer PyJobs
+                    Améliorer ${source.label} sur PyJobs
                 </a>
             % endif
 
