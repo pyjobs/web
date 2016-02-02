@@ -67,4 +67,5 @@ python-slugify==1.1.4
 # pyjobs_crawlers
 git+https://github.com/algoo/crawlers.git@master
 GitPython==1.0.1
-webhelpers
+WebHelpers==1.3
+python-dateutil==2.4.2

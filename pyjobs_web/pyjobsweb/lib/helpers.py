@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Template Helpers used in pyjobsweb."""
+import json
 import logging
 from urllib import quote_plus
 
@@ -22,6 +23,10 @@ def icon(icon_name):
 
 def slugify(string):
     return base_slugify(string)
+
+
+def to_json(data, **kwargs):
+    return json.dumps(data, **kwargs)
 
 
 def get_job_url(job_id, job_title=None, previous=None, absolute=False):

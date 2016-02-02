@@ -17,6 +17,7 @@
     ${self.footer()}
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
+  ${self.end_body_scripts()}
 </body>
 
 <%def name="content_wrapper()">
@@ -41,6 +42,8 @@
 <%def name="head_content()"></%def>
 
 <%def name="title()">  </%def>
+
+<%def name="end_body_scripts()"></%def>
 
 <%def name="footer()">
   <footer class="footer hidden-xs hidden-sm">
@@ -78,7 +81,16 @@
       <ul class="nav navbar-nav navbar-right">
 ##         <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/recruteurs')}">Recruteurs</a></li>
 ##         <li class="${('', 'active')[page=='about']}"><a href="${tg.url('/candidats')}">Candidats</a></li>
-        <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/sources')}">Sources</a></li>
+        <li class="${('', 'active')[page=='index']}">
+          <a href="${tg.url('/sources')}">
+              Sources
+          </a>
+        </li>
+        <li class="${('', 'active')[page=='stats']}">
+            <a href="${tg.url('/stats')}">
+                Statistiques
+            </a>
+        </li>
 ##         <li class="${('', 'active')[page=='data']}"><a href="${tg.url('/about')}">A propos</a></li>
 ##       % if not request.identity:
 ##         <li><a href="${tg.url('/login')}">Login</a></li>
