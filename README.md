@@ -15,7 +15,7 @@ apt-get install python python-dev python-pip git libpq-dev libxml2-dev libxslt1-
 Clone the project:
 
 ```
-git clone http://gitlab.algoo.fr:10080/algoo/pyjobs_web.git pyjobs_web
+git clone https://github.com/pyjobs/web.git
 ```
 
 Move to ``pyjobs_web/pyjobs_web`` directory:
