@@ -16,9 +16,7 @@ class CrawlCommand(AppContextCommand):
                             help='Number of processes used (set 0 to use main process)',
                             dest='processes', default=0)
 
-        parser.add_argument("-d", "--debug",
-                            help='Enable debug',
-                            dest='debug', default=0)
+        parser.add_argument("--debug", help='Enable debug', action='store_true')
         return parser
 
     def take_action(self, parsed_args):
