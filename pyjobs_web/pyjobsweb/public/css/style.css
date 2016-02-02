@@ -42,8 +42,7 @@
 }
 
 .job-item {
-    border-bottom: 1px solid #4989bc;
-    border-bottom: 1px solid #CCC;
+
 }
 
 
@@ -53,11 +52,6 @@
 
 .row-odd {
     background-color: #E7E7E7;
-}
-
-body {
-    background-color: #ffda4b;
-    background-color: #fff5cc;
 }
 
 .label-pyjob {
@@ -81,7 +75,6 @@ body {
 
 .page-header h1 {
     font-weight: bold;
-    color: #3a87ad;
     border-width: 0px;
     font-size: 3em;
     border-bottom-width: 0px;
@@ -125,4 +118,26 @@ h1.job {
 #sources article.source h2 a {
     text-decoration: none;
     color: inherit;
+}
+
+body .navbar-brand > img {
+    display: inline;
+}
+
+body nav.navbar.navbar-default div.navbar-header a.navbar-brand {
+    padding: 15px;
+}
+
+div.job.row {
+    margin-left: -24px;
+    margin-right: -24px;
+}
+
+div.job.row > div.col-md-12 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.job-tag {
+    line-height: 1.8em;
 }

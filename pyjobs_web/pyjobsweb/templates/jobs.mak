@@ -63,9 +63,9 @@ ${job_pagination()}
 
     % for job in jobs:
 
-        <div class="row">
+        <div class="row job">
             <div class="col-md-12">
-                <div id="job-post-${job.id}" class="job-item ${loop.cycle('row-even', 'row-odd')}" style="border-top: 1px dotted #DDD; padding: 1em 1em 3em 1em;">
+                <div id="job-post-${job.id}" class="job-item ${loop.cycle('row-even', 'row-odd')}" style="padding: 1em 1em 3em 1em;">
                     <div class="row" id="job-post-head-${job.id}">
                         <div class="col-md-9">
                             <h2 style="margin-top: 0; padding-top: 0; font-size: 1.7em;">
@@ -75,7 +75,7 @@ ${job_pagination()}
                                 </a>
 
                                 % for tag in job.condition_tags:
-                                    <span class="label label-default ${tag.css}">${tag.tag}</span>
+                                    <span class="label label-default job-tag ${tag.css}">${tag.tag}</span>
                                 % endfor
 
                                 <br/>
@@ -108,7 +108,7 @@ ${job_pagination()}
 ##                            <p class="label label-success" style="font-weight: bold; font-size: 1.2em;">${job.company}</p>
                         <div class="col-md-12">
                             % for tag in job.alltags:
-                                <span class="label label-default label-pyjob">${tag.tag}</span>
+                                <span class="label label-default label-pyjob job-tag">${tag.tag}</span>
                             % endfor
                         </div>
             ##             <td>
