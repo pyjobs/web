@@ -32,11 +32,11 @@ def to_json(data, **kwargs):
 
 
 def french_day(day_number):
-    return jours[day_number]
+    return jours[day_number-1]
 
 
 def french_month(month_number):
-    return mois[month_number]
+    return mois[month_number-1]
 
 
 def get_job_url(job_id, job_title=None, previous=None, absolute=False):
