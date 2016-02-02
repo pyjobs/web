@@ -17,6 +17,7 @@
     ${self.footer()}
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
+  ${self.end_body_scripts()}
 </body>
 
 <%def name="content_wrapper()">
@@ -41,6 +42,8 @@
 <%def name="head_content()"></%def>
 
 <%def name="title()">  </%def>
+
+<%def name="end_body_scripts()"></%def>
 
 <%def name="footer()">
   <footer class="footer hidden-xs hidden-sm">

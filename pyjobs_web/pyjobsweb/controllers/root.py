@@ -132,32 +132,47 @@ class RootController(BaseController):
 
     @expose('pyjobsweb.templates.stats')
     def stats(self, since_months=3):
-
-        stats_questioner = StatsQuestioner(DBSession)
-        date_from, date_to = StatsQuestioner.get_month_period(int(since_months))
+        stats = StatsQuestioner
+        stats_questioner = stats(DBSession)
+        date_from, date_to = stats.get_month_period(int(since_months))
 
         by_months = stats_questioner.by_complete_period(
-            period=StatsQuestioner.PERIOD_MONTH,
+            period=stats.PERIOD_MONTH,
             date_from=date_from,
             date_to=date_to,
         ).all()
-        months = StatsQuestioner.extract(by_months, StatsQuestioner.FIELD_DATE)
-        stats_month = StatsQuestioner.extract_stats(query_result=by_months)
+        months = stats.extract(by_months, stats.FIELD_DATE)
+        stats_month = stats.extract_stats(query_result=by_months, sources=SOURCES.keys())
+        flat_month = stats.flat_query_by_y(
+            query_result=by_months,
+            sources=SOURCES.keys(),
+            date_value_callback=lambda date: date.strftime('%Y-%m')
+        )
 
         by_weeks = stats_questioner.by_complete_period(
-            StatsQuestioner.PERIOD_WEEK,
+            stats.PERIOD_WEEK,
             date_from=date_from,
             date_to=date_to,
         ).all()
-        weeks = StatsQuestioner.extract(by_weeks, StatsQuestioner.FIELD_DATE)
-        stats_weeks = StatsQuestioner.extract_stats(query_result=by_weeks)
+        weeks = stats.extract(by_weeks, stats.FIELD_DATE)
+        stats_week = stats.extract_stats(query_result=by_weeks, sources=SOURCES.keys())
+        flat_week = stats.flat_query_by_y(
+            query_result=by_weeks,
+            sources=SOURCES.keys(),
+            date_value_callback=lambda date: date.strftime('%Y-%m-%d')
+        )
 
         return dict(
             sources=SOURCES,
             stats_month=stats_month,
-            stats_week=stats_weeks,
+            flat_month=flat_month,
+            stats_week=stats_week,
+            flat_week=flat_week,
             months=months,
-            weeks=weeks
+            weeks=weeks,
+            flat_x_field=stats.FIELDS[stats.FLAT_X_FIELD],
+            flat_y_fields=SOURCES.keys(),
+            sources_labels=[SOURCES[source].label for source in SOURCES]
         )
 
     @expose('pyjobsweb.templates.index')
