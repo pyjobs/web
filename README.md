@@ -21,7 +21,7 @@ git clone https://github.com/pyjobs/web.git
 Move to ``pyjobs_web/pyjobs_web`` directory:
 
 ```
-mv pyjobs_web/pyjobs_web
+cd pyjobs_web/pyjobs_web
 ```
 
 Install python dependencies:
