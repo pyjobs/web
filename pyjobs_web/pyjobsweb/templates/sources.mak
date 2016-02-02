@@ -9,13 +9,28 @@
         <% source = sources[source_id] %>
         <% fields_not_collected = False %>
 
-        <article class="source">
+        <article class="source ${source_id}">
 
             <h2>
                 <a href="${source.url}" target="_blank" title="Se rendre sur le site de ${source.label}">
                     ${source.label}
                 </a>
-                <img style="max-height: 32px;" src="${source.logo_url}" alt="${source.label}"/>
+
+                <img style="max-height: 32px;" src="${source.logo_url}" alt="${source.label}" class="logo"/>
+
+                % if sources_last_crawl[source_id]:
+                    <% last_crawl_date = sources_last_crawl[source_id] %>
+                    <span class="last-crawl">
+                        - Dernière récupération le
+                        ${h.french_day(last_crawl_date.weekday()).lower()}
+                        ${last_crawl_date.strftime('%d')}
+                        ${h.french_month(int(last_crawl_date.strftime('%m'))).lower()}
+                        ${last_crawl_date.strftime('%Y')}
+                        à
+                        ${last_crawl_date.strftime('%Hh%m')}
+                    </span>
+                % endif
+
             </h2>
 
             <p>État des éléments récupérable sur cette source:</p>

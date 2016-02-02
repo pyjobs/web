@@ -145,3 +145,11 @@ div.job.row > div.col-md-12 {
 .source .improve {
     margin-top: 3px;
 }
+
+.source.human .logo {
+    filter: invert(100%);
+}
+
+.source .last-crawl {
+    font-size: 0.5em;
+}

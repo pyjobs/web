@@ -10,6 +10,8 @@ from slugify import slugify as base_slugify
 from tg import config
 
 log = logging.getLogger(__name__)
+jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
+mois = ["Janvier", u"Février", "Mars", "Avril", "Mai", "Juin", "Juillet", u"Août", "Septembtre", "Octobre"]
 
 
 def current_year():
@@ -27,6 +29,14 @@ def slugify(string):
 
 def to_json(data, **kwargs):
     return json.dumps(data, **kwargs)
+
+
+def french_day(day_number):
+    return jours[day_number]
+
+
+def french_month(month_number):
+    return mois[month_number]
 
 
 def get_job_url(job_id, job_title=None, previous=None, absolute=False):

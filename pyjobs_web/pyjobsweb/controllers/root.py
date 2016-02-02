@@ -18,7 +18,7 @@ from pyjobsweb.controllers.secure import SecureController
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify
 from pyjobsweb.lib.stats import StatsQuestioner
-from pyjobsweb.model import DBSession
+from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import Job, SOURCES
 
 __all__ = ['RootController']
@@ -125,9 +125,22 @@ class RootController(BaseController):
 
     @expose('pyjobsweb.templates.sources')
     def sources(self):
+
+        sources_last_crawl = {}
+        for source_name in SOURCES:
+            try:
+                sources_last_crawl[source_name] = DBSession.query(Log.datetime) \
+                    .filter(Log.source == source_name) \
+                    .order_by(Log.datetime.desc()) \
+                    .limit(1)\
+                    .one()[0]
+            except NoResultFound:
+                sources_last_crawl[source_name] = None
+
         return dict(
                 sources=SOURCES,
-                existing_fields=existing_fields
+                existing_fields=existing_fields,
+                sources_last_crawl=sources_last_crawl
         )
 
     @expose('pyjobsweb.templates.stats')
