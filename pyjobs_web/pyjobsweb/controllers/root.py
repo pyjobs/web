@@ -131,7 +131,7 @@ class RootController(BaseController):
         )
 
     @expose('pyjobsweb.templates.stats')
-    def stats(self, since_months=3):
+    def stats(self, since_months=4):
         stats = StatsQuestioner
         stats_questioner = stats(DBSession)
         date_from, date_to = stats.get_month_period(int(since_months))
