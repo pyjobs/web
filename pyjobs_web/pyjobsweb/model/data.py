@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pyjobs_crawlers.tools import get_sources
+from pyjobs_crawlers.tools import get_sources, condition_tags
 from sqlalchemy import Column, Text, String, Integer, DateTime, Boolean
 
 from pyjobsweb.model import DeclarativeBase
@@ -75,15 +75,13 @@ class Job(DeclarativeBase):
         delta = datetime.now() - self.publication_datetime
         return format_timedelta(delta, granularity='day', locale='en_US')
 
-    job_condition_tags = (u'cdd', u'cdi', u'freelance', u'stage', u'télétravail')
-
     @property
     def alltags(self):
         import json
         tags = []
         if self.tags:
             for tag in json.loads(self.tags):
-                if tag['tag'] not in self.job_condition_tags:
+                if tag['tag'] not in condition_tags:
                     tags.append(Tag2(tag['tag'], tag['weight']))
         return tags
 
@@ -93,7 +91,7 @@ class Job(DeclarativeBase):
         tags = []
         if self.tags:
             for tag in json.loads(self.tags):
-                if tag['tag'] in self.job_condition_tags:
+                if tag['tag'] in condition_tags:
                     tag = Tag2(tag['tag'], tag['weight'], Tag2.get_css(tag['tag']))
                     tags.append(tag)
         return tags
