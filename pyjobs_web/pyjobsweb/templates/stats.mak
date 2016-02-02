@@ -13,7 +13,7 @@
 
         Morris.Line({
           element: 'month_chart',
-          data: ${h.to_json(flat_month) | n},
+          data: ${h.to_json(flat_month, indent=4) | n},
           xkey: ${h.to_json(flat_x_field) | n},
           ykeys: ${h.to_json(flat_y_fields) | n},
           labels: ${h.to_json(sources_labels) | n}
@@ -21,7 +21,7 @@
 
         Morris.Line({
           element: 'weeks_chart',
-          data: ${h.to_json(flat_week) | n},
+          data: ${h.to_json(flat_week, indent=4) | n},
           xkey: ${h.to_json(flat_x_field) | n},
           ykeys: ${h.to_json(flat_y_fields) | n},
           labels: ${h.to_json(sources_labels) | n}

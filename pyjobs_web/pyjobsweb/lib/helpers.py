@@ -25,8 +25,8 @@ def slugify(string):
     return base_slugify(string)
 
 
-def to_json(data):
-    return json.dumps(data)
+def to_json(data, **kwargs):
+    return json.dumps(data, **kwargs)
 
 
 def get_job_url(job_id, job_title=None, previous=None, absolute=False):
