@@ -141,3 +141,7 @@ div.job.row > div.col-md-12 {
 .job-tag {
     line-height: 1.8em;
 }
+
+.source .improve {
+    margin-top: 3px;
+}
