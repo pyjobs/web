@@ -34,14 +34,14 @@
 <%def name="stats_table(stats, periods, period_format)">
     <table class="stats table">
         <thead>
-        <th>
+                <th>
+                    Source
+                </th>
             % for period in periods:
-
                 <th>
                     ${period.strftime(period_format)}
                 </th>
             % endfor
-        </th>
         </thead>
         <tbody>
             % for source in stats:
