@@ -88,5 +88,5 @@ setup(
         ]
     },
     zip_safe=False,
-    requires=['gearbox', 'paste', 'webtest', 'webtest', 'dateutil']
+    requires=['gearbox', 'paste', 'webtest', 'webtest']
 )
