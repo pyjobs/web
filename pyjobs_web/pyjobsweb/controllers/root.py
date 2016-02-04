@@ -53,7 +53,7 @@ class RootController(BaseController):
     error = ErrorController()
 
     def _before(self, *args, **kw):
-        tmpl_context.project_name = "pyjobsweb"
+        tmpl_context.project_name = "Algoo"
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
