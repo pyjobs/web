@@ -7,7 +7,15 @@
 
 <section id="sources">
 
-    <h1>PyJobs sources</h1>
+    <h1>Liste des sources aggrégées par pyjobs</h1>
+    
+    <div>
+        pyjobs agrège les données à partir de différents jobboard — ce qu'on appelle « sources ».
+        <br>Si une source manque, vous pouvez l'ajouter.
+        <a href="https://github.com/pyjobs/crawlers#ajouter-une-source-dannonces">C'est facile et tout est expliqué sur le dépôt github </a>.
+        <br>Alors n'hésitez pas à contribuer !
+        <hr>
+    </div>
 
     % for source_id in sources:
         <% source = sources[source_id] %>
