@@ -4,6 +4,10 @@
     <link rel="canonical" href="${h.get_job_url(job.id, job.title, absolute=True)}" />
 </%def>
 
+<%def name="title()">
+    PyJobs: ${job.title}
+</%def>
+
 % if request.params.get('previous'):
     <a href="${request.params.get('previous')}"
        title="Retour à la page de listes"

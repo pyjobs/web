@@ -1,6 +1,10 @@
 ## -*- coding: utf-8 -*-
 <%inherit file="local:templates.master"/>
 
+<%def name="title()">
+    PyJobs: Sources
+</%def>
+
 <section id="sources">
 
     <h1>PyJobs sources</h1>

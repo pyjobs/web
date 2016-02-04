@@ -4,6 +4,10 @@
     PyJobs: Le job qu'il vous faut en python
 </%def>
 
+<%def name="title()">
+    PyJobs: Erreur
+</%def>
+
 <h1>Error ${code}</h1>
 
 <%
