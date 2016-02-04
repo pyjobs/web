@@ -150,6 +150,7 @@ class StatsQuestioner(object):
         :return: sqlalchemy Query
         :rtype: sqlalchemy.orm.Query
         """
+        # TODO - B.S. - 20160204: date_trunc only compatible with postgresql
         date_trunc_func = func.date_trunc(period, Job.publication_datetime)
         return self._session.query(Job.source, func.count(Job.id), date_trunc_func) \
             .filter(Job.publication_datetime >= date_from) \
