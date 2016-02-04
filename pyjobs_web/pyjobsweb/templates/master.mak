@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss?limit=50" />
     ${self.head_content()}
+    ${h.head_js() | n}
 </head>
 <body class="${self.body_class()}">
     ${self.main_menu()}

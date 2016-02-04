@@ -39,6 +39,10 @@ def french_month(month_number):
     return mois[month_number-1]
 
 
+def head_js():
+    return config.get('site.head_js')
+
+
 def get_job_url(job_id, job_title=None, previous=None, absolute=False):
     job_url = "/job/%s" % job_id
     if job_title:
