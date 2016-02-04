@@ -92,6 +92,11 @@
                 Statistiques
             </a>
         </li>
+        <li class="${('', 'active')[page=='about']}">
+            <a href="${tg.url('/about')}">
+                À propos
+            </a>
+        </li>
 ##         <li class="${('', 'active')[page=='data']}"><a href="${tg.url('/about')}">A propos</a></li>
 ##       % if not request.identity:
 ##         <li><a href="${tg.url('/login')}">Login</a></li>

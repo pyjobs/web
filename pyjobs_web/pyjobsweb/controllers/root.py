@@ -188,6 +188,10 @@ class RootController(BaseController):
             sources_labels=[SOURCES[source].label for source in SOURCES]
         )
 
+    @expose('pyjobsweb.templates.about')
+    def about(self):
+        return dict()
+
     @expose('pyjobsweb.templates.index')
     @require(predicates.has_permission('manage', msg=l_('Only for managers')))
     def manage_permission_only(self, **kw):
