@@ -34,6 +34,10 @@
                         <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" class="btn btn-warning">
                             <i class="fa fa-3x fa-rss"></i>
                         </a>
+
+                        <a href="https://github.com/pyjobs/annonces" title="Annonces sur GitHub" class="btn btn-default">
+                            <i class="fa fa-3x fa-github"></i>
+                        </a>
                     </span>
 
                 </h1>
