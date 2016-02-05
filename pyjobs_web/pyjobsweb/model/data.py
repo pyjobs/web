@@ -34,6 +34,7 @@ class Tag2(object):
             u'freelance': 'job-freelance',
             u'stage': 'job-stage',
             u'télétravail': 'job-remote',
+            u'télé-travail': 'job-remote',
         }
         return css[tagname]
 
