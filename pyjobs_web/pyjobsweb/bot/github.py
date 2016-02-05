@@ -9,6 +9,8 @@ from mako.template import Template
 import codecs
 from tg import config
 
+from pyjobsweb.lib.helpers import get_job_url
+
 home = expanduser("~")
 
 
@@ -102,7 +104,7 @@ class GitHubBot(object):
         """
         template = Template(filename=self._jobs_template_file_path)
         with codecs.open(self._jobs_file_path, 'w', 'utf-8') as jobs_file:
-            print(template.render(jobs=jobs), file=jobs_file)
+            print(template.render(jobs=jobs, get_job_url=get_job_url), file=jobs_file)
     
     def _get_commit_message(self, jobs):
         """
