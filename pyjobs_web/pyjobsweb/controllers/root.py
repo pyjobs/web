@@ -16,7 +16,7 @@ from pyjobsweb import model
 from pyjobsweb.controllers.error import ErrorController
 from pyjobsweb.controllers.secure import SecureController
 from pyjobsweb.lib.base import BaseController
-from pyjobsweb.lib.helpers import slugify
+from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
 from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import Job, SOURCES
@@ -98,7 +98,7 @@ class RootController(BaseController):
             job_slug = slugify(job.title)
             feed.add_item(
                     title=job.title,
-                    link=job.url,
+                    link=get_job_url(job.id, job_title=job.title, absolute=True),
                     description=job.description,
                     pubdate=job.publication_datetime,
                     unique_id="%s/job/%d/%s" % (site_url, job.id, job_slug)
