@@ -36,7 +36,7 @@
 </%def>
 
 <%def name="stats_table(stats, periods, period_format)">
-    <table class="stats table">
+    <table class="stats table table-striped table-hover">
         <thead>
                 <th>
                     Source
