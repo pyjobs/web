@@ -201,7 +201,8 @@ class RootController(BaseController):
 
         return dict(
             sources=SOURCES,
-            logs=logs_query.all()
+            logs=logs_query.all(),
+            last_days=last_days
         )
 
     @expose('pyjobsweb.templates.about')

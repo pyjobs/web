@@ -7,7 +7,7 @@
 
 
 <table class="table">
-    <caption>Last 24 hours LOGS (source=xxx&last_days=x for filter)</caption>
+    <caption>Last ${last_days} day(s) LOGS (source=xxx&last_days=x for filter)</caption>
     <thead>
     <tr>
         <th>Date</th>
