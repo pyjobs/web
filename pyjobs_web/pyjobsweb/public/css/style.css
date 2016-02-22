@@ -138,3 +138,17 @@ div.job.row > div.col-md-12 {
 .source .last-crawl {
     color: #999;
 }
+
+.full-height {
+    height: 100%;
+}
+
+html.full-height {
+    /* Surely be more clean ? */
+    padding-bottom: 220px;
+}
+
+.full-page {
+    width: 100%;
+    height: 100%;
+}

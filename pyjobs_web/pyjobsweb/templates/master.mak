@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="container ${self.html_class()}">
 <head>
     ${self.meta()}
     <title>${self.title()}</title>
@@ -12,7 +12,7 @@
 </head>
 <body class="${self.body_class()}">
     ${self.main_menu()}
-  <div class="container">
+  <div class="container ${self.container_class()}">
     ${self.content_wrapper()}
   </div>
     ${self.footer()}

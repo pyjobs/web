@@ -5,25 +5,17 @@
     PyJobs: LOGS
 </%def>
 
+<%def name="html_class()">full-height</%def>
+<%def name="body_class()">full-height</%def>
+<%def name="container_class()">full-height</%def>
 
-<table class="table">
-    <caption>Last ${last_days} day(s) LOGS (source=xxx&last_days=x for filter)</caption>
-    <thead>
-    <tr>
-        <th>Date</th>
-        <th>Source</th>
-        <th>Message</th>
-    </tr>
-    </thead>
-    <tbody>
+<caption>Last ${last_days} day(s) LOGS (source=xxx&last_days=x for filter)</caption>
 
+<div class="full-page-container">
+
+</div>
+<textarea class="full-page">
     % for log in logs:
-        <tr>
-            <th scope="row">${log.datetime}</th>
-            <td>${log.source}</td>
-            <td>${log.message}</td>
-        </tr>
+${log.datetime} ${log.source} ${log.message}
     % endfor
-
-    </tbody>
-</table>
+</textarea>
