@@ -194,7 +194,11 @@ class RootController(BaseController):
 
         logs_query = DBSession.query(Log)\
             .order_by(Log.datetime.desc())\
-            .filter(Log.datetime >= datetime.datetime.now() + datetime.timedelta(days=-int(last_days)))
+            .filter(Log.datetime >= datetime.datetime.now() + datetime.timedelta(days=-int(last_days)))\
+            .filter(Log.message.in_(('CRAWL_LIST_START',
+                                    'CRAWL_LIST_FINISHED',
+                                    'ERROR_UNEXPECTED_END',
+                                    'ERROR_CRAWNLING')))
 
         if source is not None:
             logs_query = logs_query.filter(Log.source == source)
