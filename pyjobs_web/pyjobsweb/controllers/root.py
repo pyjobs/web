@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
-
+import datetime
 import webhelpers.feedgenerator as feedgenerator
 from sqlalchemy.orm.exc import NoResultFound
 from tg import expose, flash, require, lurl, config
@@ -186,6 +186,21 @@ class RootController(BaseController):
             flat_x_field=stats.FIELDS[stats.FLAT_X_FIELD],
             flat_y_fields=SOURCES.keys(),
             sources_labels=[SOURCES[source].label for source in SOURCES]
+        )
+
+    @expose('pyjobsweb.templates.logs')
+    def logs(self, source=None, last_days=1):
+
+        logs_query = DBSession.query(Log)\
+            .order_by(Log.datetime.desc())\
+            .filter(Log.datetime >= datetime.datetime.now() + datetime.timedelta(days=-int(last_days)))
+
+        if source is not None:
+            logs_query = logs_query.filter(Log.source == source)
+
+        return dict(
+            sources=SOURCES,
+            logs=logs_query.all()
         )
 
     @expose('pyjobsweb.templates.about')
