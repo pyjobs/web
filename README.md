@@ -5,7 +5,7 @@
 Pyjobs_web require some OS dependencies (to build project python libs), for a debian-like you can install them with ``apt-get``:
 
 ```
-apt-get install python python-dev python-pip git libpq-dev libxml2-dev libxslt1-dev libffi-dev
+apt-get install python python-dev python-pip git libpq-dev libxml2-dev libxslt1-dev libffi-dev python-pip virtualenv
 ```
 
 ### Pyjobs Web
@@ -18,7 +18,7 @@ Clone the project:
 git clone https://github.com/pyjobs/web.git
 ```
 
-Move to ``pyjobs_web/pyjobs_web`` directory:
+Move to ``web/pyjobs_web`` directory:
 
 ```
 cd pyjobs_web/pyjobs_web
