@@ -19,7 +19,7 @@
 
     % for source_id in sources:
         <article class="source ${source_id}">
-            <div class="panel panel-default  col-md-8">
+            <div class="panel panel-default  col-md-7 col-sm-9 col-xs-12">
                 <div class="panel-body">
                     <% source = sources[source_id] %>
                     <% fields_not_collected = False %>
@@ -73,6 +73,7 @@
                     </p>
                 </div>
             </div>
+            <div class="col-md-1"></div>
         </article>
     % endfor
 </section>

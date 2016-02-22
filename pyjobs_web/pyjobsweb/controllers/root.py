@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
+import collections
+
 import webhelpers.feedgenerator as feedgenerator
 from sqlalchemy.orm.exc import NoResultFound
 from tg import expose, flash, require, lurl, config
@@ -125,9 +127,9 @@ class RootController(BaseController):
 
     @expose('pyjobsweb.templates.sources')
     def sources(self):
-
         sources_last_crawl = {}
-        for source_name in SOURCES:
+        sorted_sources = collections.OrderedDict(sorted(SOURCES.items(), key=lambda x: x[1].label))
+        for source_name in sorted_sources:
             try:
                 sources_last_crawl[source_name] = DBSession.query(Log.datetime) \
                     .filter(Log.source == source_name) \
@@ -138,7 +140,7 @@ class RootController(BaseController):
                 sources_last_crawl[source_name] = None
 
         return dict(
-                sources=SOURCES,
+                sources=sorted_sources,
                 existing_fields=existing_fields,
                 sources_last_crawl=sources_last_crawl
         )
