@@ -2,7 +2,7 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-    PyJobs: LOGS
+    pyjobs — logs de crawling
 </%def>
 
 <%def name="html_class()">full-height</%def>

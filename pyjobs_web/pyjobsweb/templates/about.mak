@@ -2,7 +2,7 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-    PyJobs: À propos
+    pyjobs — à propos
 </%def>
 
 <h1>pyjobs est développé par la société <a href="http://algoo.fr">algoo</a></h1>

@@ -1,11 +1,7 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-    PyJobs: Le job qu'il vous faut en python
-</%def>
-
-<%def name="title()">
-    PyJobs: Erreur
+    pyjobs — erreur
 </%def>
 
 <h1>Error ${code}</h1>

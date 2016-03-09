@@ -5,7 +5,7 @@
 </%def>
 
 <%def name="title()">
-    PyJobs: ${job.title}
+    pyjobs — ${job.title}
 </%def>
 
 % if request.params.get('previous'):

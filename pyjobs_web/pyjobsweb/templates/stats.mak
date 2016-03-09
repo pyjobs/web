@@ -6,7 +6,7 @@
 </%def>
 
 <%def name="title()">
-    PyJobs: Statistiques
+    pyjobs — statistiques
 </%def>
 
 <%def name="end_body_scripts()">

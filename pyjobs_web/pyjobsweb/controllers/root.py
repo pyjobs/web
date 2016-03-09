@@ -81,7 +81,7 @@ class RootController(BaseController):
         """
         site_url = config.get('site.domain_base_url')
         feed = feedgenerator.Rss201rev2Feed(
-            title=u"PyJobs: Le job qu'il vous faut en python",
+            title=u"pyjobs : le job qu'il vous faut en python",
             link=site_url,
             description=u"Agrégation de jobs python",
             language=u"fr",

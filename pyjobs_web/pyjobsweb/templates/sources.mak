@@ -2,7 +2,7 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-    PyJobs: Sources
+    pyjobs — sources
 </%def>
 
 <section id="sources">

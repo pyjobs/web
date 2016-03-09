@@ -19,7 +19,7 @@
 </%def>
 
 <%def name="title()">
-    PyJobs: Le job qu'il vous faut en python
+    pyjobs — le job qu'il vous faut en python
 </%def>
 
     <div class="row">

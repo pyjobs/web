@@ -65,7 +65,7 @@
         <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="${tg.url('/')}">
-        <img src="${tg.url('/img/pyjobs_logo_square.png')}" style="height: 32px;" alt="TurboGears 2"/>
+        <img src="${tg.url('/img/pyjobs_logo_square.png')}" style="height: 32px;" alt="pyjobs"/>
         pyjobs &mdash; <small>opportunités professionnelles python</small>
       </a>
     </div>
