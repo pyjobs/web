@@ -1,3 +1,5 @@
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/pyjobs/web/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/pyjobs/web/?branch=master)
+
 ## Installation and setup
 
 ### Dependencies
