@@ -39,14 +39,7 @@ class PyJobsWebConnector(Connector):
             print 'Skip existing item'
             return
 
-        # Instantiate two different kind of objects which will store job offers
-        # in different formats :
-        #     - The first  one will store job offers in a suitable format
-        #       to store them in the Postgresql database (a.k.a: sqlalchemy)
-        #     - The second one will store job offers in a suitable format
-        #       to store them in the ElasticSearch database (a.k.a: json)
         job = Job()
-        json_job_offer = {}
 
         # Populate attributes which do not require special treatments before
         # population
@@ -57,33 +50,20 @@ class PyJobsWebConnector(Connector):
         for attribute in attributes:
             if attribute in job_item:
                 setattr(job, attribute, job_item[attribute])
-                json_job_offer[attribute] = job_item[attribute]
 
         job.url = job_item['url']
         job.source = job_item['source']
         job.crawl_datetime = job_item['initial_crawl_datetime']
-
-        json_job_offer['url'] = job_item['url']
-        json_job_offer['source'] = job_item['source']
-        json_job_offer['crawl_datetime'] = job_item['initial_crawl_datetime']
 
         # Populate attributes which require special treatments before population
         if 'tags' in job_item:
             import json
             tags = [{'tag': t.tag, 'weight': t.weight} for t in job_item['tags']]
             job.tags = json.dumps(tags)
-            json_job_offer['tags'] = tags
 
         # Insert the job offer in the Postgresql database
         DBSession.add(job)
         transaction.commit()
-
-        # Insert the job offer in the ElasticSearch database too, in order to
-        # ease both the keyword specific, and the geolocation lookups of job
-        # offers
-        self.elastic_search.index(
-                index="jobs", doc_type="job-offer", body=json_job_offer
-        )
 
     def job_exist(self, job_url):
         """

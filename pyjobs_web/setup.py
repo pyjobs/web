@@ -84,7 +84,8 @@ setup(
         ],
         'gearbox.commands': [
             'crawl = pyjobsweb.commands.crawl:CrawlCommand',
-            'bots = pyjobsweb.commands.bots:BotsCommand'
+            'bots = pyjobsweb.commands.bots:BotsCommand',
+            'populateES = pyjobsweb.commands.populate_es:PopulateESCommand'
         ]
     },
     zip_safe=False,

@@ -61,11 +61,29 @@ class Job(DeclarativeBase):
 
     crawl_datetime = Column(DateTime)
 
+    already_in_elasticsearch = Column(Boolean, default=False)
+
     def __init__(self):
         pass
 
     def __repr__(self):
         return "<Job: id='%d'>" % (self.id)
+
+    def to_dict(self):
+        import json
+
+        return {
+            'id': self.id,
+            'url': self.url,
+            'source': self.source,
+            'title': self.title,
+            'description': self.description,
+            'company': self.company,
+            'company_url': self.company_url,
+            'address': self.address,
+            'tags': json.loads(self.tags),
+            'publication_datetime': self.publication_datetime
+        }
 
     @property
     def published(self):
