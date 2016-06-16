@@ -3,7 +3,6 @@ import datetime
 
 import sqlalchemy
 import transaction
-import elasticsearch
 from pyjobs_crawlers.run import Connector
 from sqlalchemy.orm.exc import NoResultFound
 from tg import config
@@ -16,9 +15,6 @@ __all__ = ('helpers', 'app_globals')
 
 
 class PyJobsWebConnector(Connector):
-    # Elasticsearch connection setup
-    elastic_search = elasticsearch.Elasticsearch()
-
     def __init__(self):
         # Postgresql connection setup
         engine = sqlalchemy.engine.create_engine(config.get('sqlalchemy.url'))
