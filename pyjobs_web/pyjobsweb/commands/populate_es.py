@@ -2,11 +2,11 @@
 import sqlalchemy
 import elasticsearch
 import tg
-import geocoder
 import transaction
 
 import pyjobsweb.commands
 import pyjobsweb.model
+import pyjobsweb.lib
 
 
 class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
@@ -28,21 +28,7 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
             .filter(
                 pyjobsweb.model.data.Job.already_in_elasticsearch is not True
             )
-
         return pending_insertions
-
-    @staticmethod
-    def __compute_geolocation(address):
-        geoloc = geocoder.osm(address)
-
-        lat, lng = None, None
-
-        if len(geoloc.latlng) == 2:
-            lat, lng = geoloc.latlng
-
-        # TODO : How should we react in case of a failed conversion ?
-
-        return lat, lng
 
     @staticmethod
     def __format_job_offer_to_json(job_offer, lat, lng):
@@ -50,11 +36,6 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         json_job_offer['lat'] = lat
         json_job_offer['lng'] = lng
         return json_job_offer
-
-    def __perform_insertion(self, json_job_offer):
-        self.__elastic_search.index(
-                index="jobs", doc_type="job-offer", body=json_job_offer
-        )
 
     @staticmethod
     def __mark_task_as_handled(job_offer):
@@ -68,12 +49,21 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
 
     def __handle_insertion_task(self, job_offer):
         # Compute lat, lng of the job offer
-        lat, lng = self.__compute_geolocation(job_offer.address)
+        try:
+            geolocator = pyjobsweb.lib.geolocation.Geolocator(job_offer.address)
+            lat, lng = geolocator.compute_geoloc()
+        except pyjobsweb.lib.geolocation.GeolocationError:
+            return
+
         # Convert the job_offer object to a json format
         json_job_offer = self.__format_job_offer_to_json(job_offer, lat, lng)
+
         # Perform the insertion in Elasticsearch
-        self.__perform_insertion(json_job_offer)
-        # TODO : Check if the job offer insertion succeeded/failed
+        try:
+            self.__elastic_search.index("jobs", "job-offer", json_job_offer)
+        except elasticsearch.RequestError:
+            return
+
         # Mark the task as handled so we don't retreat it next time
         self.__mark_task_as_handled(job_offer)
 
