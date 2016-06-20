@@ -10,7 +10,7 @@ import pyjobsweb.lib
 
 
 class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
-    __elastic_search = elasticsearch.Elasticsearch()
+    __elastic_search = elasticsearch.Elasticsearch(send_get_body_as='POST')
 
     @staticmethod
     def __database_connection():
