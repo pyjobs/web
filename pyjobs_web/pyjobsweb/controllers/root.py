@@ -21,6 +21,7 @@ from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
 from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import Job, SOURCES
+from pyjobsweb.forms.ResearchForm import ResearchForm
 
 __all__ = ['RootController']
 existing_fields = (
@@ -122,6 +123,79 @@ class RootController(BaseController):
         return dict(
                 job=job,
                 sources=SOURCES
+        )
+
+    @expose('pyjobsweb.templates.search')
+    def search(self):
+        search_form = ResearchForm(action='/compute_search').req()
+        return dict(page='search', form=search_form)
+
+    @expose('pyjobsweb.templates.jobs')
+    @paginate('jobs', items_per_page=20)
+    def compute_search(self, keywords=None):
+        # Compute research
+
+        # TODO : Flexible wrapper to ease research using elasticsearch
+        import elasticsearch
+        es = elasticsearch.Elasticsearch(send_get_body_as='POST')
+
+        es.indices.create(index="jobs", ignore=400)
+        es.indices.refresh(index="jobs")
+
+        res = es.search(
+            index="jobs",
+            doc_type="job-offer",
+            body={
+                "query": {
+                    "match_all": {}
+                }
+            },
+            sort="publication_datetime:desc",
+            size=10000
+        )
+
+        hits = res["hits"]["hits"]
+
+        return self.jobs(hits=hits)
+
+    @expose('pyjobsweb.templates.jobs')
+    @paginate('jobs', items_per_page=20)
+    def jobs(self, hits=None, *args, **kw):
+        job_offers = []
+
+        # TODO : Find a way to properly factorise HTML templates for job offers
+        # TODO : listing coming from both research and non research queries
+        for job_offer in hits:
+            job_data = job_offer["_source"]
+
+            j = Job()
+
+            for key in job_data:
+                try:
+                    getattr(j, key)
+
+                    if key == "tags":
+                        import json
+                        setattr(j, key, json.dumps(job_data[key]))
+                    elif key == "publication_datetime":
+                        setattr(
+                            j,
+                            key,
+                            datetime.datetime.strptime(
+                                job_data[key], "%Y-%m-%dT%H:%M:%S"
+                            )
+                        )
+                    else:
+                        setattr(j, key, job_data[key])
+                except AttributeError:
+                    # TODO : Log
+                    pass
+
+            job_offers.append(j)
+
+        return dict(
+            jobs=job_offers,
+            sources=SOURCES
         )
 
     @expose('pyjobsweb.templates.sources')

@@ -85,6 +85,11 @@
 ##         <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/recruteurs')}">Recruteurs</a></li>
 ##         <li class="${('', 'active')[page=='about']}"><a href="${tg.url('/candidats')}">Candidats</a></li>
         <li class="${('', 'active')[page=='index']}">
+          <a href="${tg.url('/search')}">
+              Rechercher
+          </a>
+        </li>
+        <li class="${('', 'active')[page=='index']}">
           <a href="${tg.url('/sources')}">
               Sources
           </a>
