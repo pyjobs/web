@@ -22,46 +22,46 @@
     pyjobs — le job qu'il vous faut en python
 </%def>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="page-header">
-                <h1>
-                    Le job qu'il vous faut &mdash; en python
-                    <span class="btn-group pull-right" role="group">
-##                         <button type="button" class="btn btn-default">
-##                             <i class="fa fa-3x fa-twitter" style="color: #55ACEE;"></i>
-##                         </button>
-                        <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" class="btn btn-warning">
-                            <i class="fa fa-3x fa-rss"></i>
-                        </a>
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h1>
+                Le job qu'il vous faut &mdash; en python
+                <span class="btn-group pull-right" role="group">
+##                     <button type="button" class="btn btn-default">
+##                         <i class="fa fa-3x fa-twitter" style="color: #55ACEE;"></i>
+##                     </button>
+                    <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" class="btn btn-warning">
+                        <i class="fa fa-3x fa-rss"></i>
+                    </a>
 
-                        <a href="https://github.com/pyjobs/annonces" title="Annonces sur GitHub" class="btn btn-default">
-                            <i class="fa fa-3x fa-github"></i>
-                        </a>
-                    </span>
+                    <a href="https://github.com/pyjobs/annonces" title="Annonces sur GitHub" class="btn btn-default">
+                        <i class="fa fa-3x fa-github"></i>
+                    </a>
+                </span>
 
-                </h1>
-##                 <h2>
-##                     <div class="row">
-##                         <div class="col-md-6">
-##                             <div class="input-group">
-##                                 <input type="text" class="form-control" placeholder="Search for a job...">
-##                                 <span class="input-group-btn">
-##                                     <button class="btn btn-default" type="button">Go!</button>
-##                                 </span>
-##                             </div>
-##                         </div>
-##                         <div class="col-md-6">
-##                             <div class="btn-group" role="group" aria-label="...">
-##                                 <button type="button" class="btn btn-small btn-default">Ma boîte recrute</button>
-##                                 <button type="button" class="btn btn-small btn-default">Publier une annonce</button>
-##                             </div>
+            </h1>
+##             <h2>
+##                 <div class="row">
+##                     <div class="col-md-6">
+##                         <div class="input-group">
+##                             <input type="text" class="form-control" placeholder="Search for a job...">
+##                             <span class="input-group-btn">
+##                                 <button class="btn btn-default" type="button">Go!</button>
+##                             </span>
 ##                         </div>
 ##                     </div>
-##                 </h2>
-            </div>
+##                     <div class="col-md-6">
+##                         <div class="btn-group" role="group" aria-label="...">
+##                             <button type="button" class="btn btn-small btn-default">Ma boîte recrute</button>
+##                             <button type="button" class="btn btn-small btn-default">Publier une annonce</button>
+##                         </div>
+##                     </div>
+##                 </div>
+##             </h2>
         </div>
     </div>
+</div>
 
 ${job_pagination()}
 
@@ -93,7 +93,6 @@ ${job_pagination()}
                                             ${job.address}
                                         </a>
                                     </span>
-
                                 </h2>
                             </div>
 
@@ -112,7 +111,6 @@ ${job_pagination()}
                                         ${sources[job.source].label}<br/>
                                         <img style="max-height: 32px;" src="${sources[job.source].logo_url}" alt="${sources[job.source].label}"/>
                                     </a>
-
                                 </div>
                             </div>
                         </div>
@@ -141,6 +139,7 @@ ${job_pagination()}
             </div>
         % endfor
     % endif
+
 ${job_pagination()}
 
 
