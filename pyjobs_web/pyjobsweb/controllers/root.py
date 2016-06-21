@@ -57,19 +57,94 @@ class RootController(BaseController):
     def _before(self, *args, **kw):
         tmpl_context.project_name = "Algoo"
 
+    @staticmethod
+    def _format_result_elastic_search(hits):
+        job_offers = []
+
+        # TODO : Find a way to properly factorise HTML templates for job offers
+        # TODO : listing coming from both research and non research queries
+        for job_offer in hits:
+            # TODO : Wrap this code into the model
+            # TODO : Find a nice and consistent way to have the postgres and
+            # TODO : the elasticsearch models
+
+            j = Job()
+
+            j.title = job_offer.title
+            j.address = job_offer.address
+            j.company = job_offer.company
+            j.company_url = job_offer.company_url
+            j.description = job_offer.description
+            j.id = job_offer.id
+
+            import datetime
+            j.publication_datetime = datetime.datetime.strptime(
+                job_offer.publication_datetime, "%Y-%m-%dT%H:%M:%S"
+            )
+
+            j.publication_datetime_is_fake = \
+                job_offer.publication_datetime_is_fake
+            j.source = job_offer.source
+
+            import elasticsearch_dsl.serializer
+            j.tags = \
+                elasticsearch_dsl.serializer.serializer.dumps(job_offer.tags)
+
+            j.title = job_offer.title
+            j.url = job_offer.url
+
+            job_offers.append(j)
+
+        return job_offers
+
+    def _get_specific_job_offers(self, keywords=None):
+        import elasticsearch_dsl.connections
+
+        es = elasticsearch_dsl.connections.connections.create_connection(
+            hosts=["localhost"], send_get_body_as="POST", timeout=20
+        )
+
+        fields = ["description", "title"]
+
+        res = elasticsearch_dsl.Search()\
+            .params(size=1000)\
+            .using(es)\
+            .query("multi_match", fields=fields, query=keywords)\
+            .sort("-publication_datetime")\
+            .execute()
+
+        return self._format_result_elastic_search(hits=res.hits)
+
+    def _get_all_job_offers(self):
+        import elasticsearch_dsl.connections
+
+        es = elasticsearch_dsl.connections.connections.create_connection(
+            hosts=["localhost"], send_get_body_as="POST", timeout=20
+        )
+
+        res = elasticsearch_dsl.Search()\
+            .params(size=1000)\
+            .using(es)\
+            .query("match_all")\
+            .sort("-publication_datetime")\
+            .execute()
+
+        return self._format_result_elastic_search(hits=res.hits)
+
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
-    def index(self, source=None):
+    def index(self, keywords=None):
+        if not keywords:
+            job_offers = self._get_all_job_offers()
+        else:
+            job_offers = self._get_specific_job_offers(keywords)
 
-        jobs = DBSession.query(Job) \
-            .order_by(Job.publication_datetime.desc())
-
-        if source is not None:
-            jobs = jobs.filter(Job.source == source)
+        search_form = ResearchForm(action='/', method='POST').req()
 
         return dict(
             sources=SOURCES,
-            jobs=jobs
+            jobs=job_offers,
+            job_offer_search_form=search_form
         )
 
     @expose()
@@ -123,77 +198,6 @@ class RootController(BaseController):
         return dict(
                 job=job,
                 sources=SOURCES
-        )
-
-    @expose('pyjobsweb.templates.search')
-    def search(self):
-        search_form = ResearchForm(action='/compute_search').req()
-        return dict(page='search', form=search_form)
-
-    @expose('pyjobsweb.templates.jobs')
-    @paginate('jobs', items_per_page=20)
-    def compute_search(self, keywords=None):
-        # TODO : Flexible wrapper to ease research using elasticsearch
-        import elasticsearch_dsl.connections
-
-        # TODO : remove hosts=["localhost"] 'magic' value
-        es = elasticsearch_dsl.connections.connections.create_connection(
-            hosts=["localhost"], send_get_body_as="POST", timeout=20
-        )
-
-        fields = ["description", "title"]
-
-        res = elasticsearch_dsl.Search()\
-            .params(size=1000)\
-            .using(es)\
-            .query("multi_match", fields=fields, query=keywords)\
-            .sort("-publication_datetime")\
-            .execute()
-
-        return self.jobs(hits=res.hits)
-
-    @expose('pyjobsweb.templates.jobs')
-    @paginate('jobs', items_per_page=20)
-    def jobs(self, hits=None, *args, **kw):
-        job_offers = []
-
-        # TODO : Find a way to properly factorise HTML templates for job offers
-        # TODO : listing coming from both research and non research queries
-        for job_offer in hits:
-            # TODO : Wrap this code into the model
-            # TODO : Find a nice and consistent way to have the postgres and
-            # TODO : the elasticsearch models
-
-            j = Job()
-
-            j.title = job_offer.title
-            j.address = job_offer.address
-            j.company = job_offer.company
-            j.company_url = job_offer.company_url
-            j.description = job_offer.description
-            j.id = job_offer.id
-
-            import datetime
-            j.publication_datetime = datetime.datetime.strptime(
-                job_offer.publication_datetime, "%Y-%m-%dT%H:%M:%S"
-            )
-
-            j.publication_datetime_is_fake = \
-                job_offer.publication_datetime_is_fake
-            j.source = job_offer.source
-
-            import elasticsearch_dsl.serializer
-            j.tags = \
-                elasticsearch_dsl.serializer.serializer.dumps(job_offer.tags)
-
-            j.title = job_offer.title
-            j.url = job_offer.url
-
-            job_offers.append(j)
-
-        return dict(
-            jobs=job_offers,
-            sources=SOURCES
         )
 
     @expose('pyjobsweb.templates.sources')

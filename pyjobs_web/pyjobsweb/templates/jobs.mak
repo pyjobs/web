@@ -63,6 +63,10 @@
     </div>
 </div>
 
+<div id="research_form">
+    ${job_offer_search_form.display()|n}
+</div>
+
 ${job_pagination()}
 
     % if not jobs:
