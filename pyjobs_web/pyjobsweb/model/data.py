@@ -82,7 +82,8 @@ class Job(DeclarativeBase):
             'company_url': self.company_url,
             'address': self.address,
             'tags': json.loads(self.tags),
-            'publication_datetime': self.publication_datetime
+            'publication_datetime': self.publication_datetime,
+            'publication_datetime_is_fake': self.publication_datetime_is_fake
         }
 
     @property
