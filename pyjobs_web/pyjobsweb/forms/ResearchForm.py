@@ -6,13 +6,21 @@ import tw2.forms as twf
 class ResearchForm(twf.Form):
     class child(twf.TableLayout):
         keywords = twf.TextField(
-            "keywords", label=u"Mots clés : ", validator=twc.Required
+            "keywords", label="", validator=twc.Required
         )
         keywords.css_class = "form-control"
         keywords.placeholder = u"Mot clés recherchés..."
         keywords.value = ""
         keywords.name = "keywords"
 
+        geoloc = twf.TextField(
+            "geoloc", label="", validator=twc.Required
+        )
+        geoloc.css_class = "form-control"
+        geoloc.placeholder = u"Géolocalisation..."
+        geoloc.value = ""
+        geoloc.name = "geoloc"
+
     submit = twf.SubmitButton("submit")
-    submit.value = "J'effectue ma recherche !"
+    submit.value = "Go !"
     submit.css_class = "btn btn-default right"

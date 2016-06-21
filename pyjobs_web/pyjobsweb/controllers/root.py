@@ -133,7 +133,7 @@ class RootController(BaseController):
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
-    def index(self, keywords=None):
+    def index(self, keywords=None, geoloc=None):
         if not keywords:
             job_offers = self._get_all_job_offers()
         else:
