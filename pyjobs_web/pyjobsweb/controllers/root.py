@@ -133,30 +133,24 @@ class RootController(BaseController):
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
     def compute_search(self, keywords=None):
-        # Compute research
-
         # TODO : Flexible wrapper to ease research using elasticsearch
-        import elasticsearch
-        es = elasticsearch.Elasticsearch(send_get_body_as='POST')
+        import elasticsearch_dsl.connections
 
-        es.indices.create(index="jobs", ignore=400)
-        es.indices.refresh(index="jobs")
-
-        res = es.search(
-            index="jobs",
-            doc_type="job-offer",
-            body={
-                "query": {
-                    "match_all": {}
-                }
-            },
-            sort="publication_datetime:desc",
-            size=10000
+        # TODO : remove hosts=["localhost"] 'magic' value
+        es = elasticsearch_dsl.connections.connections.create_connection(
+            hosts=["localhost"], send_get_body_as="POST", timeout=20
         )
 
-        hits = res["hits"]["hits"]
+        fields = ["description", "title"]
 
-        return self.jobs(hits=hits)
+        res = elasticsearch_dsl.Search()\
+            .params(size=1000)\
+            .using(es)\
+            .query("multi_match", fields=fields, query=keywords)\
+            .sort("-publication_datetime")\
+            .execute()
+
+        return self.jobs(hits=res.hits)
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
@@ -166,30 +160,34 @@ class RootController(BaseController):
         # TODO : Find a way to properly factorise HTML templates for job offers
         # TODO : listing coming from both research and non research queries
         for job_offer in hits:
-            job_data = job_offer["_source"]
+            # TODO : Wrap this code into the model
+            # TODO : Find a nice and consistent way to have the postgres and
+            # TODO : the elasticsearch models
 
             j = Job()
 
-            for key in job_data:
-                try:
-                    getattr(j, key)
+            j.title = job_offer.title
+            j.address = job_offer.address
+            j.company = job_offer.company
+            j.company_url = job_offer.company_url
+            j.description = job_offer.description
+            j.id = job_offer.id
 
-                    if key == "tags":
-                        import json
-                        setattr(j, key, json.dumps(job_data[key]))
-                    elif key == "publication_datetime":
-                        setattr(
-                            j,
-                            key,
-                            datetime.datetime.strptime(
-                                job_data[key], "%Y-%m-%dT%H:%M:%S"
-                            )
-                        )
-                    else:
-                        setattr(j, key, job_data[key])
-                except AttributeError:
-                    # TODO : Log
-                    pass
+            import datetime
+            j.publication_datetime = datetime.datetime.strptime(
+                job_offer.publication_datetime, "%Y-%m-%dT%H:%M:%S"
+            )
+
+            j.publication_datetime_is_fake = \
+                job_offer.publication_datetime_is_fake
+            j.source = job_offer.source
+
+            import elasticsearch_dsl.serializer
+            j.tags = \
+                elasticsearch_dsl.serializer.serializer.dumps(job_offer.tags)
+
+            j.title = job_offer.title
+            j.url = job_offer.url
 
             job_offers.append(j)
 

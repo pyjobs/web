@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sqlalchemy
-import elasticsearch
+import elasticsearch_dsl.connections
+import elasticsearch_dsl.exceptions
 import tg
 import transaction
 
@@ -10,7 +11,10 @@ import pyjobsweb.lib
 
 
 class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
-    __elastic_search = elasticsearch.Elasticsearch(send_get_body_as='POST')
+    __elastic_search = \
+        elasticsearch_dsl.connections.connections.create_connection(
+            hosts=["localhost"], send_get_body_as="POST", timeout=20
+        )
 
     @staticmethod
     def __database_connection():
@@ -59,9 +63,10 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         json_job_offer = self.__format_job_offer_to_json(job_offer, lat, lng)
 
         # Perform the insertion in Elasticsearch
+        # TODO : use elasticsearch_dsl rather than elasticsearch to insert
         try:
             self.__elastic_search.index("jobs", "job-offer", json_job_offer)
-        except elasticsearch.RequestError:
+        except elasticsearch_dsl.exceptions.ElasticsearchDslException:
             return
 
         # Mark the task as handled so we don't retreat it next time
@@ -76,3 +81,6 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
 
         for j in job_offers:
             self.__handle_insertion_task(j)
+
+        self.__elastic_search.indices.create(index="jobs", ignore=400)
+        self.__elastic_search.indices.refresh(index="jobs")
