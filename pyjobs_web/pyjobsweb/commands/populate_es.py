@@ -47,7 +47,7 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
                 logging.WARNING,
                 '{}{}'.format(
                     "Couldn't compute geolocation of the following address : ",
-                    job_offer.address
+                    u''.join(job_offer.address).encode('utf-8').strip()
                 )
             )
             es_job_offer.geolocation = [0, 0]
