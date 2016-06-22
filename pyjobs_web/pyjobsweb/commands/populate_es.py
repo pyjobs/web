@@ -2,6 +2,8 @@
 import elasticsearch_dsl.connections
 import elasticsearch_dsl.exceptions
 import elasticsearch
+import geopy.geocoders
+import geopy.exc
 import transaction
 import logging
 
@@ -40,10 +42,15 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         # Perform the insertion in Elasticsearch
         try:
             # Compute lat, lng of the job offer
-            geolocator = pyjobsweb.lib.geolocation.Geolocator(job_offer.address)
-            es_job_offer.geolocation = geolocator.compute_geoloc()
+            geolocator = geopy.geocoders.Nominatim(timeout=5)
+            location = geolocator.geocode(job_offer.address, True)
+
+            if not location:
+                raise PopulateESCommand.FailedGeoloc
+
+            es_job_offer.geolocation = [location.latitude, location.longitude]
             es_job_offer.geolocation_error = False
-        except pyjobsweb.lib.geolocation.GeolocationError:
+        except (geopy.exc.GeocoderQueryError, PopulateESCommand.FailedGeoloc):
             logging.getLogger(__name__).log(
                 logging.WARNING,
                 '{}{}{}{}'.format(
@@ -55,6 +62,31 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
             )
             es_job_offer.geolocation = [0, 0]
             es_job_offer.geolocation_error = True
+        except (geopy.exc.GeocoderQuotaExceeded,
+                geopy.exc.GeocoderAuthenticationFailure,
+                geopy.exc.GeocoderUnavailable,
+                geopy.exc.GeocoderNotFound) as e:
+            logging.getLogger(__name__).log(
+                logging.WARNING,
+                '{}{}{}{}{}'.format(
+                    "Job offer id : ",
+                    job_offer.id,
+                    " Error during geolocation : ",
+                    e.message,
+                    ". Aborting Elasticsearch insertions now..."
+                )
+            )
+            raise PopulateESCommand.AbortException
+        except geopy.exc.GeopyError as e:
+            logging.getLogger(__name__).log(
+                logging.WARNING,
+                '{}{}{}{}'.format(
+                    "Job offer id : ",
+                    job_offer.id,
+                    " Error during geolocation : ",
+                    e.message
+                )
+            )
 
         try:
             # Perform the insertion
@@ -82,4 +114,13 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         job_offers = self.__compute_pending_insertions()
 
         for j in job_offers:
-            self.__handle_insertion_task(j)
+            try:
+                self.__handle_insertion_task(j)
+            except PopulateESCommand.AbortException:
+                return
+
+    class FailedGeoloc(Exception):
+        pass
+
+    class AbortException(Exception):
+        pass
