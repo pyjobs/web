@@ -18,15 +18,6 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         )
 
     @staticmethod
-    def __database_connection():
-        engine = sqlalchemy.engine.create_engine(
-                tg.config.get('sqlalchemy.url')
-        )
-
-        engine.connect()
-        pyjobsweb.model.init_model(engine)
-
-    @staticmethod
     def __compute_pending_insertions():
         pending_insertions = pyjobsweb.model.DBSession\
             .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
@@ -83,8 +74,6 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
 
     def take_action(self, parsed_args):
         super(PopulateESCommand, self).take_action(parsed_args)
-
-        self.__database_connection()
 
         job_offers = self.__compute_pending_insertions()
 
