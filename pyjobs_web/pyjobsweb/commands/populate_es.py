@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import sqlalchemy
 import elasticsearch_dsl.connections
 import elasticsearch_dsl.exceptions
-import tg
 import transaction
 import logging
 
