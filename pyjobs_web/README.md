@@ -62,3 +62,7 @@ Then you are ready to go.
 ## Update job database with crawls
 
 Run ``gearbox crawl`` command. It will be run [PyJobs Crawlers](https://github.com/pyjobs/crawlers) and feed PyJobs Web database.
+
+## Populate the Elasticsearch database with populateES
+
+Run ``gearbox populateES`` command. It will fetch every entry in the Postgresl database which haven't been inserted into Elasticsearch yet and perform both the geolocation and the insertion of the job offers in Elasticsearch, so that the search engine of the pyjobs can find it.
