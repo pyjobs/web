@@ -62,12 +62,13 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         except elasticsearch.exceptions.RequestError as e:
             logging.getLogger(__name__).log(
                 logging.ERROR,
-                '{}{}{}{}{}'.format(
+                '{}{}{}{}{}{}'.format(
                     "Job offer id : ",
                     job_offer.id,
                     ", error during the Elasticsearch insertion : ",
                     e,
-                    ". Aborting now..."
+                    ".\nInfo : ",
+                    e.info
                 )
             )
             return
