@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import elasticsearch_dsl.connections
 import elasticsearch_dsl.exceptions
+import elasticsearch
 import transaction
 import logging
 
@@ -45,8 +46,10 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         except pyjobsweb.lib.geolocation.GeolocationError:
             logging.getLogger(__name__).log(
                 logging.WARNING,
-                '{}{}'.format(
-                    "Couldn't compute geolocation of the following address : ",
+                '{}{}{}{}'.format(
+                    "Job offer id : ",
+                    job_offer.id,
+                    " Couldn't compute geolocation of the following address : ",
                     u''.join(job_offer.address).encode('utf-8').strip()
                 )
             )
@@ -56,13 +59,15 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         try:
             # Perform the insertion
             es_job_offer.save()
-        except elasticsearch_dsl.exceptions.ElasticsearchDslException:
+        except elasticsearch.exceptions.RequestError as e:
             logging.getLogger(__name__).log(
                 logging.ERROR,
-                '{}{}{}'.format(
-                    "Error during insertion in Elasticsearch : ",
+                '{}{}{}{}{}'.format(
+                    "Job offer id : ",
                     job_offer.id,
-                    " Aborting now..."
+                    ", error during the Elasticsearch insertion : ",
+                    e,
+                    ". Aborting now..."
                 )
             )
             return
