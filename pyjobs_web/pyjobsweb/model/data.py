@@ -49,7 +49,7 @@ class Tag(elasticsearch_dsl.InnerObjectWrapper):
     pass
 
 
-class JobOfferElasticsearch( elasticsearch_dsl.DocType):
+class JobOfferElasticsearch(elasticsearch_dsl.DocType):
     class Meta:
         index = 'jobs'
         doc_type = 'job-offer'
