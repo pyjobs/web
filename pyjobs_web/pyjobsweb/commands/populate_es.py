@@ -4,6 +4,7 @@ import elasticsearch_dsl.connections
 import elasticsearch_dsl.exceptions
 import tg
 import transaction
+import logging
 
 import pyjobsweb.commands
 import pyjobsweb.model
@@ -28,45 +29,54 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
     @staticmethod
     def __compute_pending_insertions():
         pending_insertions = pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.data.Job)\
+            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
             .filter(
-                pyjobsweb.model.data.Job.already_in_elasticsearch is not True
+                pyjobsweb.model.data
+                .JobOfferSQLAlchemy.already_in_elasticsearch is not True
             )
         return pending_insertions
 
     @staticmethod
-    def __format_job_offer_to_json(job_offer, lat, lng):
-        json_job_offer = job_offer.to_dict()
-        json_job_offer['lat'] = lat
-        json_job_offer['lng'] = lng
-        return json_job_offer
-
-    @staticmethod
     def __mark_task_as_handled(job_offer):
         transaction.begin()
-        # TODO : Check if there isn't a better way to handle the update
         pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.data.Job)\
-            .filter(pyjobsweb.model.data.Job.id == job_offer.id)\
+            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
+            .filter(pyjobsweb.model.data.JobOfferSQLAlchemy.id == job_offer.id)\
             .update({'already_in_elasticsearch': True})
         transaction.commit()
 
     def __handle_insertion_task(self, job_offer):
-        # Compute lat, lng of the job offer
-        try:
-            geolocator = pyjobsweb.lib.geolocation.Geolocator(job_offer.address)
-            lat, lng = geolocator.compute_geoloc()
-        except pyjobsweb.lib.geolocation.GeolocationError:
-            return
-
-        # Convert the job_offer object to a json format
-        json_job_offer = self.__format_job_offer_to_json(job_offer, lat, lng)
+        es_job_offer = job_offer.to_elasticsearch_job_offer()
 
         # Perform the insertion in Elasticsearch
-        # TODO : use elasticsearch_dsl rather than elasticsearch to insert
         try:
-            self.__elastic_search.index("jobs", "job-offer", json_job_offer)
+            # Compute lat, lng of the job offer
+            geolocator = pyjobsweb.lib.geolocation.Geolocator(job_offer.address)
+            es_job_offer.geolocation = geolocator.compute_geoloc()
+            es_job_offer.geolocation_error = False
+        except pyjobsweb.lib.geolocation.GeolocationError:
+            logging.getLogger(__name__).log(
+                logging.WARNING,
+                '{}{}'.format(
+                    "Couldn't compute geolocation of the following address : ",
+                    job_offer.address
+                )
+            )
+            es_job_offer.geolocation = [0, 0]
+            es_job_offer.geolocation_error = True
+
+        try:
+            # Perform the insertion
+            es_job_offer.save()
         except elasticsearch_dsl.exceptions.ElasticsearchDslException:
+            logging.getLogger(__name__).log(
+                logging.ERROR,
+                '{}{}{}'.format(
+                    "Error during insertion in Elasticsearch : ",
+                    job_offer.id,
+                    " Aborting now..."
+                )
+            )
             return
 
         # Mark the task as handled so we don't retreat it next time
@@ -81,6 +91,3 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
 
         for j in job_offers:
             self.__handle_insertion_task(j)
-
-        self.__elastic_search.indices.create(index="jobs", ignore=400)
-        self.__elastic_search.indices.refresh(index="jobs")

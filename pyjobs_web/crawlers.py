@@ -9,7 +9,7 @@ from tg import config
 
 from pyjobsweb import model
 from pyjobsweb.model import DBSession, Log
-from pyjobsweb.model.data import Job
+from pyjobsweb.model.data import JobOfferSQLAlchemy
 
 __all__ = ('helpers', 'app_globals')
 
@@ -35,7 +35,7 @@ class PyJobsWebConnector(Connector):
             print 'Skip existing item'
             return
 
-        job = Job()
+        job = JobOfferSQLAlchemy()
 
         # Populate attributes which do not require special treatments before
         # population
@@ -70,8 +70,8 @@ class PyJobsWebConnector(Connector):
         :return:
         """
         return model.DBSession \
-            .query(model.data.Job) \
-            .filter(model.data.Job.url == job_url) \
+            .query(model.data.JobOfferSQLAlchemy) \
+            .filter(model.data.JobOfferSQLAlchemy.url == job_url) \
             .count()
 
     def log(self, source, action, more=None):
@@ -90,9 +90,9 @@ class PyJobsWebConnector(Connector):
 
     def get_most_recent_job_date(self, source):
         try:
-            return model.DBSession.query(model.data.Job.publication_datetime)\
-                .filter(model.data.Job.source == source)\
-                .order_by(model.data.Job.publication_datetime.desc())\
+            return model.DBSession.query(model.data.JobOfferSQLAlchemy.publication_datetime)\
+                .filter(model.data.JobOfferSQLAlchemy.source == source)\
+                .order_by(model.data.JobOfferSQLAlchemy.publication_datetime.desc())\
                 .limit(1)\
                 .one()[0]  # First element is publication_datetime datetime value
         except NoResultFound:

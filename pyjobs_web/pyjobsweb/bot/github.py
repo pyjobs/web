@@ -77,8 +77,8 @@ class GitHubBot(object):
         :rtype: list
         """
         lasts_jobs = model.DBSession \
-            .query(model.data.Job) \
-            .order_by(model.data.Job.publication_datetime.desc()) \
+            .query(model.data.JobOfferSQLAlchemy) \
+            .order_by(model.data.JobOfferSQLAlchemy.publication_datetime.desc()) \
             .limit(self._last_jobs_count) \
             .all()
         return lasts_jobs

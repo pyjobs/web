@@ -5,7 +5,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import func
 
-from pyjobsweb.model import Job
+from pyjobsweb.model import JobOfferSQLAlchemy
 
 
 class StatsQuestioner(object):
@@ -151,10 +151,10 @@ class StatsQuestioner(object):
         :rtype: sqlalchemy.orm.Query
         """
         # TODO - B.S. - 20160204: date_trunc only compatible with postgresql
-        date_trunc_func = func.date_trunc(period, Job.publication_datetime)
-        return self._session.query(Job.source, func.count(Job.id), date_trunc_func) \
-            .filter(Job.publication_datetime >= date_from) \
-            .filter(Job.publication_datetime <= date_to) \
-            .group_by(Job.source) \
+        date_trunc_func = func.date_trunc(period, JobOfferSQLAlchemy.publication_datetime)
+        return self._session.query(JobOfferSQLAlchemy.source, func.count(JobOfferSQLAlchemy.id), date_trunc_func) \
+            .filter(JobOfferSQLAlchemy.publication_datetime >= date_from) \
+            .filter(JobOfferSQLAlchemy.publication_datetime <= date_to) \
+            .group_by(JobOfferSQLAlchemy.source) \
             .group_by(date_trunc_func) \
             .order_by(date_trunc_func)

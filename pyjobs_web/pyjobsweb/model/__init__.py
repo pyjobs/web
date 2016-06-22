@@ -58,7 +58,8 @@ def init_model(engine):
 
 # Import your model modules here.
 from pyjobsweb.model.auth import User, Group, Permission
-from pyjobsweb.model.data import Job
+from pyjobsweb.model.data import JobOfferSQLAlchemy
+from pyjobsweb.model.data import JobOfferElasticsearch
 from pyjobsweb.model.system import Log
 
 __all__ = ('User', 'Group', 'Permission')
