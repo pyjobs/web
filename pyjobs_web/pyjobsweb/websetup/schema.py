@@ -29,6 +29,7 @@ def setup_schema(command, conf, vars):
 
     # Setup Elasticsearch's database schema
     import elasticsearch_dsl.connections
+    import elasticsearch_dsl.index
     from pyjobsweb import model
 
     print("Setting up Elasticsearch's model")
@@ -39,4 +40,15 @@ def setup_schema(command, conf, vars):
         timeout=20
     )
 
+    # Setup the jobs index
+    jobs_index = elasticsearch_dsl.Index('jobs')
+    # Empty at the moment
+    jobs_index.settings()
+    # Register a JobOffer doc_type in the jobs index
+    jobs_index.doc_type(model.JobOfferElasticsearch)
+    # Create the index
+    # TODO : should we drop the index if it already exists ?
+    jobs_index.create(ignore=400)
+
+    # Create the mapping for the JobOffer documents
     model.JobOfferElasticsearch.init()
