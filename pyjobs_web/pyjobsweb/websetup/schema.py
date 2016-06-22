@@ -26,3 +26,17 @@ def setup_schema(command, conf, vars):
     alembic_cfg.set_main_option("sqlalchemy.url", config['sqlalchemy.url'])
     import alembic.command
     alembic.command.stamp(alembic_cfg, "head")
+
+    # Setup Elasticsearch's database schema
+    import elasticsearch_dsl.connections
+    from pyjobsweb import model
+
+    print("Setting up Elasticsearch's model")
+
+    elasticsearch_dsl.connections.connections.create_connection(
+        hosts=[config.get('elasticsearch.host')],
+        send_get_body_as='POST',
+        timeout=20
+    )
+
+    model.JobOfferElasticsearch.init()

@@ -60,9 +60,12 @@ class RootController(BaseController):
     @staticmethod
     def _get_specific_job_offers(keywords=None):
         import elasticsearch_dsl.connections
+        import tg
 
         es = elasticsearch_dsl.connections.connections.create_connection(
-            hosts=["localhost"], send_get_body_as="POST", timeout=20
+            hosts=[tg.config.get('elasticsearch.host')],
+            send_get_body_as="POST",
+            timeout=20
         )
 
         fields = ["description", "title"]
@@ -79,9 +82,12 @@ class RootController(BaseController):
     @staticmethod
     def _get_all_job_offers():
         import elasticsearch_dsl.connections
+        import tg
 
         es = elasticsearch_dsl.connections.connections.create_connection(
-            hosts=["localhost"], send_get_body_as="POST", timeout=20
+            hosts=[tg.config.get('elasticsearch.host')],
+            send_get_body_as="POST",
+            timeout=20
         )
 
         res = model.JobOfferElasticsearch.search()\
