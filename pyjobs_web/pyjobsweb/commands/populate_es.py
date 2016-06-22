@@ -30,9 +30,8 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
     def __compute_pending_insertions():
         pending_insertions = pyjobsweb.model.DBSession\
             .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
-            .filter(
-                pyjobsweb.model.data
-                .JobOfferSQLAlchemy.already_in_elasticsearch is not True
+            .filter_by(
+                already_in_elasticsearch=False
             )
         return pending_insertions
 
