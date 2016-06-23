@@ -41,7 +41,7 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
             if not location:
                 raise PopulateESCommand.FailedGeoloc
 
-            es_job_offer.geolocation = [location.latitude, location.longitude]
+            es_job_offer.geolocation = [location.longitude, location.latitude]
             es_job_offer.geolocation_error = False
         except (geopy.exc.GeocoderQueryError, PopulateESCommand.FailedGeoloc):
             logging.getLogger(__name__).log(
