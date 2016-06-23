@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import elasticsearch_dsl.connections
-import elasticsearch_dsl.exceptions
 import elasticsearch
 import geopy.geocoders
 import geopy.exc
@@ -13,11 +11,6 @@ import pyjobsweb.lib
 
 
 class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
-    __elastic_search = \
-        elasticsearch_dsl.connections.connections.create_connection(
-            hosts=["localhost"], send_get_body_as="POST", timeout=20
-        )
-
     @staticmethod
     def __compute_pending_insertions():
         pending_insertions = pyjobsweb.model.DBSession\

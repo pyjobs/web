@@ -59,20 +59,10 @@ class RootController(BaseController):
 
     @staticmethod
     def _get_specific_job_offers(keywords=None):
-        import elasticsearch_dsl.connections
-        import tg
-
-        es = elasticsearch_dsl.connections.connections.create_connection(
-            hosts=[tg.config.get('elasticsearch.host')],
-            send_get_body_as="POST",
-            timeout=20
-        )
-
         fields = ["description", "title"]
 
         res = model.JobOfferElasticsearch.search()\
             .params(size=1000)\
-            .using(es)\
             .query("multi_match", fields=fields, query=keywords)\
             .sort("-publication_datetime")\
             .execute()
@@ -81,14 +71,6 @@ class RootController(BaseController):
 
     @staticmethod
     def _get_all_job_offers():
-        import elasticsearch_dsl.connections
-        import tg
-
-        es = elasticsearch_dsl.connections.connections.create_connection(
-            hosts=[tg.config.get('elasticsearch.host')],
-            send_get_body_as="POST",
-            timeout=20
-        )
 
         res = model.JobOfferElasticsearch.search()\
             .params(size=1000)\

@@ -15,4 +15,11 @@ class Globals(object):
 
     def __init__(self):
         """Do nothing, by default."""
-        pass
+        import elasticsearch_dsl.connections
+        import tg
+
+        elasticsearch_dsl.connections.connections.create_connection(
+            hosts=[tg.config.get('elasticsearch.host')],
+            send_get_body_as="POST",
+            timeout=20
+        )
