@@ -71,15 +71,10 @@ class RootController(BaseController):
 
     @staticmethod
     def _get_all_job_offers():
+        res = DBSession.query(model.JobOfferSQLAlchemy) \
+            .order_by(model.JobOfferSQLAlchemy.publication_datetime.desc())
 
-        res = model.JobOfferElasticsearch.search()\
-            .params(size=1000)\
-            .using(es)\
-            .query("match_all")\
-            .sort("-publication_datetime")\
-            .execute()
-
-        return res.hits
+        return res
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
