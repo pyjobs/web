@@ -71,7 +71,7 @@ ${job_pagination()}
 
     % if not jobs:
         <h3>Désolé, aucune offre d'emploi n'a  pu être trouvée.</h3>
-    %else:
+    % else:
         % for job in jobs:
             <div class="row job">
                 <div class="col-md-12">
