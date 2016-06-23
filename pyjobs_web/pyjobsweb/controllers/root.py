@@ -58,7 +58,7 @@ class RootController(BaseController):
         tmpl_context.project_name = "Algoo"
 
     @staticmethod
-    def _get_specific_job_offers(keywords=None):
+    def _get_specific_job_offers(query=None, from_location=None, max_dist=None):
         fields = ["description", "title"]
 
         res = model.JobOfferElasticsearch.search()\
@@ -78,11 +78,13 @@ class RootController(BaseController):
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
-    def index(self, keywords=None, geoloc=None):
-        if not keywords:
+    def index(self, query=None, from_location=None, max_dist=None):
+        if not query and not from_location and not max_dist:
             job_offers = self._get_all_job_offers()
         else:
-            job_offers = self._get_specific_job_offers(keywords)
+            job_offers = self._get_specific_job_offers(
+                    query, from_location, max_dist
+            )
 
         search_form = ResearchForm(action='/', method='POST').req()
 
