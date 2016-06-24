@@ -54,26 +54,89 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
         index = 'jobs'
         doc_type = 'job-offer'
 
+    french_elision = elasticsearch_dsl.token_filter(
+            'french_elision',
+            type='elision',
+            articles_case=True,
+            articles=[
+                'l', 'm', 't', 'qu', 'n', 's',
+                'j', 'd', 'c', 'jusqu', 'quoiqu',
+                'lorsqu', 'puisqu'
+            ]
+    )
+    french_stopwords = elasticsearch_dsl.token_filter(
+            'french_stopwords', type='stop', stopwords='_french_'
+    )
+    # Do not include this filter if keywords is empty
+    french_keywords = elasticsearch_dsl.token_filter(
+            'french_keywords', type='keyword_maker', keywords=[]
+    )
+    french_stemmer = elasticsearch_dsl.token_filter(
+            'french_stemmer', type='stemmer', language='light_french'
+    )
+
+    french_analyzer = elasticsearch_dsl.analyzer(
+            'french_analyzer',
+            tokenizer='standard',
+            filter=[
+                'lowercase',
+                french_elision,
+                french_stopwords,
+                # french_keywords,
+                french_stemmer
+            ]
+    )
+    french_description_analyzer = elasticsearch_dsl.analyzer(
+            'french_description_analyzer',
+            tokenizer='standard',
+            filter=[
+                'lowercase',
+                french_elision,
+                french_stopwords,
+                # french_keywords,
+                french_stemmer
+            ],
+            char_filter=['html_strip']
+    )
+
     id = elasticsearch_dsl.Integer()
-    url = elasticsearch_dsl.String()
-    source = elasticsearch_dsl.String()
-    title = elasticsearch_dsl.String()
-    description = elasticsearch_dsl.String()
-    company = elasticsearch_dsl.String()
-    company_url = elasticsearch_dsl.String()
-    address = elasticsearch_dsl.String()
+
+    url = elasticsearch_dsl.String(
+            index='not_analyzed'
+    )
+
+    source = elasticsearch_dsl.String(
+            index='not_analyzed'
+    )
+
+    title = elasticsearch_dsl.String(
+            analyzer=french_analyzer
+    )
+
+    description = elasticsearch_dsl.String(
+            analyzer=french_description_analyzer
+    )
+
+    company = elasticsearch_dsl.String(
+            index='not_analyzed'
+    )
+
+    company_url = elasticsearch_dsl.String(
+            index='not_analyzed'
+    )
+
+    address = elasticsearch_dsl.String(
+            index='not_analyzed'
+    )
 
     tags = elasticsearch_dsl.Nested(
-        doc_class=Tags,
-        properties={
-            'tags': elasticsearch_dsl.Nested(
-                doc_class=Tag,
-                properties={
-                    'tag': elasticsearch_dsl.String(),
-                    'weight': elasticsearch_dsl.Integer()
-                }
-            )
-        }
+            doc_class=Tag,
+            properties={
+                'tag': elasticsearch_dsl.String(
+                        index='not_analyzed'
+                ),
+                'weight': elasticsearch_dsl.Integer()
+            }
     )
 
     publication_datetime = elasticsearch_dsl.Date()

@@ -47,8 +47,5 @@ def setup_schema(command, conf, vars):
     # Register a JobOffer doc_type in the jobs index
     jobs_index.doc_type(model.JobOfferElasticsearch)
     # Create the index
-    # TODO : should we drop the index if it already exists ?
+    jobs_index.delete(ignore=404)
     jobs_index.create(ignore=400)
-
-    # Create the mapping for the JobOffer documents
-    model.JobOfferElasticsearch.init()
