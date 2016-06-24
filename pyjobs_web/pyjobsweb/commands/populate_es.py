@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import elasticsearch_dsl
 import elasticsearch
 import geopy.geocoders
 import geopy.exc
@@ -109,6 +110,8 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         for j in job_offers:
             try:
                 self.__handle_insertion_task(j)
+                # Refresh indices to increase research speed
+                elasticsearch_dsl.Index('jobs').refresh()
             except PopulateESCommand.AbortException:
                 return
 
