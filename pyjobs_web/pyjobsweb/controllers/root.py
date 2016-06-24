@@ -59,13 +59,24 @@ class RootController(BaseController):
 
     @staticmethod
     def _get_specific_job_offers(query=None, from_location=None, max_dist=None):
+        import geopy
+        geolocator = geopy.geocoders.Nominatim()
+        location = geolocator.geocode(from_location)
+
         fields = ["description", "title"]
 
-        res = model.JobOfferElasticsearch.search()\
+        s = model.JobOfferElasticsearch.search()\
             .params(size=1000)\
-            .query("multi_match", fields=fields, query=keywords)\
-            .sort("-publication_datetime")\
-            .execute()
+            .filter("match", geolocation_error=False)\
+            .filter(
+                "geo_distance",
+                geolocation=[location.longitude, location.latitude],
+                distance=max_dist
+            )\
+            .query("multi_match", fields=fields, query=query)\
+            .sort("-publication_datetime")
+
+        res = s.execute()
 
         return res.hits
 
