@@ -110,9 +110,10 @@ class PyJobsWebConnector(Connector):
 
     def get_most_recent_job_date(self, source):
         try:
-            return model.DBSession.query(model.data.JobOfferSQLAlchemy.publication_datetime)\
-                .filter(model.data.JobOfferSQLAlchemy.source == source)\
-                .order_by(model.data.JobOfferSQLAlchemy.publication_datetime.desc())\
+            return \
+                model.DBSession.query(JobOfferSQLAlchemy.publication_datetime)\
+                .filter(JobOfferSQLAlchemy.source == source)\
+                .order_by(JobOfferSQLAlchemy.publication_datetime.desc())\
                 .limit(1)\
                 .one()[0]  # First element is publication_datetime datetime value
         except NoResultFound:
