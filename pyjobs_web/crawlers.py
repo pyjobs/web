@@ -44,12 +44,6 @@ class PyJobsWebDryRunCrawlConnector(Connector):
 
 
 class PyJobsWebConnector(Connector):
-    def __init__(self):
-        # Postgresql connection setup
-        engine = sqlalchemy.engine.create_engine(config.get('sqlalchemy.url'))
-        engine.connect()
-        model.init_model(engine)
-
     def add_job(self, job_item):
         """
 
