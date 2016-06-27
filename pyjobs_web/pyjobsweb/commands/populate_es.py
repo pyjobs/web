@@ -15,9 +15,8 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
     def __handle_insertion_task(job_offer):
         es_job_offer = job_offer.to_elasticsearch_job_offer()
 
-        # Perform the insertion in Elasticsearch
+        # Compute lat, lng of the job offer
         try:
-            # Compute lat, lng of the job offer
             geolocator = geopy.geocoders.Nominatim(timeout=5)
             location = geolocator.geocode(job_offer.address, True)
 
@@ -65,7 +64,7 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
             )
 
         try:
-            # Perform the insertion
+            # Perform the insertion in Elasticsearch
             es_job_offer.save()
         except elasticsearch.exceptions.RequestError as e:
             logging.getLogger(__name__).log(
