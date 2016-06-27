@@ -200,7 +200,7 @@ class JobOfferSQLAlchemy(DeclarativeBase):
     crawl_datetime = sqlalchemy.Column(sqlalchemy.DateTime)
 
     already_in_elasticsearch = sqlalchemy.Column(
-        sqlalchemy.Boolean, default=False
+        sqlalchemy.Boolean, nullable=False, default=False
     )
 
     def __init__(self):
