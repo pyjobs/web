@@ -89,13 +89,14 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
         for j in job_offers:
             try:
                 self.__handle_insertion_task(j)
-                # Refresh indices to increase research speed
-                elasticsearch_dsl.Index('jobs').refresh()
                 # Mark the task as handled so we don't retreat it next time
                 pyjobsweb.model.JobOfferSQLAlchemy.\
                     mark_as_inserted_in_elasticsearch(j.id)
             except PopulateESCommand.AbortException:
-                return
+                break
+
+        # Refresh indices to increase research speed
+        elasticsearch_dsl.Index('jobs').refresh()
 
     class FailedGeoloc(Exception):
         pass
