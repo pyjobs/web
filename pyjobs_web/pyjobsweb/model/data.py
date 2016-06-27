@@ -2,9 +2,12 @@
 import elasticsearch_dsl
 import elasticsearch_dsl.serializer
 import sqlalchemy
+import transaction
 from pyjobs_crawlers.tools import get_sources, condition_tags
 
+import pyjobsweb.model
 from pyjobsweb.model import DeclarativeBase
+
 from datetime import datetime
 from babel.dates import format_date, format_timedelta
 
@@ -258,3 +261,25 @@ class JobOfferSQLAlchemy(DeclarativeBase):
             publication_datetime_is_fake=self.publication_datetime_is_fake,
             crawl_datetime=self.publication_datetime
         )
+
+    @classmethod
+    def job_offer_exists(cls, url):
+        return pyjobsweb.model.DBSession\
+            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
+            .filter(pyjobsweb.model.data.JobOfferSQLAlchemy.url == url)\
+            .count()
+
+    @classmethod
+    def mark_as_inserted_in_elasticsearch(cls, offer_id):
+        transaction.begin()
+        pyjobsweb.model.DBSession\
+            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
+            .filter(pyjobsweb.model.data.JobOfferSQLAlchemy.id == offer_id)\
+            .update({'already_in_elasticsearch': True})
+        transaction.commit()
+
+    @classmethod
+    def compute_elasticsearch_pending_insertion(cls):
+        return pyjobsweb.model.DBSession\
+            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
+            .filter_by(already_in_elasticsearch=False)

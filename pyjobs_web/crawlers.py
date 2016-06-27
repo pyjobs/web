@@ -92,10 +92,7 @@ class PyJobsWebConnector(Connector):
         :param job_url: External identifier of job (url)
         :return:
         """
-        return model.DBSession \
-            .query(model.data.JobOfferSQLAlchemy) \
-            .filter(model.data.JobOfferSQLAlchemy.url == job_url) \
-            .count()
+        return JobOfferSQLAlchemy.job_offer_exists(job_url)
 
     def log(self, source, action, more=None):
         if more is not None:

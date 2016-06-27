@@ -3,7 +3,6 @@ import elasticsearch_dsl
 import elasticsearch
 import geopy.geocoders
 import geopy.exc
-import transaction
 import logging
 
 import pyjobsweb.commands
@@ -13,24 +12,7 @@ import pyjobsweb.lib
 
 class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
     @staticmethod
-    def __compute_pending_insertions():
-        pending_insertions = pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
-            .filter_by(
-                already_in_elasticsearch=False
-            )
-        return pending_insertions
-
-    @staticmethod
-    def __mark_task_as_handled(job_offer):
-        transaction.begin()
-        pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
-            .filter(pyjobsweb.model.data.JobOfferSQLAlchemy.id == job_offer.id)\
-            .update({'already_in_elasticsearch': True})
-        transaction.commit()
-
-    def __handle_insertion_task(self, job_offer):
+    def __handle_insertion_task(job_offer):
         es_job_offer = job_offer.to_elasticsearch_job_offer()
 
         # Perform the insertion in Elasticsearch
@@ -99,19 +81,20 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
             )
             return
 
-        # Mark the task as handled so we don't retreat it next time
-        self.__mark_task_as_handled(job_offer)
-
     def take_action(self, parsed_args):
         super(PopulateESCommand, self).take_action(parsed_args)
 
-        job_offers = self.__compute_pending_insertions()
+        job_offers = pyjobsweb.model.JobOfferSQLAlchemy.\
+            compute_elasticsearch_pending_insertion()
 
         for j in job_offers:
             try:
                 self.__handle_insertion_task(j)
                 # Refresh indices to increase research speed
                 elasticsearch_dsl.Index('jobs').refresh()
+                # Mark the task as handled so we don't retreat it next time
+                pyjobsweb.model.JobOfferSQLAlchemy.\
+                    mark_as_inserted_in_elasticsearch(j.id)
             except PopulateESCommand.AbortException:
                 return
 
