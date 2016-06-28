@@ -283,3 +283,11 @@ class JobOfferSQLAlchemy(DeclarativeBase):
         return pyjobsweb.model.DBSession\
             .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
             .filter_by(already_in_elasticsearch=False)
+
+    @classmethod
+    def get_all_job_offers(cls):
+        return pyjobsweb.model.DBSession\
+            .query(pyjobsweb.model.JobOfferSQLAlchemy)\
+            .order_by(
+                pyjobsweb.model.JobOfferSQLAlchemy.publication_datetime.desc()
+            )
