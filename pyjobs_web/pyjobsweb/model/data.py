@@ -164,6 +164,34 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
                     tags.append(tag)
         return tags
 
+    @classmethod
+    def research_job_offers(cls, query=None, from_location=None, max_dist=None):
+        import geopy
+        geolocator = geopy.geocoders.Nominatim()
+        location = geolocator.geocode(from_location)
+
+        fields = ["description", "title"]
+
+        print query
+        print from_location
+        print max_dist
+
+        s = pyjobsweb.model.JobOfferElasticsearch\
+            .search()\
+            .params(size=1000)\
+            .filter("match", geolocation_error=False)\
+            .filter(
+                "geo_distance",
+                geolocation=[location.longitude, location.latitude],
+                distance=max_dist
+            )\
+            .query("multi_match", fields=fields, query=query)\
+            .sort("-publication_datetime")
+
+        res = s.execute()
+
+        return res.hits
+
 
 class JobOfferSQLAlchemy(DeclarativeBase):
 

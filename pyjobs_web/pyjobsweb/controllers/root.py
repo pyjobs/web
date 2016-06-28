@@ -21,6 +21,7 @@ from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
 from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import JobOfferSQLAlchemy, SOURCES
+from pyjobsweb.model.data import JobOfferElasticsearch
 from pyjobsweb.forms.ResearchForm import ResearchForm
 
 __all__ = ['RootController']
@@ -57,36 +58,13 @@ class RootController(BaseController):
     def _before(self, *args, **kw):
         tmpl_context.project_name = "Algoo"
 
-    @staticmethod
-    def _get_specific_job_offers(query=None, from_location=None, max_dist=None):
-        import geopy
-        geolocator = geopy.geocoders.Nominatim()
-        location = geolocator.geocode(from_location)
-
-        fields = ["description", "title"]
-
-        s = model.JobOfferElasticsearch.search()\
-            .params(size=1000)\
-            .filter("match", geolocation_error=False)\
-            .filter(
-                "geo_distance",
-                geolocation=[location.longitude, location.latitude],
-                distance=max_dist
-            )\
-            .query("multi_match", fields=fields, query=query)\
-            .sort("-publication_datetime")
-
-        res = s.execute()
-
-        return res.hits
-
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
     def index(self, query=None, from_location=None, max_dist=None):
         if not query and not from_location and not max_dist:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
-            job_offers = self._get_specific_job_offers(
+            job_offers = JobOfferElasticsearch.research_job_offers(
                     query, from_location, max_dist
             )
 
