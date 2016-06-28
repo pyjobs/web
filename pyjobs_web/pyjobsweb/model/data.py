@@ -165,24 +165,67 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
         return tags
 
     @classmethod
-    def research_job_offers(cls, query=None, from_location=None, max_dist=None):
-        import geopy
-        geolocator = geopy.geocoders.Nominatim()
-        location = geolocator.geocode(from_location)
+    def research_job_offers(cls, query=None):
+        """
+        Perform a research query on the Elasticsearch database, more
+        specifically, a research on the documents of type job-offer indexed
+        under the jobs index.
+        :param query: a dictionary of the following form:
+        {
+            'keywords_query': [
+                {
+                    'fields': ['field1', 'field2', ...],
+                    'keywords': ['keyword1', 'keyword2', ...]
+                },
+                {
+                    'fields': ['field1', 'field2', ...],
+                    'keywords': ['keyword1', 'keyword2', ...]
+                },
+                ...
+            ],
+            'geoloc_query': {
+                'center': [longitude, latitude],
+                'radius': 'xkm'
+            },
+            'parameters': {
+                'size' : x,
+                'from' : x,
+                'timeout': x(m|s|ms),
+                'request_cache': (true|false)
+            }
+        }
+        :return: a list of JobOfferElasticsearch objects matching the query
+        """
+        s = pyjobsweb.model.JobOfferElasticsearch.search()
 
-        fields = ["description", "title"]
+        if 'parameters' in query:
+            if 'size' in query['parameters']:
+                s = s.params(size=query['parameters']['size'])
+            if 'from' in query['parameters']:
+                s = s.params(from_=query['parameters']['from'])
+            if 'timeout' in query['parameters']:
+                s = s.params(timeout=query['parameters']['timeout'])
+            if 'request_cache' in query['parameters']:
+                s = s.params(request_cache=query['parameters']['request_cache'])
 
-        s = pyjobsweb.model.JobOfferElasticsearch\
-            .search()\
-            .params(size=1000)\
-            .filter("match", geolocation_error=False)\
-            .filter(
-                "geo_distance",
-                geolocation=[location.longitude, location.latitude],
-                distance=max_dist
-            )\
-            .query("multi_match", fields=fields, query=query)\
-            .sort("-publication_datetime")
+        if 'keywords_query' in query:
+            for k in query['keywords_query']:
+                s = s.query(
+                        'multi_match',
+                        fields=k['fields'],
+                        query=k['keywords']
+                )
+
+        if 'geoloc_query' in query:
+            if 'center' in query['geoloc_query'] \
+                    and 'radius' in query['geoloc_query']:
+                s = s.filter(
+                        'geo_distance',
+                        geolocation=query['geoloc_query']['center'],
+                        distance=query['geoloc_query']['radius']
+                )
+
+        s = s.sort("-publication_datetime")
 
         res = s.execute()
 

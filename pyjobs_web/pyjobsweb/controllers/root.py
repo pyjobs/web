@@ -58,15 +58,66 @@ class RootController(BaseController):
     def _before(self, *args, **kw):
         tmpl_context.project_name = "Algoo"
 
+    @staticmethod
+    def query_builder(keywords=None, geoloc=None, size=1000):
+        query = dict()
+
+        query['size'] = 1000
+
+        if keywords:
+            query['keywords_query'] = []
+
+        for k in keywords:
+            query['keywords_query'].append(
+                    {
+                        'fields': k['fields'],
+                        'keywords': k['keywords']
+                    }
+            )
+
+        if geoloc:
+            query['geoloc_query'] = {
+                'from': geoloc['from'], 'radius': geoloc['radius']
+            }
+
+        return query
+
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
     def index(self, query=None, from_location=None, max_dist=None):
         if not query and not from_location and not max_dist:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
-            job_offers = JobOfferElasticsearch.research_job_offers(
-                    query, from_location, max_dist
-            )
+            keywords = []
+            geoloc = dict()
+
+            if query:
+                keywords.append(
+                        {
+                            'fields': ['description', 'title'],
+                            'keywords': query.split(' ')
+                        }
+                )
+
+            if from_location and max_dist:
+                import geopy
+                geolocator = geopy.geocoders.Nominatim()
+                location = geolocator.geocode(from_location)
+
+                if location:
+                    geoloc['center'] = [location.longitude, location.latitude]
+                    geoloc['radius'] = max_dist
+
+            search_query = dict()
+            search_query['keywords_query'] = keywords
+            search_query['geoloc_query'] = geoloc
+            search_query['parameters'] = dict()
+            search_query['parameters']['size'] = 1000
+            search_query['parameters']['from'] = 0
+            search_query['parameters']['timeout'] = '5s'
+            search_query['parameters']['request_cache'] = True
+
+            job_offers = JobOfferElasticsearch.research_job_offers(search_query)
 
         search_form = ResearchForm(action='/', method='POST').req()
 
