@@ -9,7 +9,7 @@ class ResearchForm(twf.Form):
         template = \
             u'''
             <div class="container">
-                <h2>Rechercher un emploi</h2>
+                <h2>Rechercher une offre d'emploi</h2>
                 <form class="form-horizontal" role="form">
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="query">Requête :</label>
