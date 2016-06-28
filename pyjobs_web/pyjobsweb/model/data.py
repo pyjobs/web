@@ -160,7 +160,10 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
         if self.tags:
             for tag in self.tags:
                 if tag['tag'] in condition_tags:
-                    tag = Tag2(tag['tag'], tag['weight'], Tag2.get_css(tag['tag']))
+                    tag = Tag2(
+                            tag['tag'], tag['weight'],
+                            Tag2.get_css(tag['tag'])
+                    )
                     tags.append(tag)
         return tags
 
@@ -233,7 +236,6 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
 
 
 class JobOfferSQLAlchemy(DeclarativeBase):
-
     __tablename__ = 'jobs'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -242,23 +244,23 @@ class JobOfferSQLAlchemy(DeclarativeBase):
     source = sqlalchemy.Column(sqlalchemy.String(64))
 
     title = sqlalchemy.Column(
-        sqlalchemy.String(1024), nullable=False, default=''
+            sqlalchemy.String(1024), nullable=False, default=''
     )
     description = sqlalchemy.Column(
-        sqlalchemy.Text(), nullable=False, default=''
+            sqlalchemy.Text(), nullable=False, default=''
     )
     company = sqlalchemy.Column(
-        sqlalchemy.String(1024), nullable=False, default=''
+            sqlalchemy.String(1024), nullable=False, default=''
     )
     company_url = sqlalchemy.Column(
-        sqlalchemy.String(1024), nullable=True, default=''
+            sqlalchemy.String(1024), nullable=True, default=''
     )
 
     address = sqlalchemy.Column(
-        sqlalchemy.String(2048), nullable=False, default=''
+            sqlalchemy.String(2048), nullable=False, default=''
     )
     tags = sqlalchemy.Column(
-        sqlalchemy.Text(), nullable=False, default=''
+            sqlalchemy.Text(), nullable=False, default=''
     )  # JSON
 
     publication_datetime = sqlalchemy.Column(sqlalchemy.DateTime)
@@ -267,7 +269,7 @@ class JobOfferSQLAlchemy(DeclarativeBase):
     crawl_datetime = sqlalchemy.Column(sqlalchemy.DateTime)
 
     already_in_elasticsearch = sqlalchemy.Column(
-        sqlalchemy.Boolean, nullable=False, default=False
+            sqlalchemy.Boolean, nullable=False, default=False
     )
 
     def __init__(self):
@@ -302,7 +304,10 @@ class JobOfferSQLAlchemy(DeclarativeBase):
         if self.tags:
             for tag in json.loads(self.tags):
                 if tag['tag'] in condition_tags:
-                    tag = Tag2(tag['tag'], tag['weight'], Tag2.get_css(tag['tag']))
+                    tag = Tag2(
+                            tag['tag'], tag['weight'],
+                            Tag2.get_css(tag['tag'])
+                    )
                     tags.append(tag)
         return tags
 
@@ -315,46 +320,44 @@ class JobOfferSQLAlchemy(DeclarativeBase):
             tags.append(tag)
 
         return JobOfferElasticsearch(
-            id=self.id,
-            url=self.url,
-            source=self.source,
-            title=self.title,
-            description=self.description,
-            company=self.company,
-            company_url=self.company_url,
-            address=self.address,
-            tags=tags,
-            publication_datetime=self.publication_datetime,
-            publication_datetime_is_fake=self.publication_datetime_is_fake,
-            crawl_datetime=self.publication_datetime
+                id=self.id,
+                url=self.url,
+                source=self.source,
+                title=self.title,
+                description=self.description,
+                company=self.company,
+                company_url=self.company_url,
+                address=self.address,
+                tags=tags,
+                publication_datetime=self.publication_datetime,
+                publication_datetime_is_fake=self.publication_datetime_is_fake,
+                crawl_datetime=self.publication_datetime
         )
 
     @classmethod
     def job_offer_exists(cls, url):
-        return pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
-            .filter(pyjobsweb.model.data.JobOfferSQLAlchemy.url == url)\
+        return pyjobsweb.model.DBSession \
+            .query(JobOfferSQLAlchemy) \
+            .filter(JobOfferSQLAlchemy.url == url) \
             .count()
 
     @classmethod
     def mark_as_inserted_in_elasticsearch(cls, offer_id):
         transaction.begin()
-        pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
-            .filter(pyjobsweb.model.data.JobOfferSQLAlchemy.id == offer_id)\
+        pyjobsweb.model.DBSession \
+            .query(JobOfferSQLAlchemy) \
+            .filter(JobOfferSQLAlchemy.id == offer_id) \
             .update({'already_in_elasticsearch': True})
         transaction.commit()
 
     @classmethod
     def compute_elasticsearch_pending_insertion(cls):
-        return pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
+        return pyjobsweb.model.DBSession \
+            .query(JobOfferSQLAlchemy) \
             .filter_by(already_in_elasticsearch=False)
 
     @classmethod
     def get_all_job_offers(cls):
-        return pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.JobOfferSQLAlchemy)\
-            .order_by(
-                pyjobsweb.model.JobOfferSQLAlchemy.publication_datetime.desc()
-            )
+        return pyjobsweb.model.DBSession \
+            .query(JobOfferSQLAlchemy) \
+            .order_by(JobOfferSQLAlchemy.publication_datetime.desc())
