@@ -172,10 +172,6 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
 
         fields = ["description", "title"]
 
-        print query
-        print from_location
-        print max_dist
-
         s = pyjobsweb.model.JobOfferElasticsearch\
             .search()\
             .params(size=1000)\
