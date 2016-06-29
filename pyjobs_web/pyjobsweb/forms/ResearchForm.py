@@ -21,14 +21,14 @@ class ResearchForm(twf.Form):
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="from_location">Autour de :</label>
                         <div class="col-sm-10">
-                            ${w.children.from_location.display()|n}
+                            ${w.children.center.display()|n}
                         </div>
                     </div>
                     <div class="col-xs-12" style="height:3px;"></div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="max_dist">Dans un rayon de :</label>
                         <div class="col-sm-10">
-                            ${w.children.max_dist.display()|n}
+                            ${w.children.radius.display()|n}
                         </div>
                     </div>
                     <div class="col-xs-12" style="height:3px;"></div>
@@ -37,36 +37,40 @@ class ResearchForm(twf.Form):
                             ${w.submit.display()|n}
                         </div>
                     </div>
+                    ${w.children.unit.display()|n}
                 </form>
             </div>
             '''
 
-        query = twf.TextField(
-                name="query", label=""
-        )
+        query = twf.TextField(name="query", label="")
         query.css_class = "form-control"
         query.placeholder = u"Mot clés recherchés..."
         query.value = ""
 
-        from_location = twf.TextField(
-                name="from_location", label=""
-        )
-        from_location.css_class = "form-control"
-        from_location.placeholder = u"Géolocalisation..."
-        from_location.value = ""
+        center = twf.TextField(name="center", label="")
+        center.css_class = "form-control"
+        center.placeholder = u"Géolocalisation..."
+        center.value = ""
 
-        max_dist = twf.SingleSelectField(
-                name="max_dist", label=""
-        )
-        max_dist.css_class = "form-control col-sm-12"
+        radius = twf.SingleSelectField(name="radius", label="")
+        radius.css_class = "form-control col-sm-12"
         distances = [
             "5", "10", "25", "50", "100", "200", "200+"
         ]
-        distances_km = []
-        for d in distances:
-            distances_km.append("{}{}".format(d, "km"))
-        max_dist.options = distances_km
-        max_dist.prompt_text = "Distance maximale"
+        options = []
+        for i, d in enumerate(distances):
+            distances_km = "{}{}".format(d, "km")
+            if i == len(distances) - 1:
+                option = ('infty', distances_km)
+            else:
+                option = (d, distances_km)
+
+            options.append(option)
+
+        radius.options = options
+        radius.prompt_text = "Distance maximale"
+
+        unit = twf.HiddenField(name="unit", label="", value="km")
 
         submit = twf.SubmitButton("submit")
         submit.value = "J'effectue ma recherche"

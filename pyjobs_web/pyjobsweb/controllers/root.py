@@ -84,8 +84,8 @@ class RootController(BaseController):
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
-    def index(self, query=None, from_location=None, max_dist=None):
-        if not query and not from_location and not max_dist:
+    def index(self, query=None, center=None, radius=None, unit=None):
+        if not query and not center and not radius and not unit:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
             keywords = []
@@ -99,14 +99,15 @@ class RootController(BaseController):
                         }
                 )
 
-            if from_location and max_dist:
+            if center and radius:
                 import geopy
                 geolocator = geopy.geocoders.Nominatim()
-                location = geolocator.geocode(from_location)
+                location = geolocator.geocode(center)
 
                 if location:
-                    geoloc['center'] = [location.longitude, location.latitude]
-                    geoloc['radius'] = max_dist
+                    geoloc['center'] = [location.latitude, location.longitude]
+                    geoloc['radius'] = float(radius)
+                    geoloc['unit'] = unit
 
             search_query = dict()
             search_query['keywords_query'] = keywords

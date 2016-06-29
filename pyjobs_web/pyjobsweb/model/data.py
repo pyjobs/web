@@ -189,8 +189,9 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
                 ...
             ],
             'geoloc_query': {
-                'center': [longitude, latitude],
-                'radius': 'xkm'
+                'center': [latitude, longitude],
+                'radius': x
+                'unit': '(km|m)'
             },
             'parameters': {
                 'size' : x,
