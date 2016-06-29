@@ -113,7 +113,7 @@ class GeolocationFilter(Filter):
     def center(self, center):
         center_type = GeolocationFilter.Center
         if not isinstance(center, center_type):
-            raise TypeError('center should be a list of type %s.', center_type)
+            raise TypeError('center should be of type %s.', center_type)
 
         self._center = center
 
