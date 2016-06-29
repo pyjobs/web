@@ -209,14 +209,23 @@ class QueryTranslator(object):
 
 
 class QueryBuilder(object):
-    def __init__(self, translator):
-        self._type = QueryTranslator
+    _translator = None
 
-        if not isinstance(translator, QueryTranslator):
-            raise TypeError('translator should be of type %s.' % self._type)
+    def __init__(self, translator):
+        self.translator = translator
+        self._query = Query()
+
+    @property
+    def translator(self):
+        return self._translator
+
+    @translator.setter
+    def translator(self, translator):
+        qt_type = QueryTranslator
+        if not isinstance(translator, qt_type):
+            raise TypeError('translator should be of type %s.' % qt_type)
 
         self._translator = translator
-        self._query = Query()
 
     def add_filter(self, search_filter):
         self._query.append(search_filter)
