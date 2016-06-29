@@ -3,7 +3,7 @@ import abc
 
 
 class Filter(object):
-    abc.__metaclass__ = abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def translate(self, translator):
@@ -169,7 +169,7 @@ class Query(list):
 
 
 class QueryTranslator(object):
-    abc.__metaclass__ = abc.ABCMeta
+    __metaclass__ = abc.ABCMeta
 
     _query_object = None
 
