@@ -214,24 +214,28 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
             if 'request_cache' in query['parameters']:
                 s = s.params(request_cache=query['parameters']['request_cache'])
 
+        q = search_query.QueryBuilder(ElasticsearchTranslator(s))
+
         if 'keywords_query' in query:
             for k in query['keywords_query']:
-                s = s.query(
-                        'multi_match',
-                        fields=k['fields'],
-                        query=k['keywords']
-                )
+                fields = k['fields']
+                keywords = k['keywords']
+                q.add_filter(search_query.KeywordFilter(fields, keywords))
 
         if 'geoloc_query' in query:
             if 'center' in query['geoloc_query'] \
-                    and 'radius' in query['geoloc_query']:
-                s = s.filter(
-                        'geo_distance',
-                        geolocation=query['geoloc_query']['center'],
-                        distance=query['geoloc_query']['radius']
+                    and 'radius' in query['geoloc_query']\
+                    and 'unit' in query['geoloc_query']:
+                tmp = query['geoloc_query']['center']
+                center = search_query.GeolocationFilter.Center(tmp[0], tmp[1])
+                radius = query['geoloc_query']['radius']
+                tmp = query['geoloc_query']['unit']
+                unit = search_query.GeolocationFilter.UnitsEnum(tmp)
+                q.add_filter(
+                        search_query.GeolocationFilter(center, radius, unit)
                 )
 
-        s = s.sort("-publication_datetime")
+        s = q.build().sort("-publication_datetime")
 
         res = s.execute()
 
