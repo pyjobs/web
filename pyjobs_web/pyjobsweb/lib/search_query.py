@@ -9,23 +9,140 @@ class Filter(object):
     def translate(self, translator):
         pass
 
+    @abc.abstractmethod
+    def __str__(self):
+        return str()
+
 
 class KeywordFilter(Filter):
+    _fields = None
+    _keywords = None
+
     def __init__(self, fields, keywords):
-        self._fields = fields
-        self._keywords = keywords
+        self.fields = fields
+        self.keywords = keywords
 
     def translate(self, translator):
         translator.translate_keywordfilter(self)
 
+    @property
+    def fields(self):
+        return self._fields
+
+    @fields.setter
+    def fields(self, fields):
+        if not isinstance(fields, list) \
+                or not all(isinstance(f, basestring) for f in fields):
+            raise TypeError('fields should should be a list of strings.')
+
+        self._fields = fields
+
+    @property
+    def keywords(self):
+        return self._keywords
+
+    @keywords.setter
+    def keywords(self, keywords):
+        if not isinstance(keywords, list) \
+                or not all(isinstance(kw, basestring) for kw in keywords):
+            raise TypeError('keywords should should be a list of strings.')
+
+        self._keywords = keywords
+
+    def __str__(self):
+        return 'KeywordFilter: [{}, {}]'.format(self._fields, self._keywords)
+
 
 class GeolocationFilter(Filter):
-    def __init__(self, center, radius):
-        self._center = center
-        self._radius = radius
+    _center = None
+    _radius = None
+    _unit = None
+
+    from enum import Enum
+
+    class UnitsEnum(Enum):
+        km = 'km'
+        m = 'm'
+
+    class Center(object):
+        _latitude = None
+        _longitude = None
+
+        def __init__(self, latitude, longitude):
+            self.latitude = latitude
+            self.longitude = longitude
+
+        @property
+        def latitude(self):
+            return self._latitude
+
+        @latitude.setter
+        def latitude(self, latitude):
+            if not isinstance(latitude, float):
+                raise TypeError('latitude should be of type %s.' % float)
+
+            self._latitude = latitude
+
+        @property
+        def longitude(self):
+            return self._longitude
+
+        @longitude.setter
+        def longitude(self, longitude):
+            if not isinstance(longitude, float):
+                raise TypeError('longitude should be of type %s.' % float)
+
+            self._longitude = longitude
+
+        def __str__(self):
+            return '[{}, {}]'.format(self.latitude, self.longitude)
+
+    def __init__(self, center, radius, unit=UnitsEnum.km):
+        self.center = center
+        self.radius = radius
+        self.unit = unit
 
     def translate(self, translator):
         translator.translate_geolocationfilter(self)
+
+    @property
+    def center(self):
+        return self._center
+
+    @center.setter
+    def center(self, center):
+        center_type = GeolocationFilter.Center
+        if not isinstance(center, center_type):
+            raise TypeError('center should be a list of type %s.', center_type)
+
+        self._center = center
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @radius.setter
+    def radius(self, radius):
+        if not isinstance(radius, float):
+            raise TypeError('radius should be of type %s.' % float)
+
+        self._radius = radius
+
+    @property
+    def unit(self):
+        return self._unit.value
+
+    @unit.setter
+    def unit(self, unit):
+        unit_enum = GeolocationFilter.UnitsEnum
+        if unit not in unit_enum:
+            raise TypeError('unit should be of type %s.' % unit_enum)
+
+        self._unit = unit
+
+    def __str__(self):
+        return 'GeolocationFilter[Center: {}, Radius: {}]'\
+            .format(self._center, self._radius)
 
 
 class Query(list):
@@ -39,12 +156,25 @@ class Query(list):
 
         super(Query, self).append(search_filter)
 
+    def __str__(self):
+        res = '['
+
+        for i, e in enumerate(self):
+            if i > 0:
+                res = '{}, '.format(res)
+
+            res = '{}{}'.format(res, e)
+
+        return '{}]'.format(res)
+
 
 class QueryTranslator(object):
     abc.__metaclass__ = abc.ABCMeta
 
-    def __init__(self):
+    @abc.abstractmethod
+    def __init__(self, query_object):
         self._type = Query
+        self._query = query_object
 
     def translate(self, query):
         if not isinstance(query, Query):
@@ -53,14 +183,14 @@ class QueryTranslator(object):
         for search_query in query:
             search_query.translate(self)
 
-    @staticmethod
+        return self._query
+
     @abc.abstractmethod
-    def translate_keywordfilter(search_filter):
+    def translate_keywordfilter(self, search_filter):
         pass
 
-    @staticmethod
     @abc.abstractmethod
-    def translate_geolocationfilter(search_filter):
+    def translate_geolocationfilter(self, search_filter):
         pass
 
 
@@ -79,3 +209,6 @@ class QueryBuilder(object):
 
     def build(self):
         return self._translator.translate(self._query)
+
+    def __str__(self):
+        return self._query.__str__()
