@@ -85,7 +85,7 @@ class RootController(BaseController):
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
     def index(self, query=None, center=None, radius=None, unit=None):
-        if not query and not center and not radius and not unit:
+        if not query and not center and not radius:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
             keywords = []
