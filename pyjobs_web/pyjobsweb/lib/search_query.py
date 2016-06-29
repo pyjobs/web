@@ -171,10 +171,24 @@ class Query(list):
 class QueryTranslator(object):
     abc.__metaclass__ = abc.ABCMeta
 
+    _type = None
+    _query_object = None
+
     @abc.abstractmethod
     def __init__(self, query_object):
         self._type = Query
-        self._query = query_object
+        self.query_object = query_object
+
+    @property
+    def query_object(self):
+        return self._query_object
+
+    @query_object.setter
+    def query_object(self, query_object):
+        if not query_object:
+            raise ValueError('query_object should not be null.')
+
+        self._query_object = query_object
 
     def translate(self, query):
         if not isinstance(query, Query):
@@ -183,7 +197,7 @@ class QueryTranslator(object):
         for search_query in query:
             search_query.translate(self)
 
-        return self._query
+        return self.query_object
 
     @abc.abstractmethod
     def translate_keywordfilter(self, search_filter):

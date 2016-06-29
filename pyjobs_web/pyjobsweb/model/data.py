@@ -247,14 +247,14 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
         super(ElasticsearchTranslator, self).__init__(query_object)
 
     def translate_keywordfilter(self, search_filter):
-        self._query = self._query.query(
+        self.query_object = self.query_object.query(
                 'multi_match',
                 fields=search_filter.fields,
                 query=search_filter.keywords
         )
 
     def translate_geolocationfilter(self, search_filter):
-        self._query = self._query.filter(
+        self.query_object = self.query_object.filter(
                 'geo_distance',
                 geolocation=[
                     search_filter.center.longitude,
