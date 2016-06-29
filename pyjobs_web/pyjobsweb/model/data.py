@@ -5,6 +5,8 @@ import sqlalchemy
 import transaction
 from pyjobs_crawlers.tools import get_sources, condition_tags
 
+
+import pyjobsweb.lib.search_query as search_query
 import pyjobsweb.model
 from pyjobsweb.model import DeclarativeBase
 
@@ -233,6 +235,28 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
         res = s.execute()
 
         return res.hits
+
+
+class ElasticsearchTranslator(search_query.QueryTranslator):
+    def __init__(self, query_object):
+        super(ElasticsearchTranslator, self).__init__(query_object)
+
+    def translate_keywordfilter(self, search_filter):
+        self._query = self._query.query(
+                'multi_match',
+                fields=search_filter.fields,
+                query=search_filter.keywords
+        )
+
+    def translate_geolocationfilter(self, search_filter):
+        self._query = self._query.filter(
+                'geo_distance',
+                geolocation=[
+                    search_filter.center.longitude,
+                    search_filter.center.latitude
+                ],
+                distance='{}{}'.format(search_filter.radius, search_filter.unit)
+        )
 
 
 class JobOfferSQLAlchemy(DeclarativeBase):
