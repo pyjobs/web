@@ -88,37 +88,28 @@ class RootController(BaseController):
         if not query and not center and not radius:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
-            keywords = []
-            geoloc = dict()
+            import pyjobsweb.lib.search_query as sq
+
+            search_query = model.ElasticsearchQuery()
 
             if query:
-                keywords.append(
-                        {
-                            'fields': ['description', 'title'],
-                            'keywords': query.split(' ')
-                        }
-                )
+                default_fields = ['description', 'title']
+                keywords = query.split(' ')
+                search_query.builder.add_filter(sq.KeywordFilter(default_fields, keywords))
 
             if center and radius:
                 import geopy
                 geolocator = geopy.geocoders.Nominatim()
-                location = geolocator.geocode(center)
+                loc = geolocator.geocode(center)
+                center_point = sq.GeolocationFilter.Center(loc.latitude, loc.longitude)
+                try:
+                    radius = float(radius)
+                    unit = sq.GeolocationFilter.UnitsEnum(unit)
+                    search_query.builder.add_filter(sq.GeolocationFilter(center_point, radius, unit))
+                except ValueError:
+                    pass
 
-                if location:
-                    geoloc['center'] = [location.latitude, location.longitude]
-                    geoloc['radius'] = float(radius)
-                    geoloc['unit'] = unit
-
-            search_query = dict()
-            search_query['keywords_query'] = keywords
-            search_query['geoloc_query'] = geoloc
-            search_query['parameters'] = dict()
-            search_query['parameters']['size'] = 1000
-            search_query['parameters']['from'] = 0
-            search_query['parameters']['timeout'] = '5s'
-            search_query['parameters']['request_cache'] = True
-
-            job_offers = JobOfferElasticsearch.research_job_offers(search_query)
+            job_offers = search_query.execute_query()
 
         search_form = ResearchForm(action='/', method='POST').req()
 

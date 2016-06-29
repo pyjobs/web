@@ -169,78 +169,6 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
                     tags.append(tag)
         return tags
 
-    @classmethod
-    def research_job_offers(cls, query=None):
-        """
-        Perform a research query on the Elasticsearch database, more
-        specifically, a research on the documents of type job-offer indexed
-        under the jobs index.
-        :param query: a dictionary of the following form:
-        {
-            'keywords_query': [
-                {
-                    'fields': ['field1', 'field2', ...],
-                    'keywords': ['keyword1', 'keyword2', ...]
-                },
-                {
-                    'fields': ['field1', 'field2', ...],
-                    'keywords': ['keyword1', 'keyword2', ...]
-                },
-                ...
-            ],
-            'geoloc_query': {
-                'center': [latitude, longitude],
-                'radius': x
-                'unit': '(km|m)'
-            },
-            'parameters': {
-                'size' : x,
-                'from' : x,
-                'timeout': x(m|s|ms),
-                'request_cache': (true|false)
-            }
-        }
-        :return: a list of JobOfferElasticsearch objects matching the query
-        """
-        s = JobOfferElasticsearch.search()
-
-        if 'parameters' in query:
-            if 'size' in query['parameters']:
-                s = s.params(size=query['parameters']['size'])
-            if 'from' in query['parameters']:
-                s = s.params(from_=query['parameters']['from'])
-            if 'timeout' in query['parameters']:
-                s = s.params(timeout=query['parameters']['timeout'])
-            if 'request_cache' in query['parameters']:
-                s = s.params(request_cache=query['parameters']['request_cache'])
-
-        q = search_query.QueryBuilder(ElasticsearchTranslator(s))
-
-        if 'keywords_query' in query:
-            for k in query['keywords_query']:
-                fields = k['fields']
-                keywords = k['keywords']
-                q.add_filter(search_query.KeywordFilter(fields, keywords))
-
-        if 'geoloc_query' in query:
-            if 'center' in query['geoloc_query'] \
-                    and 'radius' in query['geoloc_query']\
-                    and 'unit' in query['geoloc_query']:
-                tmp = query['geoloc_query']['center']
-                center = search_query.GeolocationFilter.Center(tmp[0], tmp[1])
-                radius = query['geoloc_query']['radius']
-                tmp = query['geoloc_query']['unit']
-                unit = search_query.GeolocationFilter.UnitsEnum(tmp)
-                q.add_filter(
-                        search_query.GeolocationFilter(center, radius, unit)
-                )
-
-        s = q.build().sort("-publication_datetime")
-
-        res = s.execute()
-
-        return res.hits
-
 
 class ElasticsearchTranslator(search_query.QueryTranslator):
     def __init__(self, query_object):
@@ -262,6 +190,18 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
                 ],
                 distance='{}{}'.format(search_filter.radius, search_filter.unit)
         )
+
+
+class ElasticsearchQuery(search_query.GenericSearchQuery):
+    def __init__(self):
+        search_obj = JobOfferElasticsearch.search()
+        translator = ElasticsearchTranslator(search_obj)
+        query_builder = search_query.QueryBuilder(translator)
+
+        super(ElasticsearchQuery, self).__init__(query_builder)
+
+    def execute_query(self):
+        return self.builder.build().execute().hits
 
 
 class JobOfferSQLAlchemy(DeclarativeBase):

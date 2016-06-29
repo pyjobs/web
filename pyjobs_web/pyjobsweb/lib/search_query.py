@@ -233,3 +233,29 @@ class QueryBuilder(object):
 
     def __str__(self):
         return self._query.__str__()
+
+
+class GenericSearchQuery(object):
+    __metaclass__ = abc.ABCMeta
+
+    _query_builder = None
+
+    @abc.abstractmethod
+    def __init__(self, query_builder):
+        self.builder = query_builder
+
+    @property
+    def builder(self):
+        return self._query_builder
+
+    @builder.setter
+    def builder(self, builder):
+        build_type = QueryBuilder
+        if not isinstance(builder, build_type):
+            raise TypeError('query_builder should be of type %s.' % build_type)
+
+        self._query_builder = builder
+
+    @abc.abstractmethod
+    def execute_query(self):
+        pass
