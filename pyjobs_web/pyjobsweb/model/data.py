@@ -202,7 +202,7 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
         }
         :return: a list of JobOfferElasticsearch objects matching the query
         """
-        s = pyjobsweb.model.JobOfferElasticsearch.search()
+        s = JobOfferElasticsearch.search()
 
         if 'parameters' in query:
             if 'size' in query['parameters']:
