@@ -204,6 +204,7 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
 class ElasticsearchQuery(search_query.GenericSearchQuery):
     def __init__(self):
         search_obj = JobOfferElasticsearch.search()
+        search_obj = search_obj.params(size=1000)
         translator = ElasticsearchTranslator(search_obj)
         query_builder = search_query.QueryBuilder(translator)
 
