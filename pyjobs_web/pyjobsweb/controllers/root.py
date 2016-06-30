@@ -102,9 +102,9 @@ class RootController(BaseController):
                 geolocator = geopy.geocoders.Nominatim()
                 loc = geolocator.geocode(center)
                 center_point = sq.GeolocationFilter.Center(loc.latitude, loc.longitude)
+                unit = sq.GeolocationFilter.UnitsEnum(unit)
                 try:
                     radius = float(radius)
-                    unit = sq.GeolocationFilter.UnitsEnum(unit)
                     search_query.builder.add_filter(sq.GeolocationFilter(center_point, radius, unit))
                 except ValueError:
                     pass
