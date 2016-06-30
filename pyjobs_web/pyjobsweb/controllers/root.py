@@ -95,7 +95,7 @@ class RootController(BaseController):
             if query:
                 default_fields = ['description', 'title']
                 keywords = query.split(' ')
-                search_query.builder.add_filter(sq.KeywordFilter(default_fields, keywords))
+                search_query.builder.add_elem(sq.KeywordFilter(default_fields, keywords))
 
             if center and radius:
                 import geopy
@@ -105,9 +105,13 @@ class RootController(BaseController):
                 unit = sq.GeolocationFilter.UnitsEnum(unit)
                 try:
                     radius = float(radius)
-                    search_query.builder.add_filter(sq.GeolocationFilter(center_point, radius, unit))
+                    search_query.builder.add_elem(sq.GeolocationFilter(center_point, radius, unit))
                 except ValueError:
                     pass
+
+            ms = sq.Sort()
+            ms.append(sq.DescSortStatement('publication_datetime'))
+            search_query.builder.add_elem(ms)
 
             job_offers = search_query.execute_query()
 

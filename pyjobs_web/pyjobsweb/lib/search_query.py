@@ -2,7 +2,7 @@
 import abc
 
 
-class Filter(object):
+class Translatable(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
@@ -14,6 +14,73 @@ class Filter(object):
         return str()
 
 
+class QueryElement(Translatable):
+    __metaclass__ = abc.ABCMeta
+
+
+class Filter(QueryElement):
+    __metaclass__ = abc.ABCMeta
+
+
+class SortStatement(Translatable):
+    __metaclass__ = abc.ABCMeta
+
+    _to_sort = None
+
+    def __init__(self, to_sort):
+        self.to_sort = to_sort
+
+    @property
+    def to_sort(self):
+        return self._to_sort
+
+    @to_sort.setter
+    def to_sort(self, to_sort):
+        self._to_sort = to_sort
+
+
+class Sort(list, QueryElement):
+    def __init__(self):
+        super(list, self).__init__()
+        self._type = SortStatement
+
+    def append(self, sort):
+        if not isinstance(sort, SortStatement):
+            raise TypeError('sort should be of type %s.' % self._type)
+
+        super(Sort, self).append(sort)
+
+    def translate(self, translator):
+        return translator.translate_multisort(self)
+
+    def __str__(self):
+        res = 'Sort['
+
+        for i, e in enumerate(self):
+            if i > 0:
+                res = '{}, '.format(res)
+
+            res = '{}{}'.format(res, e)
+
+        return '{}]'.format(res)
+
+
+class AscSortStatement(SortStatement):
+    def translate(self, translator):
+        return translator.translate_ascsort(self)
+
+    def __str__(self):
+        return 'AscSortStatement[to_sort: {}]'.format(self.to_sort)
+
+
+class DescSortStatement(SortStatement):
+    def translate(self, translator):
+        return translator.translate_descsort(self)
+
+    def __str__(self):
+        return 'DescSortStatement[to_sort: {}]'.format(self.to_sort)
+
+
 class KeywordFilter(Filter):
     _fields = None
     _keywords = None
@@ -23,7 +90,7 @@ class KeywordFilter(Filter):
         self.keywords = keywords
 
     def translate(self, translator):
-        translator.translate_keywordfilter(self)
+        return translator.translate_keywordfilter(self)
 
     @property
     def fields(self):
@@ -103,7 +170,7 @@ class GeolocationFilter(Filter):
         self.unit = unit
 
     def translate(self, translator):
-        translator.translate_geolocationfilter(self)
+        return translator.translate_geolocationfilter(self)
 
     @property
     def center(self):
@@ -148,16 +215,16 @@ class GeolocationFilter(Filter):
 class Query(list):
     def __init__(self):
         super(list, self).__init__()
-        self._type = Filter
+        self._type = QueryElement
 
-    def append(self, search_filter):
-        if not isinstance(search_filter, Filter):
+    def append(self, query_elem):
+        if not isinstance(query_elem, QueryElement):
             raise TypeError('search_filter should be of type %s.' % self._type)
 
-        super(Query, self).append(search_filter)
+        super(Query, self).append(query_elem)
 
     def __str__(self):
-        res = '['
+        res = 'Query['
 
         for i, e in enumerate(self):
             if i > 0:
@@ -193,9 +260,21 @@ class QueryTranslator(object):
             raise TypeError('query should be of type %s.' % Query)
 
         for search_query in query:
-            search_query.translate(self)
+            self.query_object = search_query.translate(self)
 
         return self.query_object
+
+    @abc.abstractmethod
+    def translate_multisort(self, multi_sort):
+        pass
+
+    @abc.abstractmethod
+    def translate_ascsort(self, asc_sort):
+        pass
+
+    @abc.abstractmethod
+    def translate_descsort(self, desc_sort):
+        pass
 
     @abc.abstractmethod
     def translate_keywordfilter(self, search_filter):
@@ -225,8 +304,8 @@ class QueryBuilder(object):
 
         self._translator = translator
 
-    def add_filter(self, search_filter):
-        self._query.append(search_filter)
+    def add_elem(self, elem):
+        self._query.append(elem)
 
     def build(self):
         return self._translator.translate(self._query)
