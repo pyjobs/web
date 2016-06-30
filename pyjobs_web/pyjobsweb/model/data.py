@@ -174,13 +174,13 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
     def __init__(self, query_object):
         super(ElasticsearchTranslator, self).__init__(query_object)
 
-    def translate_multisort(self, multi_sort):
+    def translate_sort(self, multi_sort):
         return self.query_object.sort(*[s.translate(self) for s in multi_sort])
 
-    def translate_ascsort(self, asc_sort):
+    def translate_ascsort_statement(self, asc_sort):
         return '{}'.format(asc_sort.to_sort)
 
-    def translate_descsort(self, desc_sort):
+    def translate_descsort_statement(self, desc_sort):
         return '-{}'.format(desc_sort.to_sort)
 
     def translate_keywordfilter(self, search_filter):
@@ -201,7 +201,7 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
         )
 
 
-class ElasticsearchQuery(search_query.GenericSearchQuery):
+class ElasticsearchQuery(search_query.BaseSearchQuery):
     def __init__(self):
         search_obj = JobOfferElasticsearch.search()
         search_obj = search_obj.params(size=1000)

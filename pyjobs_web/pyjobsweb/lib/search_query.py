@@ -51,7 +51,7 @@ class Sort(list, QueryElement):
         super(Sort, self).append(sort)
 
     def translate(self, translator):
-        return translator.translate_multisort(self)
+        return translator.translate_sort(self)
 
     def __str__(self):
         res = 'Sort['
@@ -67,7 +67,7 @@ class Sort(list, QueryElement):
 
 class AscSortStatement(SortStatement):
     def translate(self, translator):
-        return translator.translate_ascsort(self)
+        return translator.translate_ascsort_statement(self)
 
     def __str__(self):
         return 'AscSortStatement[to_sort: {}]'.format(self.to_sort)
@@ -75,7 +75,7 @@ class AscSortStatement(SortStatement):
 
 class DescSortStatement(SortStatement):
     def translate(self, translator):
-        return translator.translate_descsort(self)
+        return translator.translate_descsort_statement(self)
 
     def __str__(self):
         return 'DescSortStatement[to_sort: {}]'.format(self.to_sort)
@@ -265,15 +265,15 @@ class QueryTranslator(object):
         return self.query_object
 
     @abc.abstractmethod
-    def translate_multisort(self, multi_sort):
+    def translate_sort(self, multi_sort):
         pass
 
     @abc.abstractmethod
-    def translate_ascsort(self, asc_sort):
+    def translate_ascsort_statement(self, asc_sort):
         pass
 
     @abc.abstractmethod
-    def translate_descsort(self, desc_sort):
+    def translate_descsort_statement(self, desc_sort):
         pass
 
     @abc.abstractmethod
@@ -314,7 +314,7 @@ class QueryBuilder(object):
         return self._query.__str__()
 
 
-class GenericSearchQuery(object):
+class BaseSearchQuery(object):
     __metaclass__ = abc.ABCMeta
 
     _query_builder = None
