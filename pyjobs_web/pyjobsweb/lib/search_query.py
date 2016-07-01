@@ -338,3 +338,6 @@ class BaseSearchQuery(object):
     @abc.abstractmethod
     def execute_query(self):
         pass
+
+    def __str__(self):
+        return self.builder.__str__()
