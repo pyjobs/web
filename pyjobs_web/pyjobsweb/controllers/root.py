@@ -21,7 +21,6 @@ from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
 from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import JobOfferSQLAlchemy, SOURCES
-from pyjobsweb.model.data import JobOfferElasticsearch
 from pyjobsweb.forms.ResearchForm import ResearchForm
 
 __all__ = ['RootController']
@@ -57,30 +56,6 @@ class RootController(BaseController):
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "Algoo"
-
-    @staticmethod
-    def query_builder(keywords=None, geoloc=None, size=1000):
-        query = dict()
-
-        query['size'] = 1000
-
-        if keywords:
-            query['keywords_query'] = []
-
-        for k in keywords:
-            query['keywords_query'].append(
-                    {
-                        'fields': k['fields'],
-                        'keywords': k['keywords']
-                    }
-            )
-
-        if geoloc:
-            query['geoloc_query'] = {
-                'from': geoloc['from'], 'radius': geoloc['radius']
-            }
-
-        return query
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=20)
