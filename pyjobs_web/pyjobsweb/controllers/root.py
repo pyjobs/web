@@ -57,15 +57,17 @@ class RootController(BaseController):
     def _before(self, *args, **kw):
         tmpl_context.project_name = "Algoo"
 
+    items_per_page = 20
+
     @expose('pyjobsweb.templates.jobs')
-    @paginate('jobs', items_per_page=20)
-    def index(self, query=None, center=None, radius=None, unit=None):
+    @paginate('jobs', items_per_page=items_per_page)
+    def index(self, query=None, radius=None, center=None, unit=None):
         if not query and not center and not radius:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
             import pyjobsweb.lib.search_query as sq
 
-            search_query = model.ElasticsearchQuery()
+            search_query = model.ElasticsearchQuery(0, self.items_per_page * 50)
 
             if query:
                 default_fields = ['description', 'title']

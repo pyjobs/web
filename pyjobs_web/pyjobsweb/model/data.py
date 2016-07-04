@@ -202,16 +202,19 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
 
 
 class ElasticsearchQuery(search_query.BaseSearchQuery):
-    def __init__(self):
+    def __init__(self, page_num, page_size):
         search_obj = JobOfferElasticsearch.search()
-        search_obj = search_obj.params(size=1000)
+        search_obj = search_obj.params()
         translator = ElasticsearchTranslator(search_obj)
         query_builder = search_query.QueryBuilder(translator)
+
+        self._from = page_num * page_size
+        self._to = self._from + page_size
 
         super(ElasticsearchQuery, self).__init__(query_builder)
 
     def execute_query(self):
-        return self.builder.build().execute().hits
+        return (self.builder.build()[self._from:self._to]).execute().hits
 
 
 class JobOfferSQLAlchemy(DeclarativeBase):
