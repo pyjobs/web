@@ -1,6 +1,66 @@
 # -*- coding: utf-8 -*-
 import tw2.core as twc
 import tw2.forms as twf
+import tw2.jqplugins.select2 as twsel
+
+
+class GeocompleteField(twsel.Select2AjaxSingleSelectField):
+    attrs = dict(style='width: 100%;')
+    options = []
+    opts = dict(
+        placeholder=u'Rechercher une localisation...',
+        no_results_text=u'Aucun résultat ne correspond à votre recherche...',
+        minimumInputLength=1,
+        ajax=dict(
+            # instead of writing the function to execute the
+            # request we use Select2's convenient helper
+            url="TODO",
+            dataType='TODO',
+            delay=100,
+            data=twc.js_callback(
+                """
+                function (term, page) {
+                    // TODO
+                }
+                """
+            ),
+            results=twc.js_callback(
+                """
+                function (data, page) {
+                    // TODO
+                }
+                """
+            ),
+        ),
+        initSelection=twc.js_callback(
+            """
+            function(element, callback) {
+                // TODO
+            }
+            """
+        ),
+        formatSelection=twc.js_callback(
+            """
+            function(movie) {
+                // TODO
+            }
+            """
+        ),
+        formatResult=twc.js_callback(
+            """
+            function(movie) {
+                // TODO
+            }
+            """
+        ),
+        formatInputTooShort=twc.js_callback(
+            """
+            function() {
+                return 'Veuillez saisir %s caract\\xE8re(s) suppl\\xE9mentaire(s)...';
+            }
+            """ % 1
+        )
+    )
 
 
 class ResearchForm(twf.Form):
@@ -42,18 +102,26 @@ class ResearchForm(twf.Form):
             </div>
             '''
 
-        query = twf.TextField(name="query", label="")
-        query.css_class = "form-control"
-        query.placeholder = u"Mot clés recherchés..."
-        query.value = ""
+        query = twsel.Select2MultipleSelectField(
+            name='query',
+            label='',
+            options=[],
+            value='',
+            attrs=dict(style='width: 100%;'),
+            placeholder=u"Mot clés recherchés...",
+            opts=dict(
+                tags=['Python', 'Django', 'Turbogears', 'Pypi'],
+                maximumSelectionSize=10,
+                tokenSeparators=[",", " "]
+            ),
+            ondemand=True,
+        )
 
-        center = twf.TextField(name="center", label="")
-        center.css_class = "form-control"
-        center.placeholder = u"Géolocalisation..."
-        center.value = ""
+        center = GeocompleteField(name="center", label="")
 
-        radius = twf.SingleSelectField(name="radius", label="")
-        radius.css_class = "form-control col-sm-12"
+        radius = twsel.Select2SingleSelectField(name="radius", label="")
+        radius.attrs = dict(style='width: 100%')
+        radius.css_class = "col-sm-12"
         distances = [
             "5", "10", "25", "50", "100", "200", "200+"
         ]

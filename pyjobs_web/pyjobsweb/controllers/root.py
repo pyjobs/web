@@ -69,10 +69,9 @@ class RootController(BaseController):
 
             search_query = model.ElasticsearchQuery(0, self.items_per_page * 50)
 
-            if query:
-                default_fields = ['description', 'title']
-                keywords = query.split(' ')
-                search_query.builder.add_elem(sq.KeywordFilter(default_fields, keywords))
+            search_on = ['description', 'title']
+            for q in query.split(','):
+                search_query.builder.add_elem(sq.KeywordFilter(search_on, [q]))
 
             if center and radius:
                 import geopy
