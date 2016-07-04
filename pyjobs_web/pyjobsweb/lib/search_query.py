@@ -112,7 +112,7 @@ class KeywordFilter(Filter):
     def keywords(self, keywords):
         if not isinstance(keywords, list) \
                 or not all(isinstance(kw, basestring) for kw in keywords):
-            raise TypeError('keywords should should be a list of strings.')
+            raise TypeError('keywords should be a list of strings.')
 
         self._keywords = keywords
 
