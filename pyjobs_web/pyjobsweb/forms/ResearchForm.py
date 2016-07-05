@@ -2,6 +2,7 @@
 import tw2.core as twc
 import tw2.forms as twf
 import tw2.jqplugins.select2 as twsel
+import tg
 
 
 class GeocompleteField(twsel.Select2AjaxSingleSelectField):
@@ -11,45 +12,62 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
         placeholder=u'Rechercher une localisation...',
         no_results_text=u'Aucun résultat ne correspond à votre recherche...',
         minimumInputLength=1,
+        maximumInputLength=125,
+        allowClear=True,
         ajax=dict(
-            # instead of writing the function to execute the
-            # request we use Select2's convenient helper
-            url="TODO",
-            dataType='TODO',
-            delay=100,
+            # url='{}/geocomplete'.format(
+            #     tg.config.get('site.domain_base_url')
+            # ),
+            url='/geocomplete',
+            dataType='json',
+            type='POST',
+            delay=250,
+            cache=True,
             data=twc.js_callback(
                 """
                 function (term, page) {
-                    // TODO
+                    return {address: term};
                 }
                 """
             ),
             results=twc.js_callback(
                 """
                 function (data, page) {
-                    // TODO
+                    var results = [];
+                    $.each(data['results'], function (i, v) {
+                        var o = {};
+                        o.id = i;
+                        o.name = v;
+                        o.value = v;
+                        results.push(o);
+                    })
+
+                    return {
+                        results: results
+                    };
                 }
                 """
             ),
         ),
-        initSelection=twc.js_callback(
+        espaceMarkup=twc.js_callback(
             """
-            function(element, callback) {
-                // TODO
-            }
-            """
-        ),
-        formatSelection=twc.js_callback(
-            """
-            function(movie) {
-                // TODO
+            function(markup) {
+                return markup;
             }
             """
         ),
         formatResult=twc.js_callback(
             """
-            function(movie) {
-                // TODO
+            function(location) {
+                var markup = '<option value="' + location.value + '">' + location.name + '</option>';
+                return markup;
+            }
+            """
+        ),
+        formatSelection=twc.js_callback(
+            """
+            function(location) {
+                return location.value || location.text
             }
             """
         ),

@@ -99,6 +99,35 @@ class RootController(BaseController):
             job_offer_search_form=search_form
         )
 
+    @staticmethod
+    def photon_query_builder(address):  # TODO: Export this in a package
+        return 'http://photon.komoot.de/api/?q={}&lang=fr&limit=10'\
+            .format(address)
+
+    @staticmethod
+    def execute_query(url):
+        import urllib2
+        return urllib2.urlopen(url).read()
+
+    @staticmethod
+    def format_result(result):  # TODO: export this in a package
+        import json
+        return json.loads(result)  # TODO
+
+    @expose('json')
+    def geocomplete(self, *args, **kwargs):
+        if 'address' not in kwargs:
+            return []
+
+        req_url = self.photon_query_builder(kwargs['address'])
+        query_res = self.format_result(self.execute_query(req_url))
+
+        results = list()
+        for qr in query_res['features']:
+            results.append(qr['properties']['country'])
+
+        return dict(results=results)
+
     @expose()
     def rss(self, limit=50, source=None):
         """
