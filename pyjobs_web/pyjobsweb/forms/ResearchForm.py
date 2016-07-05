@@ -137,9 +137,6 @@ class ResearchForm(twf.Form):
 
         center = GeocompleteField(name="center", label="")
 
-        radius = twsel.Select2SingleSelectField(name="radius", label="")
-        radius.attrs = dict(style='width: 100%')
-        radius.css_class = "col-sm-12"
         distances = [
             "5", "10", "25", "50", "100", "200", "200+"
         ]
@@ -153,8 +150,15 @@ class ResearchForm(twf.Form):
 
             tmp_options.append(option)
 
-        radius.options = tmp_options
-        radius.placeholder = u'Distance maximale'
+        radius = twsel.Select2SingleSelectField(
+            name='radius',
+            label='',
+            options=tmp_options,
+            value='',
+            attrs=dict(style='width: 100%'),
+            placeholder=u'Distance maximale',
+            opts=dict(allowClear=True)
+        )
 
         unit = twf.HiddenField(name="unit", label="", value="km")
 
