@@ -132,7 +132,7 @@ class ResearchForm(twf.Form):
                 maximumSelectionSize=10,
                 tokenSeparators=[",", " "]
             ),
-            ondemand=True,
+            ondemand=True
         )
 
         center = GeocompleteField(name="center", label="")
