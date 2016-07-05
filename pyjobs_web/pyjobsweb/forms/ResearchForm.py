@@ -10,7 +10,6 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
     options = []
     opts = dict(
         placeholder=u'Rechercher une localisation...',
-        no_results_text=u'Aucun résultat ne correspond à votre recherche...',
         minimumInputLength=1,
         maximumInputLength=125,
         allowClear=True,
@@ -74,9 +73,30 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
         formatInputTooShort=twc.js_callback(
             """
             function() {
-                return 'Veuillez saisir %s caract\\xE8re(s) suppl\\xE9mentaire(s)...';
+                return 'Veuillez saisir %s caract\\xE8re(s) suppl\\xE9mentaire(s).';
             }
             """ % 1
+        ),
+        formatInputTooLong=twc.js_callback(
+            """
+            function(a, b) {
+                return 'Saisie trop longue.';
+            }
+            """
+        ),
+        formatSearching=twc.js_callback(
+            """
+            function() {
+                return 'Recherche en cours...';
+            }
+            """
+        ),
+        formatNoMatches=twc.js_callback(
+            """
+            function() {
+                return 'Aucun r\\xE9sultat ne correpond \\xE0 votre recherche.';
+            }
+            """
         )
     )
 
@@ -130,7 +150,14 @@ class ResearchForm(twf.Form):
             opts=dict(
                 tags=['Python', 'Django', 'Turbogears', 'Pypi'],
                 maximumSelectionSize=10,
-                tokenSeparators=[",", " "]
+                tokenSeparators=[",", " "],
+                formatSelectionTooBig=twc.js_callback(
+                    """
+                    function(a) {
+                        return 'Nombre maximum de mots cl\\xE9s atteint.';
+                    }
+                    """
+                )
             ),
             ondemand=True
         )
