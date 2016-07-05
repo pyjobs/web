@@ -125,7 +125,7 @@ class ResearchForm(twf.Form):
         distances = [
             "5", "10", "25", "50", "100", "200", "200+"
         ]
-        options = []
+        tmp_options = []
         for i, d in enumerate(distances):
             distances_km = "{}{}".format(d, "km")
             if i == len(distances) - 1:
@@ -133,10 +133,10 @@ class ResearchForm(twf.Form):
             else:
                 option = (d, distances_km)
 
-            options.append(option)
+            tmp_options.append(option)
 
-        radius.options = options
-        radius.prompt_text = "Distance maximale"
+        radius.options = tmp_options
+        radius.placeholder = u'Distance maximale'
 
         unit = twf.HiddenField(name="unit", label="", value="km")
 
