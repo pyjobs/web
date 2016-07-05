@@ -74,16 +74,23 @@ class RootController(BaseController):
                 search_query.builder.add_elem(sq.KeywordFilter(search_on, [q]))
 
             if center and radius:
-                import geopy
-                geolocator = geopy.geocoders.Nominatim()
-                loc = geolocator.geocode(center)
-                center_point = sq.GeolocationFilter.Center(loc.latitude, loc.longitude)
-                unit = sq.GeolocationFilter.UnitsEnum(unit)
+                import geopy.exc
                 try:
+                    import geopy
+                    geolocator = geopy.geocoders.Nominatim()
+                    loc = geolocator.geocode(center)
+                    center_point = sq.GeolocationFilter.Center(
+                        loc.latitude, loc.longitude
+                    )
                     radius = float(radius)
-                    search_query.builder.add_elem(sq.GeolocationFilter(center_point, radius, unit))
+                    unit = sq.GeolocationFilter.UnitsEnum(unit)
+                    search_query.builder.add_elem(
+                        sq.GeolocationFilter(center_point, radius, unit)
+                    )
+                except geopy.exc.GeopyError:
+                    pass  # TODO : Mr proper
                 except ValueError:
-                    pass
+                    pass  # TODO : Mr proper
 
             ms = sq.Sort()
             ms.append(sq.DescSortStatement('publication_datetime'))
