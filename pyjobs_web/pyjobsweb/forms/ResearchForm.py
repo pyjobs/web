@@ -10,17 +10,14 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
     options = []
     opts = dict(
         placeholder=u'Rechercher une localisation...',
-        minimumInputLength=1,
+        minimumInputLength=3,
         maximumInputLength=125,
         allowClear=True,
         ajax=dict(
-            # url='{}/geocomplete'.format(
-            #     tg.config.get('site.domain_base_url')
-            # ),
             url='/geocomplete',
             dataType='json',
             type='POST',
-            delay=1000,
+            quietMillis=500,
             cache=True,
             data=twc.js_callback(
                 """
