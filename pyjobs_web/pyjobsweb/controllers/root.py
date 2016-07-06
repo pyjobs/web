@@ -87,6 +87,8 @@ class RootController(BaseController):
                     search_query.builder.add_elem(
                         sq.GeolocationFilter(center_point, radius, unit)
                     )
+                except AttributeError:
+                    pass  # TODO : Mr proper, in case of impossible @ resolution
                 except geopy.exc.GeopyError:
                     pass  # TODO : Mr proper
                 except ValueError:
