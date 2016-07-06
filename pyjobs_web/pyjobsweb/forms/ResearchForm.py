@@ -32,28 +32,40 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
             results=twc.js_callback(
                 """
                 function (data, page) {
+                    address_formatter = function(keys, address_dict) {
+                        res = "";
+                        first = true;
+                        $.each(keys, function (i, v) {
+                            if (address_dict[i] !== undefined) {
+                                if (i !== 0 && !first) {
+                                    res = res + (v === "space" ? " " : ", ");
+                                }
+                                first = false;
+                                res = res + address_dict[i];
+                            }
+                        })
+                        return res;
+                    }
                     var results = [];
                     $.each(data['results'], function (i, v) {
-                        var short_keys = ['housenumber', 'street', 'postcode', 'country'];
-                        var short_address = "";
-                        var complete_keys = ['name', 'housenumber', 'street', 'postcode', 'state', 'country'];
-                        var complete_address = "";
-                        $.each(short_keys, function (i, e) {
-                            if (v[e] !== undefined) {
-                                if (i !== 0) {
-                                    short_address = short_address + " ";
-                                }
-                                short_address = short_address + v[e];
-                            }
-                        })
-                        $.each(complete_keys, function (i, e) {
-                            if (v[e] !== undefined) {
-                                if (i !== 0) {
-                                    complete_address = complete_address + " ";
-                                }
-                                complete_address = complete_address + v[e];
-                            }
-                        })
+                        var short_keys = {
+                            'housenumber': 'space',
+                            'street': 'space',
+                            'postcode': 'space',
+                            'country': 'coma'
+                        };
+                        var short_address = address_formatter(short_keys, v);
+
+                        var complete_keys = {
+                            'name': 'coma',
+                            'housenumber': 'space',
+                            'street': 'space',
+                            'postcode': 'space',
+                            'state': 'coma',
+                            'country': 'coma'
+                        };
+                        var complete_address = address_formatter(complete_keys, v);
+
                         var o = {};
                         o.id = short_address;
                         o.name = complete_address;
