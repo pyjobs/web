@@ -64,7 +64,9 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
                             'state': 'coma',
                             'country': 'coma'
                         };
-                        var complete_address = address_formatter(complete_keys, v);
+                        var complete_address = address_formatter(
+                            complete_keys, v
+                        );
 
                         var o = {};
                         o.id = short_address;
@@ -90,7 +92,9 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
         formatResult=twc.js_callback(
             """
             function(location) {
-                var markup = '<option value="' + location.value + '">' + location.name + '</option>';
+                var markup = '<option value="' + location.value + '">'
+                    + location.name
+                    + '</option>';
                 return markup;
             }
             """
@@ -105,7 +109,8 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
         formatInputTooShort=twc.js_callback(
             """
             function() {
-                return 'Veuillez saisir %s caract\\xE8re(s) suppl\\xE9mentaire(s).';
+                return 'Veuillez saisir %s caract\\xE8re(s) '
+                    + 'suppl\\xE9mentaire(s).';
             }
             """ % 1
         ),
