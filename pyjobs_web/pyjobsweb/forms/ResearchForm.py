@@ -187,7 +187,7 @@ class ResearchForm(twf.Form):
             opts=dict(
                 tags=['Python', 'Django', 'Turbogears', 'Pypi'],
                 maximumSelectionSize=10,
-                tokenSeparators=[",", " "],
+                tokenSeparators=[','],
                 formatSelectionTooBig=twc.js_callback(
                     """
                     function(a) {
