@@ -122,7 +122,37 @@ class RootController(BaseController):
     @staticmethod
     def format_result(result):  # TODO: export this in a package
         import json
-        return json.loads(result)  # TODO
+        results_dict = json.loads(result)
+
+        france_results = list()
+        other_results = list()
+
+        features = results_dict['features']
+
+        for qr in features:
+            properties = qr['properties']
+            address_elem = [
+                'name', 'housenumber', 'street', 'postcode', 'state', 'country'
+            ]
+            address = dict()
+
+            for e in address_elem:
+                if e not in properties:
+                    continue
+
+                address[e] = properties[e].encode('utf-8')
+
+            if address not in france_results and address not in other_results:
+                if 'country' in address and address['country'] == 'France':
+                    france_results.append(address)
+                else:
+                    other_results.append(address)
+
+        results = list()
+        results.extend(france_results)
+        results.extend(other_results)
+
+        return results
 
     @expose('json')
     def geocomplete(self, *args, **kwargs):
@@ -130,20 +160,8 @@ class RootController(BaseController):
             return []
 
         req_url = self.photon_query_builder(kwargs['address'])
-        query_res = self.format_result(self.execute_query(req_url))
-
-        results = list()
-        for qr in query_res['features']:
-            address_elem = ['name', 'housenumber', 'street', 'postcode', 'state', 'country']
-            address = dict()
-            for e in address_elem:
-                if e not in qr['properties']:
-                    continue
-
-                address[e] = qr['properties'][e].encode('utf-8')
-
-            if address not in results:
-                results.append(address)
+        raw_res = self.execute_query(req_url)
+        results = self.format_result(raw_res)
 
         return dict(results=results)
 
