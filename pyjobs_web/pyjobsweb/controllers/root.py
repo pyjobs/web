@@ -142,7 +142,8 @@ class RootController(BaseController):
 
                 address[e] = qr['properties'][e].encode('utf-8')
 
-            results.append(address)
+            if address not in results:
+                results.append(address)
 
         return dict(results=results)
 
