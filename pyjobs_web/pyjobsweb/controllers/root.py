@@ -108,8 +108,9 @@ class RootController(BaseController):
 
     @staticmethod
     def photon_query_builder(address):  # TODO: Export this in a package
-        return 'http://photon.komoot.de/api/?q={}&lang=fr&limit=10'\
-            .format(address)
+        import urllib
+        return u'http://photon.komoot.de/api/?q={}&lang=fr'\
+            .format(urllib.quote(address.encode('utf-8')))
 
     @staticmethod
     def execute_query(url):
