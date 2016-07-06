@@ -34,10 +34,30 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
                 function (data, page) {
                     var results = [];
                     $.each(data['results'], function (i, v) {
+                        var short_keys = ['housenumber', 'street', 'postcode', 'country'];
+                        var short_address = "";
+                        var complete_keys = ['name', 'housenumber', 'street', 'postcode', 'state', 'country'];
+                        var complete_address = "";
+                        $.each(short_keys, function (i, e) {
+                            if (v[e] !== undefined) {
+                                if (i !== 0) {
+                                    short_address = short_address + " ";
+                                }
+                                short_address = short_address + v[e];
+                            }
+                        })
+                        $.each(complete_keys, function (i, e) {
+                            if (v[e] !== undefined) {
+                                if (i !== 0) {
+                                    complete_address = complete_address + " ";
+                                }
+                                complete_address = complete_address + v[e];
+                            }
+                        })
                         var o = {};
-                        o.id = v;
-                        o.name = v;
-                        o.value = v;
+                        o.id = short_address;
+                        o.name = complete_address;
+                        o.value = complete_address;
                         results.push(o);
                     })
 

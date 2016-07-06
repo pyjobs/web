@@ -135,15 +135,12 @@ class RootController(BaseController):
         results = list()
         for qr in query_res['features']:
             address_elem = ['name', 'housenumber', 'street', 'postcode', 'state', 'country']
-            address = ''
-            for i, e in enumerate(address_elem):
+            address = dict()
+            for e in address_elem:
                 if e not in qr['properties']:
                     continue
 
-                if i == 0:
-                    address = u'{}{}'.format(address, qr['properties'][e])
-                else:
-                    address = u'{} {}'.format(address, qr['properties'][e])
+                address[e] = qr['properties'][e].encode('utf-8')
 
             results.append(address)
 
