@@ -105,11 +105,12 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
         ),
         formatInputTooShort=twc.js_callback(
             """
-            function() {
-                return 'Veuillez saisir %s caract\\xE8re(s) '
+            function(a, b) {
+                var c = b - a.length;
+                return 'Veuillez saisir ' + c + ' caract\\xE8re(s) '
                     + 'suppl\\xE9mentaire(s).';
             }
-            """ % 1
+            """
         ),
         formatInputTooLong=twc.js_callback(
             """
@@ -218,7 +219,16 @@ class ResearchForm(twf.Form):
             value='',
             attrs=dict(style='width: 100%'),
             placeholder=u'Distance maximale',
-            opts=dict(allowClear=True)
+            opts=dict(
+                allowClear=True,
+                formatNoMatches=twc.js_callback(
+                    """
+                    function() {
+                        return 'Aucun r\\xE9sultat ne correpond \\xE0 votre recherche.';
+                    }
+                    """
+                )
+            )
         )
 
         unit = twf.HiddenField(name="unit", label="", value="km")
