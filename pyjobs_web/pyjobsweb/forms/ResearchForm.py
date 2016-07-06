@@ -20,7 +20,7 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
             url='/geocomplete',
             dataType='json',
             type='POST',
-            delay=250,
+            delay=1000,
             cache=True,
             data=twc.js_callback(
                 """
