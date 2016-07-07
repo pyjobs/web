@@ -44,6 +44,12 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
                         return res;
                     }
                     var results = [];
+
+                    if (!data.hasOwnProperty('results')) {
+                        console.log("Error: data['results'] undefined.");
+                        return {results: results};
+                    }
+
                     $.each(data['results'], function (i, v) {
                         var short_keys = {
                             'housenumber': 'space',
