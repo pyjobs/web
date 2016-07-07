@@ -125,7 +125,6 @@ class RootController(BaseController):
         results_dict = json.loads(result)
 
         france_results = list()
-        other_results = list()
 
         features = results_dict['features']
 
@@ -142,17 +141,11 @@ class RootController(BaseController):
 
                 address[e] = properties[e].encode('utf-8')
 
-            if address not in france_results and address not in other_results:
+            if address not in france_results:
                 if 'country' in address and address['country'] == 'France':
                     france_results.append(address)
-                else:
-                    other_results.append(address)
 
-        results = list()
-        results.extend(france_results)
-        results.extend(other_results)
-
-        return results
+        return france_results
 
     @expose('json')
     def geocomplete(self, *args, **kwargs):
