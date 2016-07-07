@@ -77,9 +77,9 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
                     };
                 }
                 """
-            ),
+            )
         ),
-        espaceMarkup=twc.js_callback(
+        escapeMarkup=twc.js_callback(
             """
             function(markup) {
                 return markup;
