@@ -108,7 +108,7 @@ class ResearchForm(twf.Form):
         inline_engine_name = "mako"
         template = \
             u'''
-            <div class="container">
+            <div class="col-md-12">
                 <h2>Rechercher une offre d'emploi</h2>
                 <form class="form-horizontal" role="form">
                     <div class="form-group">
@@ -119,21 +119,22 @@ class ResearchForm(twf.Form):
                     </div>
                     <div class="col-xs-12" style="height:3px;"></div>
                     <div class="form-group">
-                        <label class="control-label col-sm-2" for="from_location">Autour de :</label>
+                        <label class="control-label col-sm-2" for="center">Autour de :</label>
                         <div class="col-sm-10">
                             ${w.children.center.display()|n}
                         </div>
                     </div>
                     <div class="col-xs-12" style="height:3px;"></div>
                     <div class="form-group">
-                        <label class="control-label col-sm-2" for="max_dist">Dans un rayon de :</label>
+                        <label class="control-label col-sm-2" for="radius">Dans un rayon de :</label>
                         <div class="col-sm-10">
                             ${w.children.radius.display()|n}
                         </div>
                     </div>
                     <div class="col-xs-12" style="height:3px;"></div>
                     <div class="form-group">
-                        <div class="col-sm-offset-2 col-md-10">
+                        <label class="control-label col-sm-2" for="submit"> </label>
+                        <div class="col-md-10">
                             ${w.submit.display()|n}
                         </div>
                     </div>

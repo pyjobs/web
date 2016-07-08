@@ -11,11 +11,9 @@
     ${self.head_content()}
     ${h.head_js() | n}
 </head>
-<body class="${self.body_class()}">
+<body class="container ${self.body_class()}">
     ${self.main_menu()}
-<div class="container ${self.container_class()}">
     ${self.content_wrapper()}
-</div>
     ${self.footer()}
 <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
     ${self.end_body_scripts()}
@@ -56,7 +54,7 @@
 
     <%def name="main_menu()">
         <!-- Navbar -->
-        <nav class="navbar navbar-default">
+        <nav class="row navbar navbar-default">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-content">
                     <span class="sr-only">Toggle navigation</span>
@@ -85,6 +83,7 @@
                     <ul class="nav navbar-nav navbar-right">
                         ##         <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/recruteurs')}">Recruteurs</a></li>
                         ##         <li class="${('', 'active')[page=='about']}"><a href="${tg.url('/candidats')}">Candidats</a></li>
+
                         <li class="${('', 'active')[page=='index']}">
                             <a href="${tg.url('/sources')}">
                                 Sources
