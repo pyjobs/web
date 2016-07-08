@@ -19,6 +19,7 @@ from pyjobsweb.controllers.secure import SecureController
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
+from pyjobsweb.lib.photon import PhotonQuery
 from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import JobOfferSQLAlchemy, SOURCES
 from pyjobsweb.forms.ResearchForm import ResearchForm
@@ -108,93 +109,12 @@ class RootController(BaseController):
             job_offer_search_form=search_form
         )
 
-    @staticmethod
-    def photon_query_builder(address):  # TODO: Export this in a package
-        import urllib
-        return u'http://photon.komoot.de/api/?q={}&lang=fr'\
-            .format(urllib.quote(address.encode('utf-8')))
-
-    @staticmethod
-    def execute_query(url):
-        import urllib2
-        return urllib2.urlopen(url).read()
-
-    @staticmethod
-    def format_result(result):  # TODO: export this in a package
-        import json
-        results_dict = json.loads(result)
-
-        france_results = list()
-
-        if 'features' not in results_dict:
-            return dict()
-
-        features = results_dict['features']
-
-        for qr in features:
-            properties = qr['properties']
-            address = dict(to_submit=u'', to_display=u'')
-
-            if 'country' not in properties:
-                continue
-
-            if properties['country'] != 'France':
-                continue
-
-            if 'name' in properties:
-                address['to_display'] = u'{}, '.format(properties['name'])
-
-            if 'housenumber' in properties:
-                address['to_submit'] = u'{}{} '.format(
-                    address['to_submit'], properties['housenumber']
-                )
-                address['to_display'] = u'{}{} '.format(
-                    address['to_display'], properties['housenumber']
-                )
-
-            if 'street' in properties:
-                address['to_submit'] = u'{}{} '.format(
-                    address['to_submit'], properties['street']
-                )
-                address['to_display'] = u'{}{} '.format(
-                    address['to_display'], properties['street']
-                )
-
-            if 'postcode' in properties:
-                address['to_submit'] = u'{}{} '.format(
-                    address['to_submit'], properties['postcode']
-                )
-                address['to_display'] = u'{}{}, '.format(
-                    address['to_display'], properties['postcode']
-                )
-
-            if 'state' in properties:
-                address['to_display'] = u'{}{}, '.format(
-                    address['to_display'], properties['state']
-                )
-
-            address['to_submit'] = u'{}{}'.format(
-                address['to_submit'], properties['country']
-            )
-            address['to_display'] = u'{}{}'.format(
-                address['to_display'], properties['country']
-            )
-
-            if address not in france_results:
-                france_results.append(address)
-
-        return france_results
-
     @expose('json')
     def geocomplete(self, *args, **kwargs):
         if 'address' not in kwargs:
             return []
 
-        req_url = self.photon_query_builder(kwargs['address'])
-        raw_res = self.execute_query(req_url)
-        results = self.format_result(raw_res)
-
-        return dict(results=results)
+        return dict(results=PhotonQuery(kwargs['address']).execute_query())
 
     @expose()
     def rss(self, limit=50, source=None):
