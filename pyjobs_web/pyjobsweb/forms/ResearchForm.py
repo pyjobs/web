@@ -108,39 +108,37 @@ class ResearchForm(twf.Form):
         inline_engine_name = "mako"
         template = \
             u'''
-            <div class="col-md-12">
-                <h2>Rechercher une offre d'emploi</h2>
-                <form class="form-horizontal" role="form">
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="query">Requête :</label>
-                        <div class="col-sm-10">
-                            ${w.children.query.display()|n}
-                        </div>
+            <h2>Rechercher une offre d'emploi</h2>
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="query">Requête :</label>
+                    <div class="col-sm-10">
+                        ${w.children.query.display()|n}
                     </div>
-                    <div class="col-xs-12" style="height:3px;"></div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="center">Autour de :</label>
-                        <div class="col-sm-10">
-                            ${w.children.center.display()|n}
-                        </div>
+                </div>
+                <div class="col-xs-12" style="height:3px;"></div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="center">Autour de :</label>
+                    <div class="col-sm-10">
+                        ${w.children.center.display()|n}
                     </div>
-                    <div class="col-xs-12" style="height:3px;"></div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="radius">Dans un rayon de :</label>
-                        <div class="col-sm-10">
-                            ${w.children.radius.display()|n}
-                        </div>
+                </div>
+                <div class="col-xs-12" style="height:3px;"></div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="radius">Dans un rayon de :</label>
+                    <div class="col-sm-10">
+                        ${w.children.radius.display()|n}
                     </div>
-                    <div class="col-xs-12" style="height:3px;"></div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="submit"> </label>
-                        <div class="col-md-10">
-                            ${w.submit.display()|n}
-                        </div>
+                </div>
+                <div class="col-xs-12" style="height:3px;"></div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="submit"> </label>
+                    <div class="col-md-10">
+                        ${w.submit.display()|n}
                     </div>
-                    ${w.children.unit.display()|n}
-                </form>
-            </div>
+                </div>
+                ${w.children.unit.display()|n}
+            </form>
             '''
 
         query = twsel.Select2MultipleSelectField(

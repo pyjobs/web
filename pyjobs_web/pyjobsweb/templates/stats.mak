@@ -10,37 +10,36 @@
 </%def>
 
 <%def name="end_body_scripts()">
+    <script src="http://code.jquery.com/jquery.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
     <script>
-    $(document).ready(function () {
+        $(document).ready(function () {
+            Morris.Line({
+                element: 'month_chart',
+                data: ${h.to_json(flat_month, indent=4) | n},
+                xkey: ${h.to_json(flat_x_field) | n},
+                ykeys: ${h.to_json(flat_y_fields) | n},
+                labels: ${h.to_json(sources_labels) | n}
+            });
 
-        Morris.Line({
-          element: 'month_chart',
-          data: ${h.to_json(flat_month, indent=4) | n},
-          xkey: ${h.to_json(flat_x_field) | n},
-          ykeys: ${h.to_json(flat_y_fields) | n},
-          labels: ${h.to_json(sources_labels) | n}
+            Morris.Line({
+                element: 'weeks_chart',
+                data: ${h.to_json(flat_week, indent=4) | n},
+                xkey: ${h.to_json(flat_x_field) | n},
+                ykeys: ${h.to_json(flat_y_fields) | n},
+                labels: ${h.to_json(sources_labels) | n}
+            });
         });
-
-        Morris.Line({
-          element: 'weeks_chart',
-          data: ${h.to_json(flat_week, indent=4) | n},
-          xkey: ${h.to_json(flat_x_field) | n},
-          ykeys: ${h.to_json(flat_y_fields) | n},
-          labels: ${h.to_json(sources_labels) | n}
-        });
-
-    });
-</script>
+    </script>
 </%def>
 
 <%def name="stats_table(stats, periods, period_format)">
     <table class="stats table table-striped table-hover">
         <thead>
-                <th>
-                    Source
-                </th>
+        <th>
+            Source
+        </th>
             % for period in periods:
                 <th>
                     ${period.strftime(period_format)}
@@ -64,16 +63,22 @@
     </table>
 </%def>
 
-<h1>Statistiques</h1>
+<header class="page-header">
+    <div class="container">
+        <h1>Statistiques</h1>
+    </div>
+</header>
 
-<h2>Publication d'offres par mois</h2>
+<div class="container">
+    <h2>Publication d'offres par mois</h2>
 
-${stats_table(stats=stats_month, periods=months, period_format="%B %Y")}
+    ${stats_table(stats=stats_month, periods=months, period_format="%B %Y")}
 
-<div id="month_chart" style="height: 250px;"></div>
+    <div id="month_chart" style="height: 250px;"></div>
 
-<h2>Publication d'offres par semaines</h2>
+    <h2>Publication d'offres par semaines</h2>
 
-${stats_table(stats=stats_week, periods=weeks, period_format="%Y, semaine %W")}
+    ${stats_table(stats=stats_week, periods=weeks, period_format="%Y, semaine %W")}
 
-<div id="weeks_chart" style="height: 250px;"></div>
+    <div id="weeks_chart" style="height: 250px;"></div>
+</div>
