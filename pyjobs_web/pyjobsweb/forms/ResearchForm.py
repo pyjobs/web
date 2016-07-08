@@ -29,54 +29,15 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
             results=twc.js_callback(
                 """
                 function (data, page) {
-                    address_formatter = function(keys, address_dict) {
-                        res = "";
-                        first = true;
-                        $.each(keys, function (i, v) {
-                            if (address_dict[i] !== undefined) {
-                                if (i !== 0 && !first) {
-                                    res = res + (v === "space" ? " " : ", ");
-                                }
-                                first = false;
-                                res = res + address_dict[i];
-                            }
-                        })
-                        return res;
-                    }
                     var results = [];
 
-                    if (!data.hasOwnProperty('results')) {
-                        console.log("Error: data['results'] undefined.");
-                        return {results: results};
-                    }
-
-                    $.each(data['results'], function (i, v) {
-                        var short_keys = {
-                            'housenumber': 'space',
-                            'street': 'space',
-                            'postcode': 'space',
-                            'country': 'coma'
-                        };
-                        var short_address = address_formatter(short_keys, v);
-
-                        var complete_keys = {
-                            'name': 'coma',
-                            'housenumber': 'space',
-                            'street': 'space',
-                            'postcode': 'space',
-                            'state': 'coma',
-                            'country': 'coma'
-                        };
-                        var complete_address = address_formatter(
-                            complete_keys, v
-                        );
-
+                    $.each(data['results'], function(i, v) {
                         var o = {};
-                        o.id = short_address;
-                        o.name = complete_address;
-                        o.value = complete_address;
+                        o.id = v['to_submit'];
+                        o.name = v['to_display'];
+                        o.value = v['to_display'];
                         results.push(o);
-                    })
+                    });
 
                     return {
                         results: results

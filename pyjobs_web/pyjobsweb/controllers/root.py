@@ -126,24 +126,62 @@ class RootController(BaseController):
 
         france_results = list()
 
+        if 'features' not in results_dict:
+            return dict()
+
         features = results_dict['features']
 
         for qr in features:
             properties = qr['properties']
-            address_elem = [
-                'name', 'housenumber', 'street', 'postcode', 'state', 'country'
-            ]
-            address = dict()
+            address = dict(to_submit=u'', to_display=u'')
 
-            for e in address_elem:
-                if e not in properties:
-                    continue
+            if 'country' not in properties:
+                continue
 
-                address[e] = properties[e].encode('utf-8')
+            if properties['country'] != 'France':
+                continue
+
+            if 'name' in properties:
+                address['to_display'] = u'{}, '.format(properties['name'])
+
+            if 'housenumber' in properties:
+                address['to_submit'] = u'{}{} '.format(
+                    address['to_submit'], properties['housenumber']
+                )
+                address['to_display'] = u'{}{} '.format(
+                    address['to_display'], properties['housenumber']
+                )
+
+            if 'street' in properties:
+                address['to_submit'] = u'{}{} '.format(
+                    address['to_submit'], properties['street']
+                )
+                address['to_display'] = u'{}{} '.format(
+                    address['to_display'], properties['street']
+                )
+
+            if 'postcode' in properties:
+                address['to_submit'] = u'{}{} '.format(
+                    address['to_submit'], properties['postcode']
+                )
+                address['to_display'] = u'{}{}, '.format(
+                    address['to_display'], properties['postcode']
+                )
+
+            if 'state' in properties:
+                address['to_display'] = u'{}{}, '.format(
+                    address['to_display'], properties['state']
+                )
+
+            address['to_submit'] = u'{}{}'.format(
+                address['to_submit'], properties['country']
+            )
+            address['to_display'] = u'{}{}'.format(
+                address['to_display'], properties['country']
+            )
 
             if address not in france_results:
-                if 'country' in address and address['country'] == 'France':
-                    france_results.append(address)
+                france_results.append(address)
 
         return france_results
 
