@@ -208,8 +208,8 @@ class GeolocationFilter(Filter):
         self._unit = unit
 
     def __str__(self):
-        return 'GeolocationFilter[Center: {}, Radius: {}]'\
-            .format(self._center, self._radius)
+        return 'GeolocationFilter[Center: {}, Radius: {}, Unit: {}]'\
+            .format(self._center, self._radius, self._unit)
 
 
 class Query(list):
