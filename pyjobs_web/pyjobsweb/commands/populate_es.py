@@ -17,7 +17,7 @@ class PopulateESCommand(pyjobsweb.commands.AppContextCommand):
 
         # Compute lat, lng of the job offer
         try:
-            geolocator = geopy.geocoders.Nominatim(timeout=5)
+            geolocator = geopy.geocoders.Nominatim(timeout=5, country_bias='fr')
             location = geolocator.geocode(job_offer.address, True)
 
             if not location:
