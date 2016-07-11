@@ -72,7 +72,10 @@ class RootController(BaseController):
 
             search_on = ['description', 'title']
             for q in query.split(','):
-                search_query.builder.add_elem(sq.KeywordFilter(search_on, [q]))
+                if q:
+                    search_query.builder.add_elem(
+                        sq.KeywordFilter(search_on, [q])
+                    )
 
             if center and radius:
                 import geopy.exc
