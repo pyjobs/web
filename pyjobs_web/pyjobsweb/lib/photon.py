@@ -48,6 +48,16 @@ class PhotonQuery(object):
                 except KeyError:
                     pass
 
+            if properties['osm_key'] == 'boundary' \
+                    and properties['osm_value'] == 'administrative':
+                res.pop('name')
+                res['county'] = properties['name']
+
+            if properties['osm_key'] == 'place' \
+                    and properties['osm_value'] in ['village', 'town', 'city']:
+                res.pop('name')
+                res['city'] = properties['name']
+
             if res not in results:
                 results.append(res)
 

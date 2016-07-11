@@ -129,6 +129,7 @@ class RootController(BaseController):
                 ('street', ' '),
                 ('city', ', '),
                 ('postcode', ' '),
+                ('county', ', '),
                 ('state', ', '),
                 ('country', ', ')
             ]
