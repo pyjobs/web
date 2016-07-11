@@ -81,8 +81,9 @@ class RootController(BaseController):
                 import geopy.exc
                 try:
                     import geopy
-                    geolocator = geopy.geocoders.Nominatim()
                     import json
+
+                    geolocator = geopy.geocoders.Nominatim(country_bias='fr')
                     geoloc_query = json.loads(center)
                     loc = geolocator.geocode(geoloc_query)
                     center_point = sq.GeolocationFilter.Center(
