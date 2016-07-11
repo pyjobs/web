@@ -149,7 +149,9 @@ class ResearchForm(twf.Form):
             attrs=dict(style='width: 100%;'),
             placeholder=u"Mots clés recherchés...",
             opts=dict(
-                tags=['Python', 'Django', 'Turbogears', 'Pypi'],
+                tags=[
+                    'Python', 'Django', 'Flask', 'Pyramid', 'Turbogears'
+                ],
                 maximumSelectionSize=10,
                 tokenSeparators=[','],
                 formatSelectionTooBig=twc.js_callback(
