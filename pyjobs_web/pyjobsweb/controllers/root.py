@@ -82,7 +82,8 @@ class RootController(BaseController):
                 try:
                     import geopy
                     geolocator = geopy.geocoders.Nominatim()
-                    loc = geolocator.geocode(center)
+                    geoloc_query = json.loads(center)
+                    loc = geolocator.geocode(geoloc_query)
                     center_point = sq.GeolocationFilter.Center(
                         loc.latitude, loc.longitude
                     )
@@ -117,7 +118,67 @@ class RootController(BaseController):
         if 'address' not in kwargs:
             return []
 
-        return dict(results=PhotonQuery(kwargs['address']).execute_query())
+        photon_res = PhotonQuery(kwargs['address']).execute_query()
+
+        address_elem = collections.OrderedDict(
+            [
+                ('name', ' '),
+                ('housenumber', ', '),
+                ('street', ' '),
+                ('city', ', '),
+                ('postcode', ' '),
+                ('state', ', '),
+                ('country', ', ')
+            ]
+        )
+
+        submit_elem = {
+            'housenumber': 'street',
+            'street': 'street',
+            'city': 'city',
+            'country': 'country',
+            'state': 'state',
+            'county': 'county',
+            'postcode': 'postalcode'
+        }
+
+        results = []
+
+        for address in photon_res:
+            to_submit = dict()
+            to_display = u''
+            first = True
+
+            if 'country' not in address:
+                continue
+
+            if address['country'] != 'France':
+                continue
+
+            for k, v in address_elem.iteritems():
+                try:
+                    if first:
+                        to_display = address[k]
+                        first = False
+                    else:
+                        to_display = u'{}{}{}'.format(to_display, v, address[k])
+
+                    if k in submit_elem:
+                        import unidecode
+                        decoded = unidecode.unidecode(address[k])
+                        if submit_elem[k] not in to_submit:
+                            to_submit[submit_elem[k]] = decoded
+                        else:
+                            to_submit[submit_elem[k]] += ' ' + decoded
+                except KeyError:
+                    pass
+
+            import json
+            results.append(
+                dict(to_submit=json.dumps(to_submit), to_display=to_display)
+            )
+
+        return dict(results=results)
 
     @expose()
     def rss(self, limit=50, source=None):

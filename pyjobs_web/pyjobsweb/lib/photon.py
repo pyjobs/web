@@ -27,57 +27,29 @@ class PhotonQuery(object):
 
         features = results_dict['features']
 
+        address_elem = [
+            'name',
+            'housenumber',
+            'street',
+            'city',
+            'postcode',
+            'state',
+            'country'
+        ]
+
         for qr in features:
             properties = qr['properties']
-            address = dict(to_submit=u'', to_display=u'')
 
-            if 'country' not in properties:
-                continue
+            res = dict()
 
-            if properties['country'] != 'France':
-                continue
+            for k in address_elem:
+                try:
+                    res[k] = properties[k]
+                except KeyError:
+                    pass
 
-            if 'name' in properties:
-                address['to_display'] = u'{}, '.format(properties['name'])
-
-            if 'housenumber' in properties:
-                address['to_submit'] = u'{}{} '.format(
-                    address['to_submit'], properties['housenumber']
-                )
-                address['to_display'] = u'{}{} '.format(
-                    address['to_display'], properties['housenumber']
-                )
-
-            if 'street' in properties:
-                address['to_submit'] = u'{}{} '.format(
-                    address['to_submit'], properties['street']
-                )
-                address['to_display'] = u'{}{} '.format(
-                    address['to_display'], properties['street']
-                )
-
-            if 'postcode' in properties:
-                address['to_submit'] = u'{}{} '.format(
-                    address['to_submit'], properties['postcode']
-                )
-                address['to_display'] = u'{}{}, '.format(
-                    address['to_display'], properties['postcode']
-                )
-
-            if 'state' in properties:
-                address['to_display'] = u'{}{}, '.format(
-                    address['to_display'], properties['state']
-                )
-
-            address['to_submit'] = u'{}{}'.format(
-                address['to_submit'], properties['country']
-            )
-            address['to_display'] = u'{}{}'.format(
-                address['to_display'], properties['country']
-            )
-
-            if address not in results:
-                results.append(address)
+            if res not in results:
+                results.append(res)
 
         return results
 
