@@ -69,5 +69,5 @@ class PhotonQuery(object):
 
     @query.setter
     def query(self, query):
-        self._query = u'http://photon.komoot.de/api/?q={}&lang=fr'\
+        self._query = u'http://photon.komoot.de/api/?q={}&lang=fr&lat=46.2&lon=2.2'\
             .format(urllib.quote(query.encode('utf-8')))
