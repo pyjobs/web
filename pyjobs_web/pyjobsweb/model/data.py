@@ -106,9 +106,9 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
 
     id = elasticsearch_dsl.Integer()
 
-    url = elasticsearch_dsl.String()
+    url = elasticsearch_dsl.String(index='no')
 
-    source = elasticsearch_dsl.String()
+    source = elasticsearch_dsl.String(index='not_analyzed')
 
     title = elasticsearch_dsl.String(
             analyzer=french_analyzer
@@ -118,16 +118,16 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
             analyzer=french_description_analyzer
     )
 
-    company = elasticsearch_dsl.String()
+    company = elasticsearch_dsl.String(index='not_analyzed')
 
-    company_url = elasticsearch_dsl.String()
+    company_url = elasticsearch_dsl.String(index='no')
 
-    address = elasticsearch_dsl.String()
+    address = elasticsearch_dsl.String(index='no')
 
     tags = elasticsearch_dsl.Nested(
             doc_class=Tag,
             properties={
-                'tag': elasticsearch_dsl.String(),
+                'tag': elasticsearch_dsl.String(index='not_analyzed'),
                 'weight': elasticsearch_dsl.Integer()
             }
     )
