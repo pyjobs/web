@@ -98,7 +98,9 @@ class RootController(BaseController):
                     # the geolocation filter
                     pass
                 except ValueError:
-                    pass  # TODO : Mr proper
+                    # Radius couldn't be converted to float, therefore we ignore
+                    # the geolocation filter
+                    pass
 
             ms = sq.Sort()
             ms.append(sq.DescSortStatement('publication_datetime'))

@@ -28,8 +28,8 @@ class PopulateESCommand(commands.AppContextCommand):
             es_job_offer.geolocation = [0, 0]
             es_job_offer.geolocation_error = True
 
+        # Perform the insertion in Elasticsearch
         try:
-            # Perform the insertion in Elasticsearch
             es_job_offer.save()
         except elasticsearch.exceptions.RequestError as e:
             logging.getLogger(__name__).log(
