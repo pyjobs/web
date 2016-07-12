@@ -40,7 +40,7 @@ class Geolocator(object):
                 'Geolocation error: %s.' % e.message
             )
             raise TemporaryError
-        except exc.GeopyError as e:
+        except exc.GeocoderServiceError as e:
             logging.getLogger(__name__).log(
                 logging.ERROR,
                 'Geolocation error: %s.' % e.message
