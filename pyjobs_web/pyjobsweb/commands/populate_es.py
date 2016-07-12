@@ -22,9 +22,7 @@ class PopulateESCommand(commands.AppContextCommand):
 
             es_job_offer.geolocation = [location.longitude, location.latitude]
             es_job_offer.geolocation_error = False
-        except geolocation.TemporaryError:
-            raise PopulateESCommand.AbortError
-        except geolocation.GeolocationFailure, geolocation.GeolocationError:
+        except geolocation.BaseError:
             es_job_offer.geolocation = [0, 0]
             es_job_offer.geolocation_error = True
 
@@ -47,6 +45,25 @@ class PopulateESCommand(commands.AppContextCommand):
 
     def take_action(self, parsed_args):
         super(PopulateESCommand, self).take_action(parsed_args)
+
+        # We first try to recompute the geolocation of job offers of which the
+        # geolocation could not have been computed earlier. (Timeout...).
+        failed_geolocs_query = model.ElasticsearchQuery(0, 10000)
+        import pyjobsweb.lib.search_query as sq
+        failed_geolocs_query.builder.add_elem(
+            sq.BooleanFilter('geolocation_error', True)
+        )
+        failed_geolocs = failed_geolocs_query.execute_query()
+
+        for f in failed_geolocs:
+            try:
+                location = self._geolocator.geocode(f.address)
+                f.update(
+                    location=[location.longitude, location.latitude],
+                    geolocation_error=False
+                )
+            except geolocation.BaseError:
+                pass
 
         job_offers = model.JobOfferSQLAlchemy.\
             compute_elasticsearch_pending_insertion()
