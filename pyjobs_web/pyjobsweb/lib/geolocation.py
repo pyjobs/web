@@ -25,6 +25,9 @@ class Geolocator(object):
         self._geocoder = geocoders.Nominatim(timeout=5, country_bias='fr')
 
     def geocode(self, address):
+        if not isinstance(address, basestring):
+            raise TypeError("address should be of type: %s." % basestring)
+
         try:
             geolocation = self._geocoder.geocode(address)
 
