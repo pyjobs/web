@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
+import json
 import datetime
+import unidecode
 import collections
 import webhelpers.feedgenerator as feedgenerator
 from sqlalchemy.orm.exc import NoResultFound
@@ -20,6 +22,7 @@ from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
 from pyjobsweb.lib.photon import PhotonQuery
+from pyjobsweb.lib import geolocation
 from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import JobOfferSQLAlchemy, SOURCES
 from pyjobsweb.forms.ResearchForm import ResearchForm
@@ -78,12 +81,8 @@ class RootController(BaseController):
                     )
 
             if center and radius:
-                import geopy.exc
                 try:
-                    import geopy
-                    import json
-
-                    geolocator = geopy.geocoders.Nominatim(country_bias='fr')
+                    geolocator = geolocation.Geolocator()
                     geoloc_query = json.loads(center)
                     loc = geolocator.geocode(geoloc_query)
                     center_point = sq.GeolocationFilter.Center(
@@ -94,10 +93,10 @@ class RootController(BaseController):
                     search_query.builder.add_elem(
                         sq.GeolocationFilter(center_point, radius, unit)
                     )
-                except AttributeError:
-                    pass  # TODO : Mr proper, in case of impossible @ resolution
-                except geopy.exc.GeopyError:
-                    pass  # TODO : Mr proper
+                except geolocation.BaseError:
+                    # There has been an error during the geolocation, ignore
+                    # the geolocation filter
+                    pass
                 except ValueError:
                     pass  # TODO : Mr proper
 
@@ -146,6 +145,7 @@ class RootController(BaseController):
         }
 
         results = []
+        duplicates = []
 
         for address in photon_res:
             to_submit = dict()
@@ -167,7 +167,6 @@ class RootController(BaseController):
                         to_display = u'{}{}{}'.format(to_display, v, address[k])
 
                     if k in submit_elem:
-                        import unidecode
                         decoded = unidecode.unidecode(address[k])
                         if submit_elem[k] not in to_submit:
                             to_submit[submit_elem[k]] = decoded
@@ -176,10 +175,13 @@ class RootController(BaseController):
                 except KeyError:
                     pass
 
-            import json
-            results.append(
-                dict(to_submit=json.dumps(to_submit), to_display=to_display)
-            )
+            if to_display in duplicates:
+                continue
+
+            duplicates.append(to_display)
+
+            res = dict(to_submit=json.dumps(to_submit), to_display=to_display)
+            results.append(res)
 
         return dict(results=results)
 
