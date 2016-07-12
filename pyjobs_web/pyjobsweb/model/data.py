@@ -183,6 +183,12 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
     def translate_descsort_statement(self, desc_sort):
         return '-{}'.format(desc_sort.to_sort)
 
+    def translate_booleanfilter(self, search_filter):
+        return self.query_object.filter(
+                'terms',
+                **{search_filter.field: [search_filter.value]}
+        )
+
     def translate_keywordfilter(self, search_filter):
         return self.query_object.query(
                 'multi_match',

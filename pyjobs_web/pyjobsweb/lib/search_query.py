@@ -81,6 +81,43 @@ class DescSortStatement(SortStatement):
         return 'DescSortStatement[to_sort: {}]'.format(self.to_sort)
 
 
+class BooleanFilter(Filter):
+    _field = None
+    _value = None
+
+    def __init__(self, field, value):
+        self.field = field
+        self.value = value
+
+    def translate(self, translator):
+        return translator.translate_booleanfilter(self)
+
+    @property
+    def field(self):
+        return self._field
+
+    @field.setter
+    def field(self, field):
+        if not isinstance(field, basestring):
+            raise TypeError('field should be of type: %s.' % basestring)
+
+        self._field = field
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        if not isinstance(value, bool):
+            raise TypeError('value should be of type: %s.' % bool)
+
+        self._value = value
+
+    def __str__(self):
+        return 'BooleanFilter: [{} == {}]'.format(self.field, self.value)
+
+
 class KeywordFilter(Filter):
     _fields = None
     _keywords = None
@@ -274,6 +311,10 @@ class QueryTranslator(object):
 
     @abc.abstractmethod
     def translate_descsort_statement(self, desc_sort):
+        pass
+
+    @abc.abstractmethod
+    def translate_booleanfilter(self, search_filter):
         pass
 
     @abc.abstractmethod

@@ -81,6 +81,10 @@ class RootController(BaseController):
                     )
 
             if center and radius:
+                search_query.builder.add_elem(
+                    sq.BooleanFilter('geolocation_error', False)
+                )
+
                 try:
                     geolocator = geolocation.Geolocator()
                     geoloc_query = json.loads(center)
