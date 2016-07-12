@@ -65,4 +65,8 @@ Run ``gearbox crawl`` command. It will be run [PyJobs Crawlers](https://github.c
 
 ## Populate the Elasticsearch database with populateES
 
-Run ``gearbox populateES`` command. It will fetch every entry in the Postgresl database which haven't been inserted into Elasticsearch yet and perform both the geolocation and the insertion of the job offers in Elasticsearch, so that the search engine of the pyjobs can find it.
+Run ``gearbox populateES`` command. It will fetch every entry in the Postgresql database which haven't been inserted into Elasticsearch yet and perform both the geolocation and the insertion of the job offers in Elasticsearch, so that the search engine of the pyjobs can find it.
+
+## Purge the Elasticsearch database with purgeES
+
+Run ``gearbox purgeES`` command. It will purge every entry under the jobs index of the Elasticsearch database and mark it as not inserted in the Postgresql database, so that running ``gearbox populateES`` will re-index purged elements.
