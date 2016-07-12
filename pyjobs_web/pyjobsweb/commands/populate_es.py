@@ -23,7 +23,7 @@ class PopulateESCommand(commands.AppContextCommand):
             es_job_offer.geolocation = [location.longitude, location.latitude]
             es_job_offer.geolocation_error = False
         except geolocation.TemporaryError:
-            raise PopulateESCommand.AbortException
+            raise PopulateESCommand.AbortError
         except geolocation.GeolocationFailure, geolocation.GeolocationError:
             es_job_offer.geolocation = [0, 0]
             es_job_offer.geolocation_error = True
@@ -57,11 +57,11 @@ class PopulateESCommand(commands.AppContextCommand):
                 # Mark the task as handled so we don't retreat it next time
                 model.JobOfferSQLAlchemy.\
                     mark_as_inserted_in_elasticsearch(j.id)
-            except PopulateESCommand.AbortException:
+            except PopulateESCommand.AbortError:
                 break
 
         # Refresh indices to increase research speed
         elasticsearch_dsl.Index('jobs').refresh()
 
-    class AbortException(Exception):
+    class AbortError(Exception):
         pass
