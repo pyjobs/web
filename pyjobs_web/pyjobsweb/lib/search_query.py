@@ -165,8 +165,8 @@ class GeolocationFilter(Filter):
     from enum import Enum
 
     class UnitsEnum(Enum):
-        km = 'km'
-        m = 'm'
+        KM = 'km'
+        M = 'm'
 
     class Center(object):
         _latitude = None
@@ -201,7 +201,7 @@ class GeolocationFilter(Filter):
         def __str__(self):
             return '[{}, {}]'.format(self.latitude, self.longitude)
 
-    def __init__(self, center, radius, unit=UnitsEnum.km):
+    def __init__(self, center, radius, unit=UnitsEnum.KM):
         self.center = center
         self.radius = radius
         self.unit = unit
