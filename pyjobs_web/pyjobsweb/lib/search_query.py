@@ -137,7 +137,7 @@ class KeywordFilter(Filter):
     def fields(self, fields):
         if not isinstance(fields, list) \
                 or not all(isinstance(f, basestring) for f in fields):
-            raise TypeError('fields should should be a list of strings.')
+            raise TypeError('fields should be a list of strings.')
 
         self._fields = fields
 
