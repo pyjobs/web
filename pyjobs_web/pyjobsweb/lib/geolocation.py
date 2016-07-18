@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import geopy.geocoders as geocoders
 import geopy.exc as exc
-import logging
 
 
 class BaseError(Exception):
@@ -35,22 +34,13 @@ class Geolocator(object):
             geolocation = self._geocoder.geocode(address)
 
             if not geolocation:
-                err_msg = "Couldn't resolve following address: '%s'." % address
-                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+                err_msg = "Couldn't resolve following address: '%s'" % address
                 raise GeolocationFailure(err_msg)
         except (exc.GeocoderQuotaExceeded,
                 exc.GeocoderUnavailable,
                 exc.GeocoderTimedOut) as e:
-            logging.getLogger(__name__).log(
-                logging.WARNING,
-                'Geolocation error: %s.' % e.message
-            )
-            raise TemporaryError
+            raise TemporaryError('Geolocation error: %s' % e.message)
         except exc.GeocoderServiceError as e:
-            logging.getLogger(__name__).log(
-                logging.ERROR,
-                'Geolocation error: %s.' % e.message
-            )
-            raise GeolocationError
+            raise GeolocationError('Geolocation error: %s' % e.message)
 
         return geolocation

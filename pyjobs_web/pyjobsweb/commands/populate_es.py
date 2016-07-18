@@ -13,6 +13,11 @@ class PopulateESCommand(commands.AppContextCommand):
         super(PopulateESCommand, self).__init__(args, kwargs)
         self._geolocator = geolocation.Geolocator()
 
+    @staticmethod
+    def _error_logging(job_id, message, logging_level):
+        err_msg = '[Job offer id: %s] %s.' % (job_id, message)
+        logging.getLogger(__name__).log(logging_level, err_msg)
+
     def _handle_insertion_task(self, job_offer):
         es_job_offer = job_offer.to_elasticsearch_job_offer()
 
@@ -22,26 +27,17 @@ class PopulateESCommand(commands.AppContextCommand):
 
             es_job_offer.geolocation = [location.longitude, location.latitude]
             es_job_offer.geolocation_error = False
-        except geolocation.BaseError:
+        except geolocation.BaseError as e:
             es_job_offer.geolocation = [0, 0]
             es_job_offer.geolocation_error = True
+            self._error_logging(job_offer.id, e.message, logging.WARNING)
 
         # Perform the insertion in Elasticsearch
         try:
             es_job_offer.save()
         except elasticsearch.exceptions.RequestError as e:
-            logging.getLogger(__name__).log(
-                logging.ERROR,
-                '{}{}{}{}{}{}'.format(
-                    "Job offer id : ",
-                    job_offer.id,
-                    ", error during the Elasticsearch insertion : ",
-                    e,
-                    ".\nInfo : ",
-                    e.info
-                )
-            )
-            return
+            err_msg = 'Elasticsearch insertion error: %s, %s.' % (e, e.info)
+            self._error_logging(job_offer.id, err_msg, logging.ERROR)
 
     def take_action(self, parsed_args):
         super(PopulateESCommand, self).take_action(parsed_args)
@@ -62,23 +58,18 @@ class PopulateESCommand(commands.AppContextCommand):
                     location=[location.longitude, location.latitude],
                     geolocation_error=False
                 )
-            except geolocation.BaseError:
-                pass
+            except geolocation.BaseError as e:
+                self._error_logging(f.id, e, logging.WARNING)
 
         job_offers = model.JobOfferSQLAlchemy.\
             compute_elasticsearch_pending_insertion()
 
         for j in job_offers:
-            try:
-                self._handle_insertion_task(j)
-                # Mark the task as handled so we don't retreat it next time
-                model.JobOfferSQLAlchemy.\
-                    mark_as_inserted_in_elasticsearch(j.id)
-            except PopulateESCommand.AbortError:
-                break
+            self._handle_insertion_task(j)
+            # Mark the task as handled so we don't retreat it next time
+            model.JobOfferSQLAlchemy.\
+                mark_as_inserted_in_elasticsearch(j.id)
 
         # Refresh indices to increase research speed
         elasticsearch_dsl.Index('jobs').refresh()
 
-    class AbortError(Exception):
-        pass
