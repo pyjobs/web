@@ -118,7 +118,7 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
             analyzer=french_description_analyzer
     )
 
-    company = elasticsearch_dsl.String(index='not_analyzed')
+    company = elasticsearch_dsl.String(index='analyzed')
 
     company_url = elasticsearch_dsl.String(index='no')
 
