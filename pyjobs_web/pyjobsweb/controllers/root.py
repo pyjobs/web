@@ -21,8 +21,6 @@ from pyjobsweb.controllers.secure import SecureController
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
-from pyjobsweb.lib.photon import PhotonQuery
-from pyjobsweb.lib import geolocation
 from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import JobOfferSQLAlchemy, SOURCES
 from pyjobsweb.forms.ResearchForm import ResearchForm
@@ -87,21 +85,14 @@ class RootController(BaseController):
                 )
 
                 try:
-                    geolocator = geolocation.Geolocator()
                     geoloc_query = json.loads(center)
-                    loc = geolocator.geocode(geoloc_query)
-                    center_point = sq.GeolocationFilter.Center(
-                        loc.latitude, loc.longitude
-                    )
-                    radius = float(radius)
+                    lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
+                    center_point = sq.GeolocationFilter.Center(lat, lon)
                     unit = sq.GeolocationFilter.UnitsEnum(unit)
+                    radius = float(radius)
                     search_query.builder.add_elem(
                         sq.GeolocationFilter(center_point, radius, unit)
                     )
-                except geolocation.BaseError:
-                    # There has been an error during the geolocation, ignore
-                    # the geolocation filter
-                    pass
                 except ValueError:
                     # Radius couldn't be converted to float, therefore we ignore
                     # the geolocation filter
@@ -122,75 +113,33 @@ class RootController(BaseController):
         )
 
     @expose('json')
-    def geocomplete(self, *args, **kwargs):
+    def geocomplete(self, **kwargs):
         if 'address' not in kwargs:
             return []
 
-        photon_res = PhotonQuery(kwargs['address']).execute_query()
-
-        address_elem = collections.OrderedDict(
-            [
-                ('name', ' '),
-                ('housenumber', ', '),
-                ('street', ' '),
-                ('city', ', '),
-                ('postcode', ' '),
-                ('county', ', '),
-                ('state', ', '),
-                ('country', ', ')
-            ]
+        s = model.Geocomplete.search()
+        s = s.suggest(
+            'geocomplete',
+            kwargs['address'],
+            completion=dict(
+                field='name_suggest',
+                fuzziness=2,
+                unicode_aware=True,
+                size=10  # TODO: find a better way to get all results
+            )
         )
+        suggestions = s.execute_suggest()
 
-        submit_elem = {
-            'housenumber': 'street',
-            'street': 'street',
-            'city': 'city',
-            'country': 'country',
-            'state': 'state',
-            'county': 'county',
-            'postcode': 'postalcode'
-        }
+        res = list()
+        for s in suggestions.geocomplete:
+            for e in s['options']:
+                payload = e['payload']
+                geoloc = dict(lat=payload['lat'], lon=payload['lon'])
+                submit = json.dumps(geoloc)
+                display = '%s, France' % e['text']
+                res.append(dict(to_submit=submit, to_display=display))
 
-        results = []
-        duplicates = []
-
-        for address in photon_res:
-            to_submit = dict()
-            to_display = u''
-            first = True
-
-            if 'country' not in address:
-                continue
-
-            if address['country'] != 'France':
-                continue
-
-            for k, v in address_elem.iteritems():
-                try:
-                    if first:
-                        to_display = address[k]
-                        first = False
-                    else:
-                        to_display = u'{}{}{}'.format(to_display, v, address[k])
-
-                    if k in submit_elem:
-                        decoded = unidecode.unidecode(address[k])
-                        if submit_elem[k] not in to_submit:
-                            to_submit[submit_elem[k]] = decoded
-                        else:
-                            to_submit[submit_elem[k]] += ' ' + decoded
-                except KeyError:
-                    pass
-
-            if to_display in duplicates:
-                continue
-
-            duplicates.append(to_display)
-
-            res = dict(to_submit=json.dumps(to_submit), to_display=to_display)
-            results.append(res)
-
-        return dict(results=results)
+        return dict(results=res)
 
     @expose()
     def rss(self, limit=50, source=None):
