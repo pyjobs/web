@@ -21,14 +21,14 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
             cache=True,
             data=twc.js_callback(
                 """
-                function (term, page) {
+                function(term) {
                     return {address: term};
                 }
                 """
             ),
             results=twc.js_callback(
                 """
-                function (data, page) {
+                function(data) {
                     var results = [];
 
                     $.each(data['results'], function(i, v) {

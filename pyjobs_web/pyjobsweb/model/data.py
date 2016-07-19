@@ -5,7 +5,6 @@ import sqlalchemy
 import transaction
 from pyjobs_crawlers.tools import get_sources, condition_tags
 
-
 import pyjobsweb.lib.search_query as search_query
 import pyjobsweb.model
 from pyjobsweb.model import DeclarativeBase
