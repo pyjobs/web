@@ -73,7 +73,8 @@ class RootController(BaseController):
 
             search_query = model.ElasticsearchQuery(0, self.items_per_page * 50)
 
-            search_on = ['description', 'title']
+            search_on = ['description', 'title', 'company']
+
             for q in query.split(','):
                 if q:
                     search_query.builder.add_elem(
