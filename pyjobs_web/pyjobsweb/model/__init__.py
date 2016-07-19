@@ -61,6 +61,7 @@ from pyjobsweb.model.auth import User, Group, Permission
 from pyjobsweb.model.data import JobOfferSQLAlchemy
 from pyjobsweb.model.data import JobOfferElasticsearch
 from pyjobsweb.model.data import ElasticsearchQuery
+from pyjobsweb.model.geocomplete import Geocomplete
 from pyjobsweb.model.system import Log
 
 __all__ = ('User', 'Group', 'Permission')

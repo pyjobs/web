@@ -2,6 +2,9 @@
 """Setup the pyjobsweb application"""
 from __future__ import print_function
 
+import json
+import logging
+
 from tg import config
 import transaction
 
@@ -28,13 +31,13 @@ def setup_schema(command, conf, vars):
     alembic.command.stamp(alembic_cfg, "head")
 
     # Setup Elasticsearch's database schema
-    import elasticsearch_dsl.connections
+    from elasticsearch_dsl.connections import connections
     import elasticsearch_dsl.index
     from pyjobsweb import model
 
     print("Setting up Elasticsearch's model")
 
-    elasticsearch_dsl.connections.connections.create_connection(
+    connections.create_connection(
         hosts=[config.get('elasticsearch.host')],
         send_get_body_as='POST',
         timeout=20
@@ -42,10 +45,48 @@ def setup_schema(command, conf, vars):
 
     # Setup the jobs index
     jobs_index = elasticsearch_dsl.Index('jobs')
-    # Empty at the moment
     jobs_index.settings()
-    # Register a JobOffer doc_type in the jobs index
     jobs_index.doc_type(model.JobOfferElasticsearch)
-    # Create the index
-    jobs_index.delete(ignore=404)
+    # jobs_index.delete(ignore=404)
     jobs_index.create(ignore=400)
+
+    # Setup the geocompletion index
+    geocomplete_index = elasticsearch_dsl.Index('geocomplete')
+    geocomplete_index.settings()
+    geocomplete_index.doc_type(model.Geocomplete)
+    geocomplete_index.delete(ignore=404)
+    geocomplete_index.create(ignore=400)
+
+    # Population the geocompletion index
+    geolocation_data = open(config.get('fr.geolocation_data.path'))
+
+    json_dict = json.loads(geolocation_data.read())
+
+    to_index = list()
+
+    for postal_code, places in json_dict.items():
+        for place in places:
+            entry = model.Geocomplete(
+                name=place['name'],
+                name_suggest=dict(
+                    input=[postal_code, place['name']],
+                    output=place['name'],
+                    payload=dict(
+                        lat=float(place['lat']),
+                        lon=float(place['lon'])
+                    )
+                ),
+                postal_code=postal_code,
+                geolocation=[float(place['lon']), float(place['lat'])]
+            )
+
+            to_index.append(entry)
+
+    from elasticsearch.helpers import streaming_bulk
+
+    conn = connections.get_connection()
+    for ok, info in streaming_bulk(conn, (d.to_dict(True) for d in to_index)):
+        if not ok:
+            logging_level = logging.ERROR
+            err_msg = "Failed to index document: %s." % info['create']['_id']
+            logging.getLogger(__name__).log(logging_level, err_msg)
