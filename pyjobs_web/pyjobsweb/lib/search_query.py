@@ -14,11 +14,11 @@ class Translatable(object):
         return str()
 
 
-class QueryElement(Translatable):
+class QueryStatement(Translatable):
     __metaclass__ = abc.ABCMeta
 
 
-class Filter(QueryElement):
+class Filter(QueryStatement):
     __metaclass__ = abc.ABCMeta
 
 
@@ -39,7 +39,7 @@ class SortStatement(Translatable):
         self._to_sort = to_sort
 
 
-class Sort(list, QueryElement):
+class Sort(list, QueryStatement):
     def __init__(self):
         super(list, self).__init__()
         self._type = SortStatement
@@ -252,10 +252,10 @@ class GeolocationFilter(Filter):
 class Query(list):
     def __init__(self):
         super(list, self).__init__()
-        self._type = QueryElement
+        self._type = QueryStatement
 
     def append(self, query_elem):
-        if not isinstance(query_elem, QueryElement):
+        if not isinstance(query_elem, QueryStatement):
             raise TypeError('search_filter should be of type %s.' % self._type)
 
         super(Query, self).append(query_elem)
