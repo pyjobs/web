@@ -60,48 +60,48 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
         doc_type = 'job-offer'
 
     french_elision = elasticsearch_dsl.token_filter(
-            'french_elision',
-            type='elision',
-            articles_case=True,
-            articles=[
-                'l', 'm', 't', 'qu', 'n', 's',
-                'j', 'd', 'c', 'jusqu', 'quoiqu',
-                'lorsqu', 'puisqu'
-            ]
+        'french_elision',
+        type='elision',
+        articles_case=True,
+        articles=[
+            'l', 'm', 't', 'qu', 'n', 's',
+            'j', 'd', 'c', 'jusqu', 'quoiqu',
+            'lorsqu', 'puisqu'
+        ]
     )
     french_stopwords = elasticsearch_dsl.token_filter(
-            'french_stopwords', type='stop', stopwords='_french_'
+        'french_stopwords', type='stop', stopwords='_french_'
     )
     # Do not include this filter if keywords is empty
     french_keywords = elasticsearch_dsl.token_filter(
-            'french_keywords', type='keyword_maker', keywords=[]
+        'french_keywords', type='keyword_maker', keywords=[]
     )
     french_stemmer = elasticsearch_dsl.token_filter(
-            'french_stemmer', type='stemmer', language='light_french'
+        'french_stemmer', type='stemmer', language='light_french'
     )
 
     french_analyzer = elasticsearch_dsl.analyzer(
-            'french_analyzer',
-            tokenizer='standard',
-            filter=[
-                'lowercase',
-                french_elision,
-                french_stopwords,
-                # french_keywords,
-                french_stemmer
-            ]
+        'french_analyzer',
+        tokenizer='standard',
+        filter=[
+            'lowercase',
+            french_elision,
+            french_stopwords,
+            # french_keywords,
+            french_stemmer
+        ]
     )
     french_description_analyzer = elasticsearch_dsl.analyzer(
-            'french_description_analyzer',
-            tokenizer='standard',
-            filter=[
-                'lowercase',
-                french_elision,
-                french_stopwords,
-                # french_keywords,
-                french_stemmer
-            ],
-            char_filter=['html_strip']
+        'french_description_analyzer',
+        tokenizer='standard',
+        filter=[
+            'lowercase',
+            french_elision,
+            french_stopwords,
+            # french_keywords,
+            french_stemmer
+        ],
+        char_filter=['html_strip']
     )
 
     id = elasticsearch_dsl.Integer()
@@ -111,11 +111,11 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
     source = elasticsearch_dsl.String(index='not_analyzed')
 
     title = elasticsearch_dsl.String(
-            analyzer=french_analyzer
+        analyzer=french_analyzer
     )
 
     description = elasticsearch_dsl.String(
-            analyzer=french_description_analyzer
+        analyzer=french_description_analyzer
     )
 
     company = elasticsearch_dsl.String(index='analyzed')
@@ -125,11 +125,11 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
     address = elasticsearch_dsl.String(index='no')
 
     tags = elasticsearch_dsl.Nested(
-            doc_class=Tag,
-            properties={
-                'tag': elasticsearch_dsl.String(index='not_analyzed'),
-                'weight': elasticsearch_dsl.Integer()
-            }
+        doc_class=Tag,
+        properties={
+            'tag': elasticsearch_dsl.String(index='not_analyzed'),
+            'weight': elasticsearch_dsl.Integer()
+        }
     )
 
     publication_datetime = elasticsearch_dsl.Date()
@@ -163,8 +163,8 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
             for tag in self.tags:
                 if tag['tag'] in condition_tags:
                     tag = Tag2(
-                            tag['tag'], tag['weight'],
-                            Tag2.get_css(tag['tag'])
+                        tag['tag'], tag['weight'],
+                        Tag2.get_css(tag['tag'])
                     )
                     tags.append(tag)
         return tags
@@ -185,25 +185,25 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
 
     def translate_booleanfilter(self, search_filter):
         return self.query_object.filter(
-                'terms',
-                **{search_filter.field: [search_filter.value]}
+            'terms',
+            **{search_filter.field: [search_filter.value]}
         )
 
     def translate_keywordfilter(self, search_filter):
         return self.query_object.query(
-                'multi_match',
-                fields=search_filter.fields,
-                query=search_filter.keywords
+            'multi_match',
+            fields=search_filter.fields,
+            query=search_filter.keywords
         )
 
     def translate_geolocationfilter(self, search_filter):
         return self.query_object.filter(
-                'geo_distance',
-                geolocation=[
-                    search_filter.center.longitude,
-                    search_filter.center.latitude
-                ],
-                distance='{}{}'.format(search_filter.radius, search_filter.unit)
+            'geo_distance',
+            geolocation=[
+                search_filter.center.longitude,
+                search_filter.center.latitude
+            ],
+            distance='{}{}'.format(search_filter.radius, search_filter.unit)
         )
 
 
@@ -232,23 +232,23 @@ class JobOfferSQLAlchemy(DeclarativeBase):
     source = sqlalchemy.Column(sqlalchemy.String(64))
 
     title = sqlalchemy.Column(
-            sqlalchemy.String(1024), nullable=False, default=''
+        sqlalchemy.String(1024), nullable=False, default=''
     )
     description = sqlalchemy.Column(
-            sqlalchemy.Text(), nullable=False, default=''
+        sqlalchemy.Text(), nullable=False, default=''
     )
     company = sqlalchemy.Column(
-            sqlalchemy.String(1024), nullable=False, default=''
+        sqlalchemy.String(1024), nullable=False, default=''
     )
     company_url = sqlalchemy.Column(
-            sqlalchemy.String(1024), nullable=True, default=''
+        sqlalchemy.String(1024), nullable=True, default=''
     )
 
     address = sqlalchemy.Column(
-            sqlalchemy.String(2048), nullable=False, default=''
+        sqlalchemy.String(2048), nullable=False, default=''
     )
     tags = sqlalchemy.Column(
-            sqlalchemy.Text(), nullable=False, default=''
+        sqlalchemy.Text(), nullable=False, default=''
     )  # JSON
 
     publication_datetime = sqlalchemy.Column(sqlalchemy.DateTime)
@@ -257,7 +257,7 @@ class JobOfferSQLAlchemy(DeclarativeBase):
     crawl_datetime = sqlalchemy.Column(sqlalchemy.DateTime)
 
     already_in_elasticsearch = sqlalchemy.Column(
-            sqlalchemy.Boolean, nullable=False, default=False
+        sqlalchemy.Boolean, nullable=False, default=False
     )
 
     def __init__(self):
@@ -293,8 +293,8 @@ class JobOfferSQLAlchemy(DeclarativeBase):
             for tag in json.loads(self.tags):
                 if tag['tag'] in condition_tags:
                     tag = Tag2(
-                            tag['tag'], tag['weight'],
-                            Tag2.get_css(tag['tag'])
+                        tag['tag'], tag['weight'],
+                        Tag2.get_css(tag['tag'])
                     )
                     tags.append(tag)
         return tags
@@ -308,18 +308,18 @@ class JobOfferSQLAlchemy(DeclarativeBase):
             tags.append(tag)
 
         return JobOfferElasticsearch(
-                id=self.id,
-                url=self.url,
-                source=self.source,
-                title=self.title,
-                description=self.description,
-                company=self.company,
-                company_url=self.company_url,
-                address=self.address,
-                tags=tags,
-                publication_datetime=self.publication_datetime,
-                publication_datetime_is_fake=self.publication_datetime_is_fake,
-                crawl_datetime=self.publication_datetime
+            id=self.id,
+            url=self.url,
+            source=self.source,
+            title=self.title,
+            description=self.description,
+            company=self.company,
+            company_url=self.company_url,
+            address=self.address,
+            tags=tags,
+            publication_datetime=self.publication_datetime,
+            publication_datetime_is_fake=self.publication_datetime_is_fake,
+            crawl_datetime=self.publication_datetime
         )
 
     @classmethod
