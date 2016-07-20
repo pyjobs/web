@@ -26,7 +26,7 @@ class Geolocator(object):
     def geocode(self, address):
         if not isinstance(address, basestring) \
                 and not isinstance(address, dict):
-            err_msg = "address should either be of type: %s, or of type %s." \
+            err_msg = u"address should either be of type: %s, or of type %s." \
                       % (basestring, dict)
             raise TypeError(err_msg)
 
@@ -34,13 +34,13 @@ class Geolocator(object):
             geolocation = self._geocoder.geocode(address)
 
             if not geolocation:
-                err_msg = "Couldn't resolve following address: '%s'" % address
+                err_msg = u"Couldn't resolve following address: '%s'" % address
                 raise GeolocationFailure(err_msg)
         except (exc.GeocoderQuotaExceeded,
                 exc.GeocoderUnavailable,
                 exc.GeocoderTimedOut) as e:
-            raise TemporaryError('Geolocation error: %s' % e.message)
+            raise TemporaryError(u'Geolocation error: %s' % e.message)
         except exc.GeocoderServiceError as e:
-            raise GeolocationError('Geolocation error: %s' % e.message)
+            raise GeolocationError(u'Geolocation error: %s' % e.message)
 
         return geolocation

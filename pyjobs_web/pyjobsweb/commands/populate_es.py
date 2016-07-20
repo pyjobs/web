@@ -15,7 +15,7 @@ class PopulateESCommand(commands.AppContextCommand):
 
     @staticmethod
     def _error_logging(job_id, message, logging_level):
-        err_msg = '[Job offer id: %s] %s.' % (job_id, message)
+        err_msg = u'[Job offer id: %s] %s.' % (job_id, message)
         logging.getLogger(__name__).log(logging_level, err_msg)
 
     def _handle_insertion_task(self, job_offer):
@@ -36,7 +36,7 @@ class PopulateESCommand(commands.AppContextCommand):
         try:
             es_job_offer.save()
         except elasticsearch.exceptions.RequestError as e:
-            err_msg = 'Elasticsearch insertion error: %s, %s.' % (e, e.info)
+            err_msg = u'Elasticsearch insertion error: %s, %s.' % (e, e.info)
             self._error_logging(job_offer.id, err_msg, logging.ERROR)
 
     def take_action(self, parsed_args):
