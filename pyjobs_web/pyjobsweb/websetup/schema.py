@@ -3,10 +3,12 @@
 from __future__ import print_function
 
 import json
-import logging
+from elasticsearch_dsl.connections import connections
 
 from tg import config
 import transaction
+
+from pyjobsweb.lib.helpers import elasticsearch_bulk_indexing
 
 
 def setup_schema(command, conf, vars):
@@ -58,15 +60,18 @@ def setup_schema(command, conf, vars):
     geocomplete_index.create(ignore=400)
 
     # Population the geocompletion index
+    elasticsearch_conn = connections.get_connection()
+    elasticsearch_bulk_indexing(elasticsearch_conn, geocompletion_documents())
+
+
+def geocompletion_documents():
     geolocation_data = open(config.get('fr.geolocation_data.path'))
 
     json_dict = json.loads(geolocation_data.read())
 
-    to_index = list()
-
     for postal_code, places in json_dict.items():
         for place in places:
-            entry = model.Geocomplete(
+            yield model.Geocomplete(
                 name=place['name'],
                 postal_code=postal_code,
                 geolocation=dict(
@@ -74,14 +79,3 @@ def setup_schema(command, conf, vars):
                     lon=float(place['lon'])
                 )
             )
-
-            to_index.append(entry)
-
-    from elasticsearch.helpers import streaming_bulk
-
-    conn = connections.get_connection()
-    for ok, info in streaming_bulk(conn, (d.to_dict(True) for d in to_index)):
-        if not ok:
-            logging_level = logging.ERROR
-            err_msg = u'Failed to index document: %s.' % info['create']['_id']
-            logging.getLogger(__name__).log(logging_level, err_msg)
