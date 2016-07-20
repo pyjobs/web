@@ -135,6 +135,7 @@ class RootController(BaseController):
 
         sort = sq.Sort()  # TODO: Fix broken sort
         sort.append(sq.AscSortStatement('name'))
+        query = model.ElasticsearchQuery(model.Geocomplete, 0, 4)
 
         if address:
             query.builder.add_elem(sq.KeywordFilter(['name'], [address]))
