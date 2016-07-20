@@ -45,6 +45,11 @@
 
 }
 
+.no-job-found {
+    margin-top: 21px;
+    display: inline-block;
+}
+
 
 .row-even {
     background-color: #FFF;

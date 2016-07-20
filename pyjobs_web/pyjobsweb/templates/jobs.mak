@@ -67,7 +67,9 @@
     ${job_pagination()}
 
     % if not jobs:
-        <h3>Désolé, aucune offre d'emploi n'a  pu être trouvée.</h3>
+        <div class="no-job-found">
+            <h3>Désolé, aucune offre d'emploi n'a  pu être trouvée.</h3>
+        </div>
     % else:
         % for job in jobs:
             <div id="job-post-${job.id}" class="job-item ${loop.cycle('row-even', 'row-odd')}" style="padding: 1em 1em 3em 1em;">
