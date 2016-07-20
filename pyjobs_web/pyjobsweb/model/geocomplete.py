@@ -17,6 +17,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
 
     geocompletion_index_analyzer = elasticsearch_dsl.analyzer(
         'geocompletion_index_analyzer',
+        type='custom',
         tokenizer='standard',
         filter=[
             'lowercase',
@@ -28,9 +29,9 @@ class Geocomplete(elasticsearch_dsl.DocType):
 
     geocompletion_search_analyzer = elasticsearch_dsl.analyzer(
         'geocompletion_search_analyzer',
+        type='custom',
         tokenizer='standard',
         filter=[
-            'standard',
             'lowercase',
             'asciifolding'
         ]
@@ -46,19 +47,20 @@ class Geocomplete(elasticsearch_dsl.DocType):
 
     postal_code_index_analyzer = elasticsearch_dsl.analyzer(
         'postal_code_index_analyzer',
+        type='custom',
         tokenizer='standard',
         filter=[
-            'lowercase',
-            'asciifolding',
             postal_code_ngram_filter
         ]
     )
 
     postal_code_search_analyzer = elasticsearch_dsl.analyzer(
         'postal_code_search_analyzer',
+        type='custom',
         tokenizer='standard',
         filter=[
-            'standard'
+            'lowercase',
+            'asciifolding'
         ]
     )
 
