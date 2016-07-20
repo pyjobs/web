@@ -136,7 +136,7 @@ class RootController(BaseController):
                 payload = e['payload']
                 geoloc = dict(lat=payload['lat'], lon=payload['lon'])
                 submit = json.dumps(geoloc)
-                display = '%s, France' % e['text']
+                display = u'%s, France' % e['text']
                 res.append(dict(to_submit=submit, to_display=display))
 
         return dict(results=res)

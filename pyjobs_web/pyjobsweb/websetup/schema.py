@@ -88,5 +88,5 @@ def setup_schema(command, conf, vars):
     for ok, info in streaming_bulk(conn, (d.to_dict(True) for d in to_index)):
         if not ok:
             logging_level = logging.ERROR
-            err_msg = "Failed to index document: %s." % info['create']['_id']
+            err_msg = u"Failed to index document: %s." % info['create']['_id']
             logging.getLogger(__name__).log(logging_level, err_msg)
