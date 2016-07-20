@@ -207,8 +207,8 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
 
 
 class ElasticsearchQuery(search_query.BaseSearchQuery):
-    def __init__(self, page_num, page_size):
-        search_obj = JobOfferElasticsearch.search()
+    def __init__(self, class_name, page_num, page_size):
+        search_obj = class_name.search()
         search_obj = search_obj.params()
         translator = ElasticsearchTranslator(search_obj)
         query_builder = search_query.QueryBuilder(translator)

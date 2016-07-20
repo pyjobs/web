@@ -9,7 +9,7 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
     options = []
     opts = dict(
         placeholder=u'Rechercher une localisation...',
-        minimumInputLength=3,
+        minimumInputLength=2,
         maximumInputLength=125,
         allowClear=True,
         ajax=dict(

@@ -69,7 +69,7 @@ class RootController(BaseController):
         else:
             import pyjobsweb.lib.search_query as sq
 
-            search_query = model.ElasticsearchQuery(0, self.items_per_page * 50)
+            search_query = model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, self.items_per_page * 50)
 
             search_on = ['description', 'title', 'company']
 
@@ -117,27 +117,53 @@ class RootController(BaseController):
         if 'address' not in kwargs:
             return []
 
-        s = model.Geocomplete.search()
-        s = s.suggest(
-            'geocomplete',
-            kwargs['address'],
-            completion=dict(
-                field='name_suggest',
-                fuzziness=2,
-                unicode_aware=True,
-                size=10  # TODO: find a better way to get all results
+        import pyjobsweb.lib.search_query as sq
+
+        query_tokens = kwargs['address'].split(' ')
+
+        postal_code = None
+        address = None
+
+        for token in query_tokens:
+            try:
+                int_code = int(token)
+                postal_code = postal_code if postal_code else str(int_code)
+            except ValueError:
+                address = u'%s %s' % (address, token) if address else token
+
+        query = model.ElasticsearchQuery(model.Geocomplete, 0, 10)
+
+        sort = sq.Sort()  # TODO: Fix broken sort
+        sort.append(sq.AscSortStatement('name'))
+
+        if address:
+            query.builder.add_elem(sq.KeywordFilter(['name'], [address]))
+
+        if postal_code:
+            query.builder.add_elem(
+                sq.KeywordFilter(['postal_code'], [postal_code])
             )
-        )
-        suggestions = s.execute_suggest()
+
+        query.builder.add_elem(sort)
+        raw_res = query.execute_query()
+
+        if not raw_res and postal_code and address:
+            query = model.ElasticsearchQuery(model.Geocomplete, 0, 10)
+            address = u'%s %s' % (address, postal_code)
+            query.builder.add_elem(sq.KeywordFilter(['name'], [address]))
+            query.builder.add_elem(sort)
+            raw_res = query.execute_query()
 
         res = list()
-        for s in suggestions.geocomplete:
-            for e in s['options']:
-                payload = e['payload']
-                geoloc = dict(lat=payload['lat'], lon=payload['lon'])
-                submit = json.dumps(geoloc)
-                display = u'%s, France' % e['text']
+        duplicates = list()
+        for s in raw_res:
+            geoloc = dict(lat=s.geolocation.lat, lon=s.geolocation.lon)
+            submit = json.dumps(geoloc)
+            display = u'%s, France' % s.name
+
+            if display not in duplicates:
                 res.append(dict(to_submit=submit, to_display=display))
+                duplicates.append(display)
 
         return dict(results=res)
 

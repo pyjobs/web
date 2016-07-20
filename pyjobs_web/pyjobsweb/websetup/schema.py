@@ -68,16 +68,11 @@ def setup_schema(command, conf, vars):
         for place in places:
             entry = model.Geocomplete(
                 name=place['name'],
-                name_suggest=dict(
-                    input=[postal_code, place['name']],
-                    output=place['name'],
-                    payload=dict(
-                        lat=float(place['lat']),
-                        lon=float(place['lon'])
-                    )
-                ),
                 postal_code=postal_code,
-                geolocation=[float(place['lon']), float(place['lat'])]
+                geolocation=dict(
+                    lat=float(place['lat']),
+                    lon=float(place['lon'])
+                )
             )
 
             to_index.append(entry)
