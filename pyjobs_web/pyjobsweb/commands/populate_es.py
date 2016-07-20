@@ -69,7 +69,7 @@ class PopulateESCommand(commands.AppContextCommand):
                 self._error_logging(f.id, e, logging.WARNING)
 
         job_offers = model.JobOfferSQLAlchemy.\
-            compute_elasticsearch_pending_insertion()
+            compute_elasticsearch_pending_insertions()
 
         for j in job_offers:
             self._handle_insertion_task(j)

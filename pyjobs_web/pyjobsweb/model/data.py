@@ -338,7 +338,7 @@ class JobOfferSQLAlchemy(DeclarativeBase):
         transaction.commit()
 
     @classmethod
-    def compute_elasticsearch_pending_insertion(cls):
+    def compute_elasticsearch_pending_insertions(cls):
         return pyjobsweb.model.DBSession \
             .query(JobOfferSQLAlchemy) \
             .filter_by(already_in_elasticsearch=False)
