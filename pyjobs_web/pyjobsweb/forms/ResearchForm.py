@@ -2,7 +2,6 @@
 import tw2.core as twc
 import tw2.forms as twf
 import tw2.jqplugins.select2 as twsel
-import tg
 
 
 class GeocompleteField(twsel.Select2AjaxSingleSelectField):
