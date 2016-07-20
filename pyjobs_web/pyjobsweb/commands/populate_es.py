@@ -47,7 +47,8 @@ class PopulateESCommand(commands.AppContextCommand):
 
         # We first try to recompute the geolocation of job offers of which the
         # geolocation could not have been computed earlier. (Timeout...).
-        failed_geolocs_query = model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, 10000)
+        failed_geolocs_query = \
+            model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, 10000)
         import pyjobsweb.lib.search_query as sq
         failed_geolocs_query.builder.add_elem(
             sq.BooleanFilter('geolocation_error', True)
