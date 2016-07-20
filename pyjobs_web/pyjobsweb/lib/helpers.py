@@ -3,6 +3,7 @@
 import json
 import logging
 from urllib import quote_plus
+from elasticsearch.helpers import streaming_bulk
 
 from markupsafe import Markup
 from datetime import datetime
@@ -60,3 +61,11 @@ try:
     from webhelpers2 import date, html, number, misc, text
 except SyntaxError:
     log.error("WebHelpers2 helpers not available with this Python Version")
+
+
+def elasticsearch_bulk_indexing(conn, to_index):
+    for ok, info in streaming_bulk(conn, (d.to_dict(True) for d in to_index)):
+        if not ok:
+            logging_level = logging.ERROR
+            err_msg = u'Failed to index document: %s.' % info['create']['_id']
+            logging.getLogger(__name__).log(logging_level, err_msg)
