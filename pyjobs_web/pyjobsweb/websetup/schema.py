@@ -3,10 +3,13 @@
 from __future__ import print_function
 
 import json
+import elasticsearch_dsl.index
 from elasticsearch_dsl.connections import connections
 
 from tg import config
 import transaction
+
+from pyjobsweb import model
 
 from pyjobsweb.lib.helpers import elasticsearch_bulk_indexing
 
@@ -33,10 +36,6 @@ def setup_schema(command, conf, vars):
     alembic.command.stamp(alembic_cfg, "head")
 
     # Setup Elasticsearch's database schema
-    from elasticsearch_dsl.connections import connections
-    import elasticsearch_dsl.index
-    from pyjobsweb import model
-
     print("Setting up Elasticsearch's model")
 
     connections.create_connection(
