@@ -7,7 +7,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
         index = 'geocomplete'
         doc_type = 'geoloc-entry'
 
-    geocompletion_ngram = elasticsearch_dsl.token_filter(
+    geocompletion_ngram_filter = elasticsearch_dsl.token_filter(
         'geocompletion_ngram',
         type='edgeNGram',
         min_gram=1,
@@ -22,7 +22,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
             'lowercase',
             'asciifolding',
             'word_delimiter',
-            geocompletion_ngram
+            geocompletion_ngram_filter
         ]
     )
 
@@ -36,7 +36,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
         ]
     )
 
-    postal_code_ngram = elasticsearch_dsl.token_filter(
+    postal_code_ngram_filter = elasticsearch_dsl.token_filter(
         'postal_code_ngram',
         type='edgeNGram',
         min_gram=1,
@@ -50,7 +50,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
         filter=[
             'lowercase',
             'asciifolding',
-            postal_code_ngram
+            postal_code_ngram_filter
         ]
     )
 
