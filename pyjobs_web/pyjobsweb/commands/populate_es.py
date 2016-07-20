@@ -25,10 +25,13 @@ class PopulateESCommand(commands.AppContextCommand):
         try:
             location = self._geolocator.geocode(job_offer.address)
 
-            es_job_offer.geolocation = [location.longitude, location.latitude]
+            es_job_offer.geolocation = dict(
+                lat=location.latitude,
+                lon=location.longitude
+            )
             es_job_offer.geolocation_error = False
         except geolocation.BaseError as e:
-            es_job_offer.geolocation = [0, 0]
+            es_job_offer.geolocation = dict(lat=0.0, lon=0.0)
             es_job_offer.geolocation_error = True
             self._error_logging(job_offer.id, e.message, logging.WARNING)
 
@@ -55,7 +58,10 @@ class PopulateESCommand(commands.AppContextCommand):
             try:
                 location = self._geolocator.geocode(f.address)
                 f.update(
-                    location=[location.longitude, location.latitude],
+                    location=dict(
+                        lat=location.latitude,
+                        lon=location.longitude
+                    ),
                     geolocation_error=False
                 )
             except geolocation.BaseError as e:
