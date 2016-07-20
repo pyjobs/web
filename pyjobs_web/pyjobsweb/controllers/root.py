@@ -131,10 +131,6 @@ class RootController(BaseController):
             except ValueError:
                 address = u'%s %s' % (address, token) if address else token
 
-        query = model.ElasticsearchQuery(model.Geocomplete, 0, 10)
-
-        sort = sq.Sort()  # TODO: Fix broken sort
-        sort.append(sq.AscSortStatement('name'))
         query = model.ElasticsearchQuery(model.Geocomplete, 0, 4)
 
         if address:
@@ -145,15 +141,7 @@ class RootController(BaseController):
                 sq.KeywordFilter(['postal_code'], [postal_code])
             )
 
-        query.builder.add_elem(sort)
         raw_res = query.execute_query()
-
-        if not raw_res and postal_code and address:
-            query = model.ElasticsearchQuery(model.Geocomplete, 0, 10)
-            address = u'%s %s' % (address, postal_code)
-            query.builder.add_elem(sq.KeywordFilter(['name'], [address]))
-            query.builder.add_elem(sort)
-            raw_res = query.execute_query()
 
         res = list()
         duplicates = list()
