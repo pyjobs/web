@@ -349,7 +349,7 @@ class QueryBuilder(object):
         self._query.append(elem)
 
     def build(self):
-        return self._translator.translate(self._query)
+        return self.translator.translate(self._query)
 
     def __str__(self):
         return self._query.__str__()
