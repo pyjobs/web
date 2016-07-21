@@ -79,24 +79,24 @@ class RootController(BaseController):
                         sq.KeywordFilter(search_on, [q])
                     )
 
-            if center and radius:
+            try:
+                geoloc_query = json.loads(center)
+                lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
+                center_point = sq.GeolocationFilter.Center(lat, lon)
+                unit = sq.GeolocationFilter.UnitsEnum(unit)
+                radius = float(radius)
+                search_query.builder.add_elem(
+                    sq.GeolocationFilter(center_point, radius, unit)
+                )
                 search_query.builder.add_elem(
                     sq.BooleanFilter('geolocation_error', False)
                 )
-
-                try:
-                    geoloc_query = json.loads(center)
-                    lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
-                    center_point = sq.GeolocationFilter.Center(lat, lon)
-                    unit = sq.GeolocationFilter.UnitsEnum(unit)
-                    radius = float(radius)
-                    search_query.builder.add_elem(
-                        sq.GeolocationFilter(center_point, radius, unit)
-                    )
-                except ValueError:
-                    # Radius couldn't be converted to float, therefore we ignore
-                    # the geolocation filter
-                    pass
+            except ValueError:
+                # One of the following case has occurred:
+                #     - Center, radius or unit weren't set properly
+                #     - Radius couldn't be converted to float, therefore we
+                #       ignore the geolocation filters
+                pass
 
             ms = sq.Sort()
             ms.append(sq.DescSortStatement('publication_datetime'))
