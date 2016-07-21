@@ -67,7 +67,7 @@ class Sort(list, QueryStatement):
 
 class AscSortStatement(SortStatement):
     def translate(self, translator):
-        return translator.translate_ascsort_statement(self)
+        return translator.translate_asc_sort_statement(self)
 
     def __str__(self):
         return 'AscSortStatement[to_sort: {}]'.format(self.to_sort)
@@ -75,7 +75,7 @@ class AscSortStatement(SortStatement):
 
 class DescSortStatement(SortStatement):
     def translate(self, translator):
-        return translator.translate_descsort_statement(self)
+        return translator.translate_desc_sort_statement(self)
 
     def __str__(self):
         return 'DescSortStatement[to_sort: {}]'.format(self.to_sort)
@@ -90,7 +90,7 @@ class BooleanFilter(Filter):
         self.value = value
 
     def translate(self, translator):
-        return translator.translate_booleanfilter(self)
+        return translator.translate_boolean_filter(self)
 
     @property
     def field(self):
@@ -127,7 +127,7 @@ class KeywordFilter(Filter):
         self.keywords = keywords
 
     def translate(self, translator):
-        return translator.translate_keywordfilter(self)
+        return translator.translate_keyword_filter(self)
 
     @property
     def fields(self):
@@ -207,7 +207,7 @@ class GeolocationFilter(Filter):
         self.unit = unit
 
     def translate(self, translator):
-        return translator.translate_geolocationfilter(self)
+        return translator.translate_geolocation_filter(self)
 
     @property
     def center(self):
@@ -306,23 +306,23 @@ class QueryTranslator(object):
         pass
 
     @abc.abstractmethod
-    def translate_ascsort_statement(self, asc_sort):
+    def translate_asc_sort_statement(self, asc_sort):
         pass
 
     @abc.abstractmethod
-    def translate_descsort_statement(self, desc_sort):
+    def translate_desc_sort_statement(self, desc_sort):
         pass
 
     @abc.abstractmethod
-    def translate_booleanfilter(self, search_filter):
+    def translate_boolean_filter(self, search_filter):
         pass
 
     @abc.abstractmethod
-    def translate_keywordfilter(self, search_filter):
+    def translate_keyword_filter(self, search_filter):
         pass
 
     @abc.abstractmethod
-    def translate_geolocationfilter(self, search_filter):
+    def translate_geolocation_filter(self, search_filter):
         pass
 
 

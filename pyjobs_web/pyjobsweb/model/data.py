@@ -176,26 +176,26 @@ class ElasticsearchTranslator(search_query.QueryTranslator):
     def translate_sort(self, multi_sort):
         return self.query_object.sort(*[s.translate(self) for s in multi_sort])
 
-    def translate_ascsort_statement(self, asc_sort):
+    def translate_asc_sort_statement(self, asc_sort):
         return '{}'.format(asc_sort.to_sort)
 
-    def translate_descsort_statement(self, desc_sort):
+    def translate_desc_sort_statement(self, desc_sort):
         return '-{}'.format(desc_sort.to_sort)
 
-    def translate_booleanfilter(self, search_filter):
+    def translate_boolean_filter(self, search_filter):
         return self.query_object.filter(
             'terms',
             **{search_filter.field: [search_filter.value]}
         )
 
-    def translate_keywordfilter(self, search_filter):
+    def translate_keyword_filter(self, search_filter):
         return self.query_object.query(
             'multi_match',
             fields=search_filter.fields,
             query=search_filter.keywords
         )
 
-    def translate_geolocationfilter(self, search_filter):
+    def translate_geolocation_filter(self, search_filter):
         return self.query_object.filter(
             'geo_distance',
             geolocation=[
