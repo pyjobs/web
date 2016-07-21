@@ -33,7 +33,7 @@ class PopulateESCommand(commands.AppContextCommand):
         except geolocation.BaseError as e:
             es_job_offer.geolocation = dict(lat=0.0, lon=0.0)
             es_job_offer.geolocation_error = True
-            self._error_logging(job_offer.id, e.message, logging.WARNING)
+            self._error_logging(job_offer.id, e, logging.WARNING)
 
         # Perform the insertion in Elasticsearch
         try:

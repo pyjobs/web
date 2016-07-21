@@ -39,8 +39,8 @@ class Geolocator(object):
         except (exc.GeocoderQuotaExceeded,
                 exc.GeocoderUnavailable,
                 exc.GeocoderTimedOut) as e:
-            raise TemporaryError(u'Geolocation error: %s' % e.message)
+            raise TemporaryError(u'Geolocation error: %s' % e)
         except exc.GeocoderServiceError as e:
-            raise GeolocationError(u'Geolocation error: %s' % e.message)
+            raise GeolocationError(u'Geolocation error: %s' % e)
 
         return geolocation
