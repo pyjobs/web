@@ -18,10 +18,6 @@ class QueryStatement(Translatable):
     __metaclass__ = abc.ABCMeta
 
 
-class Filter(QueryStatement):
-    __metaclass__ = abc.ABCMeta
-
-
 class SortStatement(Translatable):
     __metaclass__ = abc.ABCMeta
 
@@ -37,6 +33,10 @@ class SortStatement(Translatable):
     @to_sort.setter
     def to_sort(self, to_sort):
         self._to_sort = to_sort
+
+
+class Filter(QueryStatement):
+    __metaclass__ = abc.ABCMeta
 
 
 class Sort(list, QueryStatement):
