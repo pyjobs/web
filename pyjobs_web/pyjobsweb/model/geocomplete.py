@@ -48,3 +48,5 @@ class Geocomplete(elasticsearch_dsl.DocType):
     )
 
     geolocation = elasticsearch_dsl.GeoPoint()
+
+    weight = elasticsearch_dsl.Integer()
