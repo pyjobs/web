@@ -75,9 +75,7 @@ class RootController(BaseController):
 
             for q in query.split(','):
                 if q:
-                    search_query.builder.add_elem(
-                        sq.KeywordFilter(search_on, [q])
-                    )
+                    search_query.add_elem(sq.KeywordFilter(search_on, [q]))
 
             try:
                 geoloc_query = json.loads(center)
@@ -85,10 +83,10 @@ class RootController(BaseController):
                 center_point = sq.GeolocationFilter.Center(lat, lon)
                 unit = sq.GeolocationFilter.UnitsEnum(unit)
                 radius = float(radius)
-                search_query.builder.add_elem(
+                search_query.add_elem(
                     sq.GeolocationFilter(center_point, radius, unit)
                 )
-                search_query.builder.add_elem(
+                search_query.add_elem(
                     sq.BooleanFilter('geolocation_error', False)
                 )
             except ValueError:
@@ -100,7 +98,7 @@ class RootController(BaseController):
 
             ms = sq.Sort()
             ms.append(sq.DescSortStatement('publication_datetime'))
-            search_query.builder.add_elem(ms)
+            search_query.add_elem(ms)
 
             job_offers = search_query.execute_query()
 
@@ -134,12 +132,10 @@ class RootController(BaseController):
         query = model.ElasticsearchQuery(model.Geocomplete, 0, 4)
 
         if address:
-            query.builder.add_elem(sq.KeywordFilter(['name'], [address]))
+            query.add_elem(sq.KeywordFilter(['name'], [address]))
 
         if postal_code:
-            query.builder.add_elem(
-                sq.KeywordFilter(['postal_code'], [postal_code])
-            )
+            query.add_elem(sq.KeywordFilter(['postal_code'], [postal_code]))
 
         raw_res = query.execute_query()
 

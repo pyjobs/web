@@ -50,7 +50,7 @@ class PopulateESCommand(commands.AppContextCommand):
         failed_geolocs_query = \
             model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, 10000)
         import pyjobsweb.lib.search_query as sq
-        failed_geolocs_query.builder.add_elem(
+        failed_geolocs_query.add_elem(
             sq.BooleanFilter('geolocation_error', True)
         )
         failed_geolocs = failed_geolocs_query.execute_query()

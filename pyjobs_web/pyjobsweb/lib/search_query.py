@@ -376,6 +376,9 @@ class BaseSearchQuery(object):
 
         self._query_builder = builder
 
+    def add_elem(self, elem):
+        self.builder.add_elem(elem)
+
     @abc.abstractmethod
     def execute_query(self):
         pass
