@@ -132,7 +132,7 @@ class RootController(BaseController):
             except ValueError:
                 address = u'%s %s' % (address, token) if address else token
 
-        query = model.ElasticsearchQuery(model.Geocomplete, 0, 4)
+        query = model.ElasticsearchQuery(model.Geocomplete, 0, 5)
 
         if address:
             query.add_elem(sq.KeywordFilter(['name'], [address]))
