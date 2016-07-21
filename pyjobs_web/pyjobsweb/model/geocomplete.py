@@ -11,7 +11,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
         'geocompletion_ngram',
         type='edgeNGram',
         min_gram=1,
-        max_gram=10,
+        max_gram=50,
         side='front'
     )
 
