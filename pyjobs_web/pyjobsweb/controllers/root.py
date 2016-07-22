@@ -2,7 +2,6 @@
 """Main Controller"""
 import json
 import datetime
-import unidecode
 import collections
 import webhelpers.feedgenerator as feedgenerator
 from sqlalchemy.orm.exc import NoResultFound
