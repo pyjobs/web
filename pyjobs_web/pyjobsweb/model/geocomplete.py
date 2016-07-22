@@ -40,7 +40,8 @@ class Geocomplete(elasticsearch_dsl.DocType):
     name = elasticsearch_dsl.String(
         index='analyzed',
         analyzer=geocompletion_index_analyzer,
-        search_analyzer=geocompletion_search_analyzer
+        search_analyzer=geocompletion_search_analyzer,
+        fields=dict(raw=elasticsearch_dsl.String(index='not_analyzed'))
     )
 
     postal_code = elasticsearch_dsl.String(
