@@ -114,7 +114,8 @@ class RootController(BaseController):
         if 'address' not in kwargs:
             return []
 
-        import pyjobsweb.lib.search_query as sq
+        from elasticsearch_dsl.aggs import A
+        from elasticsearch_dsl.query import Q
 
         query_tokens = kwargs['address'].split(' ')
 
@@ -131,26 +132,41 @@ class RootController(BaseController):
             except ValueError:
                 address = u'%s %s' % (address, token) if address else token
 
-        query = model.ElasticsearchQuery(model.Geocomplete, 0, 5)
+        search = model.Geocomplete.search()
+
+        address_query = Q()
+        postal_code_query = Q()
 
         if address:
-            query.add_elem(sq.KeywordFilter(['name'], [address]))
+            address_query = Q('multi_match', query=address, fields=['name'])
 
         if postal_code:
-            query.add_elem(sq.KeywordFilter(['postal_code'], [postal_code]))
+            postal_code_query = \
+                Q('multi_match', query=postal_code, fields=['postal_code'])
 
-        raw_res = query.execute_query()
+        search.query = address_query & postal_code_query
+
+        tmp_1 = A('terms', field='name.raw', size=1,
+                  order={'avg_doc_score': 'desc'})
+        tmp_2 = A('top_hits', size=1)
+        tmp_3 = A('avg', script=dict(lang='groovy', file='geocomplete-sort'))
+
+        tmp_1.bucket('top_geo_matches', tmp_2)
+        tmp_1.bucket('avg_doc_score', tmp_3)
+
+        search.aggs.bucket('geo_matches', tmp_1)
+
+        raw_res = search[0:0].execute()
 
         res = list()
-        duplicates = list()
-        for s in raw_res:
-            geoloc = dict(lat=s.geolocation.lat, lon=s.geolocation.lon)
-            submit = json.dumps(geoloc)
-            display = u'%s, France' % s.name
-
-            if display not in duplicates:
+        for bucket in raw_res.aggregations.geo_matches.buckets:
+            for source_doc in bucket['top_geo_matches']['hits']['hits']:
+                fields = source_doc['_source']
+                geo_field = fields['geolocation']
+                geoloc = dict(lat=geo_field['lat'], lon=geo_field['lon'])
+                submit = json.dumps(geoloc)
+                display = u'%s, France' % fields['name']
                 res.append(dict(to_submit=submit, to_display=display))
-                duplicates.append(display)
 
         return dict(results=res)
 
