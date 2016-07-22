@@ -76,5 +76,6 @@ def geocompletion_documents():
                 geolocation=dict(
                     lat=float(place['lat']),
                     lon=float(place['lon'])
-                )
+                ),
+                weight=place['weight']
             )
