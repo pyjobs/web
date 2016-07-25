@@ -68,28 +68,41 @@ class RootController(BaseController):
         if not query and not center and not radius:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
-            import pyjobsweb.lib.search_query as sq
 
-            search_query = model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, self.items_per_page * 50)
+            search_query = model.JobOfferElasticsearch.search()
 
-            search_on = ['description', 'title', 'company']
+            search_on = ['description', 'title^10', 'company^20']
 
-            for q in query.split(','):
-                if q:
-                    search_query.add_elem(sq.KeywordFilter(search_on, [q]))
+            keyword_query = Q()
+
+            if query:
+                query = query.replace(',', ' ')
+
+                keyword_query = Q('multi_match',
+                                  type='cross_fields',
+                                  query=query,
+                                  fields=search_on,
+                                  minimum_should_match='2<50%')
+
+            decay_function = SF('gauss',
+                                publication_datetime=dict(origin='now',
+                                                          scale='120d',
+                                                          offset='7d',
+                                                          decay='0.1'))
+            search_query.query = Q('function_score',
+                                   query=keyword_query,
+                                   functions=[decay_function])
 
             try:
                 geoloc_query = json.loads(center)
                 lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
-                center_point = sq.GeolocationFilter.Center(lat, lon)
-                unit = sq.GeolocationFilter.UnitsEnum(unit)
-                radius = float(radius)
-                search_query.add_elem(
-                    sq.GeolocationFilter(center_point, radius, unit)
-                )
-                search_query.add_elem(
-                    sq.BooleanFilter('geolocation_error', False)
-                )
+                search_query = \
+                    search_query.filter('term', geolocation_error=False)
+
+                search_query = \
+                    search_query.filter('geo_distance',
+                                        geolocation=[lon, lat],
+                                        distance='%skm' % float(radius))
             except ValueError:
                 # One of the following case has occurred:
                 #     - Center, radius or unit weren't set properly
@@ -97,11 +110,7 @@ class RootController(BaseController):
                 #       ignore the geolocation filters
                 pass
 
-            ms = sq.Sort()
-            ms.append(sq.DescSortStatement('publication_datetime'))
-            search_query.add_elem(ms)
-
-            job_offers = search_query.execute_query()
+            job_offers = search_query[0:self.items_per_page * 50].execute()
 
         search_form = ResearchForm(action='/', method='POST').req()
 
