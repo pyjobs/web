@@ -7,6 +7,17 @@ class Geocomplete(elasticsearch_dsl.DocType):
         index = 'geocomplete'
         doc_type = 'geoloc-entry'
 
+    french_elision = elasticsearch_dsl.token_filter(
+        'french_elision',
+        type='elision',
+        articles_case=True,
+        articles=[
+            'l', 'm', 't', 'qu', 'n', 's',
+            'j', 'd', 'c', 'jusqu', 'quoiqu',
+            'lorsqu', 'puisqu'
+        ]
+    )
+
     geocompletion_ngram_filter = elasticsearch_dsl.token_filter(
         'geocompletion_ngram',
         type='edgeNGram',
@@ -23,6 +34,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
             'lowercase',
             'asciifolding',
             'word_delimiter',
+            french_elision,
             geocompletion_ngram_filter
         ]
     )
