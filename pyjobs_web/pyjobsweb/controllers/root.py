@@ -141,8 +141,8 @@ class RootController(BaseController):
             address_query = Q('multi_match', query=address, fields=['name'])
 
         if postal_code:
-            postal_code_query = \
-                Q('multi_match', query=postal_code, fields=['postal_code'])
+            postal_code_query = Q('multi_match',
+                                  query=postal_code, fields=['postal_code'])
 
         search_query = Q('function_score',
                          query=address_query & postal_code_query,
@@ -151,15 +151,16 @@ class RootController(BaseController):
                                        field='weight')])
         search.query = search_query
 
-        tmp_1 = A('terms', field='name.raw', size=1,
-                  order={'avg_doc_score': 'desc'})
-        tmp_2 = A('top_hits', size=1)
-        tmp_3 = A('avg', script=dict(lang='groovy', file='geocomplete-sort'))
+        top_agg = A('terms', field='name.raw', size=1,
+                    order={'avg_doc_score': 'desc'})
+        field_agg = A('top_hits', size=1)
+        score_agg = A('avg',
+                      script=dict(lang='groovy', file='geocomplete-sort'))
 
-        tmp_1.bucket('top_geo_matches', tmp_2)
-        tmp_1.bucket('avg_doc_score', tmp_3)
+        top_agg.bucket('top_geo_matches', field_agg)
+        top_agg.bucket('avg_doc_score', score_agg)
 
-        search.aggs.bucket('geo_matches', tmp_1)
+        search.aggs.bucket('geo_matches', top_agg)
 
         raw_res = search[0:0].execute()
 
