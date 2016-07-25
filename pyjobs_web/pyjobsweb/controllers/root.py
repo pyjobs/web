@@ -124,11 +124,12 @@ class RootController(BaseController):
 
         for token in query_tokens:
             try:
-                if len(token) == 5:
-                    int_code = int(token)
+                int_code = int(token)
+
+                if len(token) <= 5:
                     postal_code = postal_code if postal_code else str(int_code)
                 else:
-                    raise ValueError
+                    return dict(results=[])
             except ValueError:
                 address = u'%s %s' % (address, token) if address else token
 
