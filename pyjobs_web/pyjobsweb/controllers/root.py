@@ -123,11 +123,11 @@ class RootController(BaseController):
         )
 
     @expose('json')
-    def geocomplete(self, **kwargs):
-        if 'address' not in kwargs:
+    def geocomplete(self, address=None):
+        if not address:
             return dict(results=[])
 
-        query_tokens = kwargs['address'].split(' ')
+        query_tokens = address.split(' ')
 
         postal_code = None
         address = None
