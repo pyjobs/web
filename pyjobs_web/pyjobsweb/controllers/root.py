@@ -96,13 +96,14 @@ class RootController(BaseController):
             try:
                 geoloc_query = json.loads(center)
                 lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
-                search_query = \
-                    search_query.filter('term', geolocation_error=False)
 
                 search_query = \
                     search_query.filter('geo_distance',
                                         geolocation=[lon, lat],
                                         distance='%skm' % float(radius))
+
+                search_query = \
+                    search_query.filter('term', geolocation_error=False)
             except ValueError:
                 # One of the following case has occurred:
                 #     - Center wasn't a valid json string
