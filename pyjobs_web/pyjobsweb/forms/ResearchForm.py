@@ -30,13 +30,15 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
                 function(data) {
                     var results = [];
 
-                    $.each(data['results'], function(i, v) {
-                        var o = {};
-                        o.id = v['to_submit'];
-                        o.name = v['to_display'];
-                        o.value = v['to_display'];
-                        results.push(o);
-                    });
+                    if ('results' in data) {
+                        $.each(data['results'], function(i, v) {
+                            var o = {};
+                            o.id = v['to_submit'];
+                            o.name = v['to_display'];
+                            o.value = v['to_display'];
+                            results.push(o);
+                        });
+                    }
 
                     return {
                         results: results
