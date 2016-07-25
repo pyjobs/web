@@ -154,9 +154,8 @@ class RootController(BaseController):
         if postal_code:
             postal_code_query = Q('match', postal_code=postal_code)
 
-        weight_scoring_function = SF('field_value_factor',
-                                     modifier='log1p',
-                                     field='weight')
+        weight_scoring_function = \
+            SF('field_value_factor', modifier='log1p', field='weight')
 
         search.query = Q('function_score',
                          query=address_query & postal_code_query,
@@ -167,8 +166,7 @@ class RootController(BaseController):
                        size=1,
                        order={'avg_doc_score': 'desc'})
         field_agg = A('top_hits', size=1)
-        score_agg = A('avg',
-                      script=dict(lang='expression', script='_score'))
+        score_agg = A('avg', script=dict(lang='expression', script='_score'))
 
         unique_agg.bucket('top_geo_matches', field_agg)
         unique_agg.bucket('avg_doc_score', score_agg)
