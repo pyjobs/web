@@ -138,7 +138,6 @@ class ResearchForm(twf.Form):
                         ${w.submit.display()|n}
                     </div>
                 </div>
-                ${w.children.unit.display()|n}
             </form>
             '''
 
@@ -199,8 +198,6 @@ class ResearchForm(twf.Form):
                 )
             )
         )
-
-        unit = twf.HiddenField(name="unit", label="", value="km")
 
         submit = twf.SubmitButton("submit")
         submit.value = "J'effectue ma recherche"

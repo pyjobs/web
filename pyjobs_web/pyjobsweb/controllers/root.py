@@ -64,7 +64,7 @@ class RootController(BaseController):
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=items_per_page)
-    def index(self, query=None, radius=None, center=None, unit=None):
+    def index(self, query=None, radius=None, center=None):
         if not query and not center and not radius:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
@@ -105,9 +105,10 @@ class RootController(BaseController):
                                         distance='%skm' % float(radius))
             except ValueError:
                 # One of the following case has occurred:
-                #     - Center, radius or unit weren't set properly
-                #     - Radius couldn't be converted to float, therefore we
-                #       ignore the geolocation filters
+                #     - Center wasn't a valid json string
+                #     - Radius couldn't be converted to float
+                # Since both these information are required to set a geolocation
+                # filter are required, we ignore it.
                 pass
 
             job_offers = search_query[0:self.items_per_page * 50].execute()
