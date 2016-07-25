@@ -115,7 +115,7 @@ class RootController(BaseController):
             return []
 
         from elasticsearch_dsl.aggs import A
-        from elasticsearch_dsl.query import Q
+        from elasticsearch_dsl.query import Q, SF
 
         query_tokens = kwargs['address'].split(' ')
 
@@ -144,7 +144,12 @@ class RootController(BaseController):
             postal_code_query = \
                 Q('multi_match', query=postal_code, fields=['postal_code'])
 
-        search.query = address_query & postal_code_query
+        search_query = Q('function_score',
+                         query=address_query & postal_code_query,
+                         functions=[SF('field_value_factor',
+                                       modifier='log1p',
+                                       field='weight')])
+        search.query = search_query
 
         tmp_1 = A('terms', field='name.raw', size=1,
                   order={'avg_doc_score': 'desc'})
