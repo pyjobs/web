@@ -149,12 +149,10 @@ class RootController(BaseController):
         postal_code_query = Q()
 
         if address:
-            address_query = Q('multi_match', query=address, fields=['name'])
+            address_query = Q('match', name=address)
 
         if postal_code:
-            postal_code_query = Q('multi_match',
-                                  query=postal_code,
-                                  fields=['postal_code'])
+            postal_code_query = Q('match', postal_code=postal_code)
 
         weight_scoring_function = SF('field_value_factor',
                                      modifier='log1p',
