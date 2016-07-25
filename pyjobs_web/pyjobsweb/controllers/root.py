@@ -112,7 +112,7 @@ class RootController(BaseController):
     @expose('json')
     def geocomplete(self, **kwargs):
         if 'address' not in kwargs:
-            return []
+            return dict(results=[])
 
         from elasticsearch_dsl.aggs import A
         from elasticsearch_dsl.query import Q, SF
