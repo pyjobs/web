@@ -13,6 +13,8 @@ from tg.exceptions import HTTPFound
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.controller import AdminController
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
+from elasticsearch_dsl.aggs import A
+from elasticsearch_dsl.query import Q, SF
 
 from pyjobsweb import model
 from pyjobsweb.controllers.error import ErrorController
@@ -114,9 +116,6 @@ class RootController(BaseController):
         if 'address' not in kwargs:
             return dict(results=[])
 
-        from elasticsearch_dsl.aggs import A
-        from elasticsearch_dsl.query import Q, SF
-
         query_tokens = kwargs['address'].split(' ')
 
         postal_code = None
@@ -143,25 +142,29 @@ class RootController(BaseController):
 
         if postal_code:
             postal_code_query = Q('multi_match',
-                                  query=postal_code, fields=['postal_code'])
+                                  query=postal_code,
+                                  fields=['postal_code'])
 
-        search_query = Q('function_score',
+        weight_scoring_function = SF('field_value_factor',
+                                     modifier='log1p',
+                                     field='weight')
+
+        search.query = Q('function_score',
                          query=address_query & postal_code_query,
-                         functions=[SF('field_value_factor',
-                                       modifier='log1p',
-                                       field='weight')])
-        search.query = search_query
+                         functions=[weight_scoring_function])
 
-        top_agg = A('terms', field='name.raw', size=1,
-                    order={'avg_doc_score': 'desc'})
+        unique_agg = A('terms',
+                       field='name.raw',
+                       size=1,
+                       order={'avg_doc_score': 'desc'})
         field_agg = A('top_hits', size=1)
         score_agg = A('avg',
                       script=dict(lang='groovy', file='geocomplete-sort'))
 
-        top_agg.bucket('top_geo_matches', field_agg)
-        top_agg.bucket('avg_doc_score', score_agg)
+        unique_agg.bucket('top_geo_matches', field_agg)
+        unique_agg.bucket('avg_doc_score', score_agg)
 
-        search.aggs.bucket('geo_matches', top_agg)
+        search.aggs.bucket('geo_matches', unique_agg)
 
         raw_res = search[0:0].execute()
 
@@ -204,11 +207,11 @@ class RootController(BaseController):
         for job in jobs:
             job_slug = slugify(job.title)
             feed.add_item(
-                    title=job.title,
-                    link=get_job_url(job.id, job_title=job.title, absolute=True),
-                    description=job.description,
-                    pubdate=job.publication_datetime,
-                    unique_id="%s/job/%d/%s" % (site_url, job.id, job_slug)
+                title=job.title,
+                link=get_job_url(job.id, job_title=job.title, absolute=True),
+                description=job.description,
+                pubdate=job.publication_datetime,
+                unique_id="%s/job/%d/%s" % (site_url, job.id, job_slug)
             )
 
         return feed.writeString('utf-8')
@@ -226,28 +229,29 @@ class RootController(BaseController):
         except NoResultFound:
             pass  # TODO: TubroGears 404 ?
         return dict(
-                job=job,
-                sources=SOURCES
+            job=job,
+            sources=SOURCES
         )
 
     @expose('pyjobsweb.templates.sources')
     def sources(self):
         sources_last_crawl = {}
-        sorted_sources = collections.OrderedDict(sorted(SOURCES.items(), key=lambda x: x[1].label))
+        sorted_sources = collections.OrderedDict(
+            sorted(SOURCES.items(), key=lambda x: x[1].label))
         for source_name in sorted_sources:
             try:
                 sources_last_crawl[source_name] = DBSession.query(Log.datetime) \
                     .filter(Log.source == source_name) \
                     .order_by(Log.datetime.desc()) \
-                    .limit(1)\
+                    .limit(1) \
                     .one()[0]
             except NoResultFound:
                 sources_last_crawl[source_name] = None
 
         return dict(
-                sources=sorted_sources,
-                existing_fields=existing_fields,
-                sources_last_crawl=sources_last_crawl
+            sources=sorted_sources,
+            existing_fields=existing_fields,
+            sources_last_crawl=sources_last_crawl
         )
 
     @expose('pyjobsweb.templates.stats')
@@ -262,7 +266,8 @@ class RootController(BaseController):
             date_to=date_to,
         ).all()
         months = stats.extract(by_months, stats.FIELD_DATE)
-        stats_month = stats.extract_stats(query_result=by_months, sources=SOURCES.keys())
+        stats_month = stats.extract_stats(query_result=by_months,
+                                          sources=SOURCES.keys())
         flat_month = stats.flat_query_by_y(
             query_result=by_months,
             sources=SOURCES.keys(),
@@ -275,7 +280,8 @@ class RootController(BaseController):
             date_to=date_to,
         ).all()
         weeks = stats.extract(by_weeks, stats.FIELD_DATE)
-        stats_week = stats.extract_stats(query_result=by_weeks, sources=SOURCES.keys())
+        stats_week = stats.extract_stats(query_result=by_weeks,
+                                         sources=SOURCES.keys())
         flat_week = stats.flat_query_by_y(
             query_result=by_weeks,
             sources=SOURCES.keys(),
@@ -298,13 +304,15 @@ class RootController(BaseController):
     @expose('pyjobsweb.templates.logs')
     def logs(self, source=None, last_days=1):
 
-        logs_query = DBSession.query(Log)\
-            .order_by(Log.datetime.desc())\
-            .filter(Log.datetime >= datetime.datetime.now() + datetime.timedelta(days=-int(last_days)))\
+        logs_query = DBSession.query(Log) \
+            .order_by(Log.datetime.desc()) \
+            .filter(
+            Log.datetime >= datetime.datetime.now() + datetime.timedelta(
+                days=-int(last_days))) \
             .filter(Log.message.in_(('CRAWL_LIST_START',
-                                    'CRAWL_LIST_FINISHED',
-                                    'ERROR_UNEXPECTED_END',
-                                    'ERROR_CRAWNLING')))
+                                     'CRAWL_LIST_FINISHED',
+                                     'ERROR_UNEXPECTED_END',
+                                     'ERROR_CRAWNLING')))
 
         if source is not None:
             logs_query = logs_query.filter(Log.source == source)
