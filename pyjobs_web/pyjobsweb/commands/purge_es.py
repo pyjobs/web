@@ -12,14 +12,14 @@ class PurgeESCommand(AppContextCommand):
     def get_parser(self, prog_name):
         parser = super(PurgeESCommand, self).get_parser(prog_name)
 
-        jobs_help_msg = 'purge the jobs index of the elasticsearch database'
+        jobs_help_msg = 'purges the jobs index of the elasticsearch database'
         parser.add_argument('-j', '--jobs',
                             help=jobs_help_msg,
                             dest='purge_jobs_index',
                             action='store_const', const=True)
 
         geocomplete_help_msg = \
-            'purge the geocomplete index of the elasticsearch database'
+            'purges the geocomplete index of the elasticsearch database'
         parser.add_argument('-g', '--geocomplete',
                             help=geocomplete_help_msg,
                             dest='purge_geocomplete_index',
