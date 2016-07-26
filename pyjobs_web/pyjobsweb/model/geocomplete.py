@@ -76,11 +76,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
     postal_code_search_analyzer = elasticsearch_dsl.analyzer(
         'postal_code_search_analyzer',
         type='custom',
-        tokenizer='standard',
-        filter=[
-            'lowercase',
-            'asciifolding'
-        ]
+        tokenizer='standard'
     )
 
     postal_code = elasticsearch_dsl.String(
