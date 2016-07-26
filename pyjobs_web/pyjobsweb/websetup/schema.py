@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import json
 import elasticsearch_dsl.index
+import elasticsearch.exceptions
 from elasticsearch_dsl.connections import connections
 
 from tg import config
@@ -38,29 +39,34 @@ def setup_schema(command, conf, vars):
     # Setup Elasticsearch's database schema
     print("Setting up Elasticsearch's model")
 
-    connections.create_connection(
-        hosts=[config.get('elasticsearch.host')],
-        send_get_body_as='POST',
-        timeout=20
-    )
+    connections.create_connection(hosts=[config.get('elasticsearch.host')],
+                                  send_get_body_as='POST',
+                                  timeout=20)
 
     # Setup the jobs index
     jobs_index = elasticsearch_dsl.Index('jobs')
     jobs_index.settings()
     jobs_index.doc_type(model.JobOfferElasticsearch)
-    # jobs_index.delete(ignore=404)
-    jobs_index.create(ignore=400)
 
-    # Setup the geocompletion index
+    try:
+        jobs_index.create()
+    except elasticsearch.ElasticsearchException as e:
+        print("Error while creating the 'jobs' index: %s." % e)
+
+    # Setup the geocomplete index
     geocomplete_index = elasticsearch_dsl.Index('geocomplete')
     geocomplete_index.settings()
     geocomplete_index.doc_type(model.Geocomplete)
-    geocomplete_index.delete(ignore=404)
-    geocomplete_index.create(ignore=400)
 
-    # Population the geocompletion index
-    elasticsearch_conn = connections.get_connection()
-    elasticsearch_bulk_indexing(elasticsearch_conn, geocompletion_documents())
+    try:
+        geocomplete_index.create()
+
+        # Populate the geocomplete index
+        elasticsearch_conn = connections.get_connection()
+        elasticsearch_bulk_indexing(elasticsearch_conn,
+                                    geocompletion_documents())
+    except elasticsearch.ElasticsearchException as e:
+        print("Error while creating the 'geocomplete' index: %s." % e)
 
 
 def geocompletion_documents():
