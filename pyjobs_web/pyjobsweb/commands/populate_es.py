@@ -3,12 +3,12 @@ import elasticsearch_dsl
 import elasticsearch
 import logging
 
-import pyjobsweb.commands as commands
 import pyjobsweb.model as model
 import pyjobsweb.lib.geolocation as geolocation
+from pyjobsweb.commands import AppContextCommand
 
 
-class PopulateESCommand(commands.AppContextCommand):
+class PopulateESCommand(AppContextCommand):
     def __init__(self, *args, **kwargs):
         super(PopulateESCommand, self).__init__(args, kwargs)
         self._geolocator = geolocation.Geolocator()
