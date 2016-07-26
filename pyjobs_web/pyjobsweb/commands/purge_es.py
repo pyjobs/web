@@ -1,27 +1,83 @@
 # -*- coding: utf-8 -*-
+import elasticsearch.exceptions
 import elasticsearch_dsl
 import transaction
+import logging
 
-import pyjobsweb.commands
-import pyjobsweb.model
+from pyjobsweb.commands import AppContextCommand
+from pyjobsweb import model
 
 
-class PurgeESCommand(pyjobsweb.commands.AppContextCommand):
-    def take_action(self, parsed_args):
-        super(PurgeESCommand, self).take_action(parsed_args)
-        # Drop the index and create a new one
-        jobs_index = elasticsearch_dsl.Index('jobs')
-        # Empty at the moment
-        jobs_index.settings()
-        # Register a JobOffer doc_type in the jobs index
-        jobs_index.doc_type(pyjobsweb.model.JobOfferElasticsearch)
-        # Create the index
-        jobs_index.delete(ignore=404)
-        jobs_index.create(ignore=400)
+class PurgeESCommand(AppContextCommand):
+    def get_parser(self, prog_name):
+        parser = super(PurgeESCommand, self).get_parser(prog_name)
+
+        jobs_help_msg = 'purge the jobs index of the elasticsearch database'
+        parser.add_argument('-j', '--jobs',
+                            help=jobs_help_msg,
+                            dest='purge_jobs_index',
+                            action='store_const', const=True)
+
+        geocomplete_help_msg = \
+            'purge the geocomplete index of the elasticsearch database'
+        parser.add_argument('-g', '--geocomplete',
+                            help=geocomplete_help_msg,
+                            dest='purge_geocomplete_index',
+                            action='store_const', const=True)
+
+        return parser
+
+    @staticmethod
+    def purge_index(index_name, index_settings, doc_type_class):
+        log_msg = "Dropping '%s' index." % index_name
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
+        index = elasticsearch_dsl.Index(index_name)
+        index.settings(**index_settings)
+        index.doc_type(doc_type_class)
+
+        if not index.exists():
+            log_msg = "Nothing to do. '%s' index does not exist." % index_name
+            logging.getLogger(__name__).log(logging.INFO, log_msg)
+            return
+
+        try:
+            index.delete()
+            index.create()
+        except elasticsearch.exceptions.ElasticsearchException as e:
+            log_msg = "'%s' index: %s." % e
+            logging.getLogger(__name__).log(logging.ERROR, log_msg)
+            return
+
+        log_msg = "Index '%s' has been dropped successfully." % index_name
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
+    def purge_jobs_index(self):
+        self.purge_index('jobs', dict(), model.JobOfferElasticsearch)
 
         # Update the Postgresql database
+        log_msg = "Resetting the 'already_in_elasticsearch' " \
+                  "field of the Postgresql database."
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
         transaction.begin()
-        pyjobsweb.model.DBSession\
-            .query(pyjobsweb.model.data.JobOfferSQLAlchemy)\
+        model.DBSession\
+            .query(model.data.JobOfferSQLAlchemy)\
             .update({'already_in_elasticsearch': False})
         transaction.commit()
+
+        log_msg = "'already_in_elasticsearch' field of the " \
+                  "Postgresql database has been reset."
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
+    def purge_geocomplete_index(self):
+        self.purge_index('geocomplete', dict(), model.Geocomplete)
+
+    def take_action(self, parsed_args):
+        super(PurgeESCommand, self).take_action(parsed_args)
+
+        if parsed_args.purge_jobs_index:
+            self.purge_jobs_index()
+
+        if parsed_args.purge_geocomplete_index:
+            self.purge_geocomplete_index()

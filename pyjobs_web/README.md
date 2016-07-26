@@ -69,4 +69,4 @@ Run ``gearbox populateES`` command. It will fetch every entry in the Postgresql 
 
 ## Purge the Elasticsearch database with purgeES
 
-Run ``gearbox purgeES`` command. It will purge every entry under the jobs index of the Elasticsearch database and mark it as not inserted in the Postgresql database, so that running ``gearbox populateES`` will re-index purged elements.
+Run ``gearbox purgeES [-j|--jobs] [-g|--geocomplete]`` command. The command will delete both the ``jobs`` and/or ``geocomplete`` Elasticsearch indices depending on the specified arguments. After deleting them they will recreate them along with their mappings. Also, after purging the ``jobs`` index, the command will also set back the ``already_in_elasticsearch`` column to ``False`` for every entry in the Postgresql ``jobs`` table.
