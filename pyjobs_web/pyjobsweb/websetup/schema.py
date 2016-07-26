@@ -2,15 +2,12 @@
 """Setup the pyjobsweb application"""
 from __future__ import print_function
 
-import json
 import elasticsearch_dsl.index
 import elasticsearch.exceptions
 from elasticsearch_dsl.connections import connections
 
 from tg import config
 import transaction
-
-from pyjobsweb import model
 
 
 def setup_schema(command, conf, vars):
