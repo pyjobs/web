@@ -28,7 +28,7 @@ class PurgeESCommand(AppContextCommand):
         return parser
 
     @staticmethod
-    def purge_index(index_name, index_settings, doc_type_class):
+    def _purge_index(index_name, index_settings, doc_type_class):
         log_msg = "Dropping '%s' index." % index_name
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
@@ -53,7 +53,7 @@ class PurgeESCommand(AppContextCommand):
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def purge_jobs_index(self):
-        self.purge_index('jobs', dict(), model.JobOfferElasticsearch)
+        self._purge_index('jobs', dict(), model.JobOfferElasticsearch)
 
         # Update the Postgresql database
         log_msg = "Resetting the 'already_in_elasticsearch' " \
@@ -71,7 +71,7 @@ class PurgeESCommand(AppContextCommand):
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def purge_geocomplete_index(self):
-        self.purge_index('geocomplete', dict(), model.Geocomplete)
+        self._purge_index('geocomplete', dict(), model.Geocomplete)
 
     def take_action(self, parsed_args):
         super(PurgeESCommand, self).take_action(parsed_args)
