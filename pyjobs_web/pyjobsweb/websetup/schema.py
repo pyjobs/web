@@ -49,7 +49,7 @@ def setup_schema(command, conf, vars):
     try:
         jobs_index.create()
     except elasticsearch.ElasticsearchException as e:
-        print("Error while creating the 'jobs' index: %s." % e)
+        print("Exception while creating index 'jobs': %s." % e)
 
     # Setup the geocomplete index
     geocomplete_index = elasticsearch_dsl.Index('geocomplete')
@@ -59,4 +59,4 @@ def setup_schema(command, conf, vars):
     try:
         geocomplete_index.create()
     except elasticsearch.ElasticsearchException as e:
-        print("Error while creating the 'geocomplete' index: %s." % e)
+        print("Exception while creating index 'geocomplete': %s." % e)
