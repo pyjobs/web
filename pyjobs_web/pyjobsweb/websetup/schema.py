@@ -12,8 +12,6 @@ import transaction
 
 from pyjobsweb import model
 
-from pyjobsweb.lib.helpers import elasticsearch_bulk_indexing
-
 
 def setup_schema(command, conf, vars):
     """Place any commands to setup pyjobsweb here"""
@@ -60,24 +58,5 @@ def setup_schema(command, conf, vars):
 
     try:
         geocomplete_index.create()
-
-        # Populate the geocomplete index
-        elasticsearch_conn = connections.get_connection()
-        elasticsearch_bulk_indexing(elasticsearch_conn,
-                                    geocompletion_documents())
     except elasticsearch.ElasticsearchException as e:
         print("Error while creating the 'geocomplete' index: %s." % e)
-
-
-def geocompletion_documents():
-    geolocation_data = open(config.get('fr.geolocation_data.path'))
-
-    json_dict = json.loads(geolocation_data.read())
-
-    for postal_code, places in json_dict.items():
-        for place in places:
-            yield model.Geocomplete(name=place['name'],
-                                    postal_code=postal_code,
-                                    geolocation=dict(lat=float(place['lat']),
-                                                     lon=float(place['lon'])),
-                                    weight=place['weight'])
