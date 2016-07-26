@@ -25,10 +25,8 @@ class PopulateESCommand(AppContextCommand):
         try:
             location = self._geolocator.geocode(job_offer.address)
 
-            es_job_offer.geolocation = dict(
-                lat=location.latitude,
-                lon=location.longitude
-            )
+            es_job_offer.geolocation = dict(lat=location.latitude,
+                                            lon=location.longitude)
             es_job_offer.geolocation_error = False
         except geolocation.BaseError as e:
             es_job_offer.geolocation = dict(lat=0.0, lon=0.0)
@@ -50,33 +48,27 @@ class PopulateESCommand(AppContextCommand):
         failed_geolocs_query = \
             model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, 10000)
         import pyjobsweb.lib.search_query as sq
-        failed_geolocs_query.add_elem(
-            sq.BooleanFilter('geolocation_error', True)
-        )
+        failed_geolocs_query. \
+            add_elem(sq.BooleanFilter('geolocation_error', True))
         failed_geolocs = failed_geolocs_query.execute_query()
 
         for f in failed_geolocs:
             try:
                 location = self._geolocator.geocode(f.address)
-                f.update(
-                    location=dict(
-                        lat=location.latitude,
-                        lon=location.longitude
-                    ),
-                    geolocation_error=False
-                )
+                f.update(location=dict(lat=location.latitude,
+                                       lon=location.longitude),
+                         geolocation_error=False)
             except geolocation.BaseError as e:
                 self._error_logging(f.id, e, logging.WARNING)
 
-        job_offers = model.JobOfferSQLAlchemy.\
+        job_offers = model.JobOfferSQLAlchemy. \
             compute_elasticsearch_pending_insertions()
 
         for j in job_offers:
             self._handle_insertion_task(j)
             # Mark the task as handled so we don't retreat it next time
-            model.JobOfferSQLAlchemy.\
+            model.JobOfferSQLAlchemy. \
                 mark_as_inserted_in_elasticsearch(j.id)
 
         # Refresh indices to increase research speed
         elasticsearch_dsl.Index('jobs').refresh()
-

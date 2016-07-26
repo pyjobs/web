@@ -76,12 +76,8 @@ def geocompletion_documents():
 
     for postal_code, places in json_dict.items():
         for place in places:
-            yield model.Geocomplete(
-                name=place['name'],
-                postal_code=postal_code,
-                geolocation=dict(
-                    lat=float(place['lat']),
-                    lon=float(place['lon'])
-                ),
-                weight=place['weight']
-            )
+            yield model.Geocomplete(name=place['name'],
+                                    postal_code=postal_code,
+                                    geolocation=dict(lat=float(place['lat']),
+                                                     lon=float(place['lon'])),
+                                    weight=place['weight'])
