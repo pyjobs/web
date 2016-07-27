@@ -63,3 +63,4 @@ target/
 
 # Project specific
 data/templates/*
+venv2.7
