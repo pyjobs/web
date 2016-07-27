@@ -86,8 +86,8 @@ setup(
             'crawl = pyjobsweb.commands.crawl:CrawlCommand',
             'crawl-dry = pyjobsweb.commands.crawl_dry:DryRunCrawlCommand',
             'bots = pyjobsweb.commands.bots:BotsCommand',
-            'populateES = pyjobsweb.commands.populate_es:PopulateESCommand',
-            'purgeES = pyjobsweb.commands.purge_es:PurgeESCommand'
+            'populate-es = pyjobsweb.commands.populate_es:PopulateESCommand',
+            'purge-es = pyjobsweb.commands.purge_es:PurgeESCommand'
         ]
     },
     zip_safe=False,
