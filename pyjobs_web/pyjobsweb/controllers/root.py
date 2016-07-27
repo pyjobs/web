@@ -163,7 +163,7 @@ class RootController(BaseController):
 
         unique_agg = A('terms',
                        field='name.raw',
-                       size=1,
+                       size=5,
                        order={'avg_doc_score': 'desc'})
         field_agg = A('top_hits', size=1)
         score_agg = A('avg', script=dict(lang='expression', script='_score'))
