@@ -1,7 +1,8 @@
 /* TurboGears flash bootstrap look */
 #flash > div {
   padding: 8px 35px 8px 14px;
-  margin-bottom: 20px;
+  margin-top: 40px;
+  margin-bottom: -20px;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   background-color: #fcf8e3;
   border: 1px solid #fbeed5;

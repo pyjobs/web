@@ -25,10 +25,8 @@
             flash=tg.flash_obj.render('flash', use_js=False)
         %>
         % if flash:
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    ${flash | n}
-                </div>
+            <div class="container">
+                ${flash | n}
             </div>
         % endif
         ${self.body()}
