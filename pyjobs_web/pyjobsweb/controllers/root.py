@@ -166,7 +166,7 @@ class RootController(BaseController):
                        size=5,
                        order={'avg_doc_score': 'desc'})
         field_agg = A('top_hits', size=1)
-        score_agg = A('avg', script=dict(lang='expression', script='_score'))
+        score_agg = A('max', script=dict(lang='expression', script='_score'))
 
         unique_agg.bucket('top_geo_matches', field_agg)
         unique_agg.bucket('avg_doc_score', score_agg)
