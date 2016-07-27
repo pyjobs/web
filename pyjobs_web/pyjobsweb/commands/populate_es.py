@@ -84,6 +84,7 @@ class PopulateESCommand(AppContextCommand):
         for postal_code, places in json_dict.items():
             for place in places:
                 yield model.Geocomplete(name=place['name'],
+                                        complement=place['complement'],
                                         postal_code=postal_code,
                                         geolocation=dict(
                                             lat=float(place['lat']),

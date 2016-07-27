@@ -182,7 +182,12 @@ class RootController(BaseController):
                 geo_field = fields['geolocation']
                 geoloc = dict(lat=geo_field['lat'], lon=geo_field['lon'])
                 submit = json.dumps(geoloc)
-                display = u'%s, France' % fields['name']
+                display = u'%s %s - %s, France' % (fields['name'].upper(),
+                                                   fields['complement'].upper(),
+                                                   fields['postal_code']) \
+                    if fields['complement'] else \
+                    u'%s - %s, France' % (fields['name'].upper(),
+                                          fields['postal_code'])
                 res.append(dict(to_submit=submit, to_display=display))
 
         return dict(results=res)

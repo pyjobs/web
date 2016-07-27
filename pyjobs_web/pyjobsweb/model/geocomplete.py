@@ -56,6 +56,8 @@ class Geocomplete(elasticsearch_dsl.DocType):
         fields=dict(raw=elasticsearch_dsl.String(index='not_analyzed'))
     )
 
+    complement = elasticsearch_dsl.String(index='not_analyzed')
+
     postal_code_ngram_filter = elasticsearch_dsl.token_filter(
         'postal_code_ngram',
         type='edgeNGram',
