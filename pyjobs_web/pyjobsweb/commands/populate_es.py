@@ -51,7 +51,7 @@ class PopulateESCommand(AppContextCommand):
             model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, 10000)
         import pyjobsweb.lib.search_query as sq
         to_geoloc_query. \
-            add_elem(sq.BooleanFilter('geolocation_error', True))
+            add_elem(sq.BooleanFilter('geolocation_is_valid', False))
         to_geoloc = to_geoloc_query.execute_query()
 
         log_msg = 'Computing geolocations for documents requiring it.'
@@ -62,7 +62,7 @@ class PopulateESCommand(AppContextCommand):
                 location = self._geolocator.geocode(document.address)
                 document.update(geolocation=dict(lat=location.latitude,
                                                  lon=location.longitude),
-                                geolocation_error=False)
+                                geolocation_is_valid=True)
             except geolocation.BaseError as e:
                 self._jobs_error_logging(document.id, e, logging.WARNING)
 
@@ -76,7 +76,7 @@ class PopulateESCommand(AppContextCommand):
         for job_offer in pending_insertion_job_offers:
             es_job_offer = job_offer.to_elasticsearch_job_offer()
             es_job_offer.geolocation = dict(lat=0.0, lon=0.0)
-            es_job_offer.geolocation_error = True
+            es_job_offer.geolocation_is_valid = False
 
             res.append(es_job_offer)
 

@@ -103,7 +103,7 @@ class RootController(BaseController):
                                         distance='%skm' % float(radius))
 
                 search_query = \
-                    search_query.filter('term', geolocation_error=False)
+                    search_query.filter('term', geolocation_is_valid=True)
             except ValueError:
                 # One of the following case has occurred:
                 #     - Center wasn't a valid json string

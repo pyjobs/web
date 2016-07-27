@@ -125,16 +125,16 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
 
     tags = elasticsearch_dsl.Nested(
         doc_class=Tag,
-        properties={
-            'tag': elasticsearch_dsl.String(index='not_analyzed'),
-            'weight': elasticsearch_dsl.Integer()
-        }
+        properties=dict(
+            tag=elasticsearch_dsl.String(index='not_analyzed'),
+            weight=elasticsearch_dsl.Integer()
+        )
     )
 
     publication_datetime = elasticsearch_dsl.Date()
     publication_datetime_is_fake = elasticsearch_dsl.Boolean()
     crawl_datetime = elasticsearch_dsl.Date()
-    geolocation_error = elasticsearch_dsl.Boolean()
+    geolocation_is_valid = elasticsearch_dsl.Boolean()
     geolocation = elasticsearch_dsl.GeoPoint()
 
     @property
