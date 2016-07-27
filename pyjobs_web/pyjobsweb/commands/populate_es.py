@@ -119,7 +119,7 @@ class PopulateESCommand(AppContextCommand):
         for i, (ok, info) in bulk_results:
             if i == 0:
                 log_msg = 'Marking indexed documents as ' \
-                          'already_in_elasticsearch in the Postgresql database.'
+                          'indexed_in_elasticsearch in the Postgresql database.'
                 logging.getLogger(__name__).log(logging.INFO, log_msg)
 
             job_id = pending_insertions[i].id

@@ -255,7 +255,7 @@ class JobOfferSQLAlchemy(DeclarativeBase):
 
     crawl_datetime = sqlalchemy.Column(sqlalchemy.DateTime)
 
-    already_in_elasticsearch = sqlalchemy.Column(
+    indexed_in_elasticsearch = sqlalchemy.Column(
         sqlalchemy.Boolean, nullable=False, default=False
     )
 
@@ -334,14 +334,14 @@ class JobOfferSQLAlchemy(DeclarativeBase):
         pyjobsweb.model.DBSession \
             .query(JobOfferSQLAlchemy) \
             .filter(JobOfferSQLAlchemy.id == offer_id) \
-            .update({'already_in_elasticsearch': True})
+            .update({'indexed_in_elasticsearch': True})
         transaction.commit()
 
     @classmethod
     def compute_elasticsearch_pending_insertions(cls):
         return pyjobsweb.model.DBSession \
             .query(JobOfferSQLAlchemy) \
-            .filter_by(already_in_elasticsearch=False)
+            .filter_by(indexed_in_elasticsearch=False)
 
     @classmethod
     def get_all_job_offers(cls):

@@ -56,18 +56,18 @@ class PurgeESCommand(AppContextCommand):
         self._purge_index('jobs', dict(), model.JobOfferElasticsearch)
 
         # Update the Postgresql database
-        log_msg = "Resetting the 'already_in_elasticsearch' " \
-                  "field of the Postgresql database."
+        log_msg = "Resetting the 'indexed_in_elasticsearch'" \
+                  " field of the Postgresql database."
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
         transaction.begin()
         model.DBSession\
             .query(model.data.JobOfferSQLAlchemy)\
-            .update({'already_in_elasticsearch': False})
+            .update({'indexed_in_elasticsearch': False})
         transaction.commit()
 
-        log_msg = "'already_in_elasticsearch' field of the " \
-                  "Postgresql database has been reset."
+        log_msg = "Postgresql database's 'indexed_in_elasticsearch' field" \
+                  " has been reset."
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def purge_geocomplete_index(self):
