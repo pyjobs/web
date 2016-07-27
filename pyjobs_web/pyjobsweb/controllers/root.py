@@ -68,7 +68,6 @@ class RootController(BaseController):
         if not query and not center and not radius:
             job_offers = JobOfferSQLAlchemy.get_all_job_offers()
         else:
-
             search_query = model.JobOfferElasticsearch.search()
 
             search_on = ['description', 'title^10', 'company^20']
