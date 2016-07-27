@@ -43,12 +43,19 @@ class PopulateESCommand(AppContextCommand):
     def _compute_geoloc(self):
         # We first try to recompute the geolocation of job offers whose
         # geolocation could not be computed earlier. (Timeout...).
+        log_msg = 'Computing document requiring their geolocation ' \
+                  'to be computed.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
         to_geoloc_query = \
             model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, 10000)
         import pyjobsweb.lib.search_query as sq
         to_geoloc_query. \
             add_elem(sq.BooleanFilter('geolocation_error', True))
         to_geoloc = to_geoloc_query.execute_query()
+
+        log_msg = 'Computing geolocations for documents requiring it.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
 
         for document in to_geoloc:
             try:
@@ -93,14 +100,28 @@ class PopulateESCommand(AppContextCommand):
                                         weight=place['weight'])
 
     def populate_jobs_index(self):
+        log_msg = "Populating 'jobs' index."
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
         elasticsearch_conn = connections.get_connection()
+
+        log_msg = "Computing required 'job-offer' documents."
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
         pending_insertions = self._compute_job_offers_elasticsearch_documents()
 
         to_index = (d.to_dict(True) for d in pending_insertions)
 
         bulk_results = enumerate(parallel_bulk(elasticsearch_conn, to_index))
 
+        log_msg = 'Indexing documents in elasticsearch.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
         for i, (ok, info) in bulk_results:
+            if i == 0:
+                log_msg = 'Marking indexed documents as ' \
+                          'already_in_elasticsearch in the Postgresql database.'
+                logging.getLogger(__name__).log(logging.INFO, log_msg)
+
             job_id = pending_insertions[i].id
 
             if ok:
@@ -119,9 +140,21 @@ class PopulateESCommand(AppContextCommand):
         # Refresh indices to increase research speed
         elasticsearch_dsl.Index('jobs').refresh()
 
+        log_msg = "'jobs' index populated and refreshed."
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
     def populate_geocomplete_index(self):
+        log_msg = "Populating 'geocomplete' index."
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
         elasticsearch_conn = connections.get_connection()
+
+        log_msg = "Computing required 'geoloc-entry' documents."
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
         to_index = (d.to_dict(True) for d in self._geocompletion_documents())
+
+        log_msg = 'Indexing documents.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
 
         for ok, info in parallel_bulk(elasticsearch_conn, to_index):
             if not ok:
@@ -136,6 +169,9 @@ class PopulateESCommand(AppContextCommand):
                 logging.getLogger(__name__).log(logging_level, err_msg)
 
         elasticsearch_dsl.Index('geocomplete').refresh()
+
+        log_msg = "'gecomplete' index populated and refreshed."
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def take_action(self, parsed_args):
         super(PopulateESCommand, self).take_action(parsed_args)
