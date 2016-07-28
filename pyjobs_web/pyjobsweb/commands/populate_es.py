@@ -36,9 +36,12 @@ class PopulateESCommand(AppContextCommand):
         return parser
 
     @staticmethod
-    def _jobs_error_logging(job_id, message, logging_level):
-        err_msg = u'[Job offer id: %s] %s.' % (job_id, message)
-        logging.getLogger(__name__).log(logging_level, err_msg)
+    def _logging(message, logging_level):
+        logging.getLogger(__name__).log(logging_level, message)
+
+    def _job_id_logging(self, job_id, message, logging_level):
+        log_msg = u'[Job offer id: %s] %s.' % (job_id, message)
+        self._logging(log_msg, logging_level)
 
     def _compute_geoloc(self):
         # We first try to recompute the geolocation of job offers whose
@@ -56,17 +59,34 @@ class PopulateESCommand(AppContextCommand):
             add_elem(sq.BooleanFilter('address_is_valid', True))
         to_geoloc = to_geoloc_query.execute_query()
 
-        log_msg = 'Computing geolocations for documents requiring it.'
+        log_msg = 'Computing geolocations of documents requiring it.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
         for document in to_geoloc:
+            job_id = document.id
+            job_address = document.address
+
             try:
+                log_msg = "Resolving address: '%s'." % job_address
+                self._job_id_logging(job_id, log_msg, logging.INFO)
+
                 location = self._geolocator.geocode(document.address)
+
+                log_msg = "Successful resolution: '%s'." % location
+                self._job_id_logging(job_id, log_msg, logging.INFO)
+
                 document.update(geolocation=dict(lat=location.latitude,
                                                  lon=location.longitude),
                                 geolocation_is_valid=True)
-            except geolocation.BaseError as e:
-                self._jobs_error_logging(document.id, e, logging.WARNING)
+            except geolocation.GeolocationFailure as e:
+                self._job_id_logging(job_id, e, logging.ERROR)
+            except geolocation.TemporaryError as e:
+                self._job_id_logging(job_id, e, logging.WARNING)
+            except geolocation.GeolocationError as e:
+                self._job_id_logging(job_id, e, logging.ERROR)
+
+        log_msg = 'Geolocations computed.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     @staticmethod
     def _compute_job_offers_elasticsearch_documents():
@@ -137,7 +157,7 @@ class PopulateESCommand(AppContextCommand):
 
                 err_msg = "Couldn't index document: '%s', of type: %s, " \
                           "under index: %s." % (doc_id, doc_type, doc_index)
-                self._jobs_error_logging(job_id, err_msg, logging.ERROR)
+                self._job_id_logging(job_id, err_msg, logging.ERROR)
 
         # Refresh indices to increase research speed
         elasticsearch_dsl.Index('jobs').refresh()

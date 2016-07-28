@@ -34,7 +34,8 @@ class Geolocator(object):
             geolocation = self._geocoder.geocode(address)
 
             if not geolocation:
-                err_msg = u"Couldn't resolve following address: '%s'" % address
+                err_msg = u"Couldn't resolve the following address: '%s'" \
+                          % address
                 raise GeolocationFailure(err_msg)
         except (exc.GeocoderQuotaExceeded,
                 exc.GeocoderUnavailable,
