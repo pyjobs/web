@@ -79,6 +79,8 @@ class PopulateESCommand(AppContextCommand):
                                                  lon=location.longitude),
                                 geolocation_is_valid=True)
             except geolocation.GeolocationFailure as e:
+                model.JobOfferSQLAlchemy.set_address_is_valid(job_id, False)
+                document.update(address_is_valid=False)
                 self._job_id_logging(job_id, e, logging.ERROR)
             except geolocation.TemporaryError as e:
                 self._job_id_logging(job_id, e, logging.WARNING)
