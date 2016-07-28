@@ -4,19 +4,18 @@
     pyjobs — erreur
 </%def>
 
-<header class="page-header">
-    <div class="container">
+<%def name="page_header()">
+    <header class="page-header">
         <h1>Error ${code}</h1>
-    </div>
-</header>
+    </header>
+</%def>
 
-<div class="container">
-    <%
+<%
     import re
     mf = re.compile(r'(</?)script', re.IGNORECASE)
     def fixmessage(message):
         return mf.sub(r'\1noscript', message)
-    %>
+%>
 
-    <div>${fixmessage(message) | n}</div>
-</div>
+<div>${fixmessage(message) | n}</div>
+

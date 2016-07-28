@@ -63,22 +63,20 @@
     </table>
 </%def>
 
-<header class="page-header">
-    <div class="container">
+<%def name="page_header()">
+    <header class="page-header">
         <h1>Statistiques</h1>
-    </div>
-</header>
+    </header>
+</%def>
 
-<div class="container">
-    <h2>Publication d'offres par mois</h2>
+<h2>Publication d'offres par mois</h2>
 
-    ${stats_table(stats=stats_month, periods=months, period_format="%B %Y")}
+${stats_table(stats=stats_month, periods=months, period_format="%B %Y")}
 
-    <div id="month_chart" style="height: 250px;"></div>
+<div id="month_chart" style="height: 250px;"></div>
 
-    <h2>Publication d'offres par semaines</h2>
+<h2>Publication d'offres par semaines</h2>
 
-    ${stats_table(stats=stats_week, periods=weeks, period_format="%Y, semaine %W")}
+${stats_table(stats=stats_week, periods=weeks, period_format="%Y, semaine %W")}
 
-    <div id="weeks_chart" style="height: 250px;"></div>
-</div>
+<div id="weeks_chart" style="height: 250px;"></div>

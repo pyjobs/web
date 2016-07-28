@@ -1,16 +1,15 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="head_content()">
-    <link rel="canonical" href="${h.get_job_url(job.id, job.title, absolute=True)}" />
+    <link rel="canonical" href="${h.get_job_url(job.id, job.title, absolute=True)}"/>
 </%def>
 
 <%def name="title()">
     pyjobs — ${job.title}
 </%def>
 
-
-<header class="page-header">
-    <div class="container">
+<%def name="page_header()">
+    <header class="page-header">
         % if request.params.get('previous'):
             <a href="${request.params.get('previous')}"
                title="Retour à la page de listes"
@@ -31,11 +30,10 @@
                 <span class="label label-default ${tag.css}">${tag.tag}</span>
             % endfor
         </h4>
-    </div>
-</header>
+    </header>
+</%def>
 
-<div class="container">
-    <p class="lead job_content">
+<p class="lead job_content">
 
         <span class="published">
             ${job.published}
@@ -56,16 +54,15 @@
             % endif
         </span>
 
-    </p>
+</p>
 
-    <div class="job-description">
-        ${job.description|n}
-    </div>
-
-    <a title="Page d'origine de l'annonce"
-       class="btn btn-primary btn-lg centered-block job-source-link"
-       href="${job.url}"
-        target="_blank">
-        Voir l'annonce d'origine
-    </a>
+<div class="job-description">
+    ${job.description|n}
 </div>
+
+<a title="Page d'origine de l'annonce"
+   class="btn btn-primary btn-lg centered-block job-source-link"
+   href="${job.url}"
+   target="_blank">
+    Voir l'annonce d'origine
+</a>

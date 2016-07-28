@@ -9,18 +9,16 @@
 <%def name="body_class()">full-height</%def>
 <%def name="container_class()">full-height</%def>
 
-<header class="page-header">
-    <div class="container">
+<%def name="page_header()">
+    <header class="page-header">
         <h1>Crawling logs</h1>
-    </div>
-</header>
+    </header>
+</%def>
 
-<div class="container">
-    <caption>Last ${last_days} day(s) LOGS (source=xxx&last_days=x for filter)</caption>
+<caption>Last ${last_days} day(s) LOGS (source=xxx&last_days=x for filter)</caption>
 
-    <textarea class="full-page">
-        % for log in logs:
-            ${log.datetime} ${log.source} ${log.message}
-        % endfor
-    </textarea>
-</div>
+<textarea class="logs-text-area form-control" readonly>
+    % for log in logs:
+        ${log.datetime} ${log.source} ${log.message}
+    % endfor
+</textarea>
