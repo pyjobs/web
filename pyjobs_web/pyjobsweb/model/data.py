@@ -123,6 +123,8 @@ class JobOfferElasticsearch(elasticsearch_dsl.DocType):
 
     address = elasticsearch_dsl.String(index='no')
 
+    address_is_valid = elasticsearch_dsl.Boolean()
+
     tags = elasticsearch_dsl.Nested(
         doc_class=Tag,
         properties=dict(
@@ -246,6 +248,11 @@ class JobOfferSQLAlchemy(DeclarativeBase):
     address = sqlalchemy.Column(
         sqlalchemy.String(2048), nullable=False, default=''
     )
+
+    address_is_valid = sqlalchemy.Column(
+        sqlalchemy.Boolean, nullable=False, default=True
+    )
+
     tags = sqlalchemy.Column(
         sqlalchemy.Text(), nullable=False, default=''
     )  # JSON
@@ -315,6 +322,7 @@ class JobOfferSQLAlchemy(DeclarativeBase):
             company=self.company,
             company_url=self.company_url,
             address=self.address,
+            address_is_valid=self.address_is_valid,
             tags=tags,
             publication_datetime=self.publication_datetime,
             publication_datetime_is_fake=self.publication_datetime_is_fake,
@@ -348,3 +356,12 @@ class JobOfferSQLAlchemy(DeclarativeBase):
         return pyjobsweb.model.DBSession \
             .query(JobOfferSQLAlchemy) \
             .order_by(JobOfferSQLAlchemy.publication_datetime.desc())
+
+    @classmethod
+    def set_address_is_valid(cls, offer_id, is_valid):
+        transaction.begin()
+        pyjobsweb.model.DBSession \
+            .query(JobOfferSQLAlchemy) \
+            .filter(JobOfferSQLAlchemy.id == offer_id) \
+            .update({'address_is_valid': is_valid})
+        transaction.commit()
