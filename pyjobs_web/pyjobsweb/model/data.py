@@ -337,16 +337,24 @@ class JobOfferSQLAlchemy(DeclarativeBase):
             .count()
 
     @classmethod
-    def mark_as_inserted_in_elasticsearch(cls, offer_id):
+    def set_indexed_in_elasticsearch(cls, offer_id, inserted):
         transaction.begin()
         pyjobsweb.model.DBSession \
             .query(JobOfferSQLAlchemy) \
             .filter(JobOfferSQLAlchemy.id == offer_id) \
-            .update({'indexed_in_elasticsearch': True})
+            .update({'indexed_in_elasticsearch': inserted})
         transaction.commit()
 
     @classmethod
-    def compute_elasticsearch_pending_insertions(cls):
+    def reset_indexed_in_elasticsearch(cls):
+        transaction.begin()
+        pyjobsweb.model.DBSession \
+            .query(JobOfferSQLAlchemy) \
+            .update({'indexed_in_elasticsearch': False})
+        transaction.commit()
+
+    @classmethod
+    def get_offers_to_index(cls):
         return pyjobsweb.model.DBSession \
             .query(JobOfferSQLAlchemy) \
             .filter_by(indexed_in_elasticsearch=False)

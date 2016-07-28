@@ -60,11 +60,7 @@ class PurgeESCommand(AppContextCommand):
                   " field of the Postgresql database."
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
-        transaction.begin()
-        model.DBSession\
-            .query(model.data.JobOfferSQLAlchemy)\
-            .update({'indexed_in_elasticsearch': False})
-        transaction.commit()
+        model.JobOfferSQLAlchemy.reset_indexed_in_elasticsearch()
 
         log_msg = "Postgresql database's 'indexed_in_elasticsearch' field" \
                   " has been reset."

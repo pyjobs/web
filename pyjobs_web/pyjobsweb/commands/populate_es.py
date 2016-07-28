@@ -92,12 +92,11 @@ class PopulateESCommand(AppContextCommand):
 
     @staticmethod
     def _compute_job_offers_elasticsearch_documents():
-        pending_insertion_job_offers = \
-            model.JobOfferSQLAlchemy.compute_elasticsearch_pending_insertions()
+        offers_to_index = model.JobOfferSQLAlchemy.get_offers_to_index()
 
         res = list()
 
-        for job_offer in pending_insertion_job_offers:
+        for job_offer in offers_to_index:
             es_job_offer = job_offer.to_elasticsearch_job_offer()
             es_job_offer.geolocation = dict(lat=0.0, lon=0.0)
             es_job_offer.geolocation_is_valid = False
@@ -150,8 +149,8 @@ class PopulateESCommand(AppContextCommand):
 
             if ok:
                 # Mark the task as handled so we don't retreat it next time
-                model.JobOfferSQLAlchemy. \
-                    mark_as_inserted_in_elasticsearch(job_id)
+                model.JobOfferSQLAlchemy \
+                    .set_indexed_in_elasticsearch(job_id, True)
             else:
                 doc_id = info['create']['_id']
                 doc_type = info['create']['_type']
