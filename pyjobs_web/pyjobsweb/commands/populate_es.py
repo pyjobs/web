@@ -52,6 +52,8 @@ class PopulateESCommand(AppContextCommand):
         import pyjobsweb.lib.search_query as sq
         to_geoloc_query. \
             add_elem(sq.BooleanFilter('geolocation_is_valid', False))
+        to_geoloc_query. \
+            add_elem(sq.BooleanFilter('address_is_valid', True))
         to_geoloc = to_geoloc_query.execute_query()
 
         log_msg = 'Computing geolocations for documents requiring it.'
