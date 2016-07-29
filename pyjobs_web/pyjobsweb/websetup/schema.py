@@ -41,7 +41,7 @@ def setup_schema(command, conf, vars):
     # Setup the jobs index
     jobs_index = elasticsearch_dsl.Index('jobs')
     jobs_index.settings()
-    jobs_index.doc_type(model.JobOfferElasticsearch)
+    jobs_index.doc_type(model.JobElastic)
 
     try:
         jobs_index.create()

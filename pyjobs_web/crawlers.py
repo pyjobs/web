@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-import sqlalchemy
 import transaction
 from pyjobs_crawlers.run import Connector
 from sqlalchemy.orm.exc import NoResultFound
-from tg import config
 
 from pyjobsweb import model
 from pyjobsweb.model import DBSession, Log
-from pyjobsweb.model.data import JobOfferSQLAlchemy
 
 __all__ = ('helpers', 'app_globals')
 
@@ -58,7 +55,7 @@ class PyJobsWebConnector(Connector):
             print 'Skip existing item'
             return
 
-        job = JobOfferSQLAlchemy()
+        job = model.JobAlchemy()
 
         # Populate attributes which do not require special treatments before
         # population
@@ -92,7 +89,7 @@ class PyJobsWebConnector(Connector):
         :param job_url: External identifier of job (url)
         :return:
         """
-        return JobOfferSQLAlchemy.job_offer_exists(job_url)
+        return model.JobAlchemy.job_offer_exists(job_url)
 
     def log(self, source, action, more=None):
         if more is not None:
@@ -111,9 +108,9 @@ class PyJobsWebConnector(Connector):
     def get_most_recent_job_date(self, source):
         try:
             return \
-                model.DBSession.query(JobOfferSQLAlchemy.publication_datetime)\
-                .filter(JobOfferSQLAlchemy.source == source)\
-                .order_by(JobOfferSQLAlchemy.publication_datetime.desc())\
+                model.DBSession.query(model.JobAlchemy.publication_datetime)\
+                .filter(model.JobAlchemy.source == source)\
+                .order_by(model.JobAlchemy.publication_datetime.desc())\
                 .limit(1)\
                 .one()[0]  # First element is publication_datetime datetime value
         except NoResultFound:

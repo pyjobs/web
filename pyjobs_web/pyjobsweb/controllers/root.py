@@ -23,7 +23,7 @@ from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
 from pyjobsweb.model import DBSession, Log
-from pyjobsweb.model.data import JobOfferSQLAlchemy, SOURCES
+from pyjobsweb.model.data import SOURCES
 from pyjobsweb.forms.ResearchForm import ResearchForm
 
 __all__ = ['RootController']
@@ -66,9 +66,9 @@ class RootController(BaseController):
     @paginate('jobs', items_per_page=items_per_page)
     def index(self, query=None, radius=None, center=None):
         if not query and not center and not radius:
-            job_offers = JobOfferSQLAlchemy.get_all_job_offers()
+            job_offers = model.JobAlchemy.get_all_job_offers()
         else:
-            search_query = model.JobOfferElasticsearch.search()
+            search_query = model.JobElastic.search()
 
             search_on = ['description', 'title^10', 'company^20']
 
@@ -208,12 +208,12 @@ class RootController(BaseController):
             feed_url=u"http://www.pyjobs.fr/rss?limit=%s" % limit
         )
 
-        jobs = DBSession.query(JobOfferSQLAlchemy) \
-            .order_by(JobOfferSQLAlchemy.publication_datetime.desc()) \
+        jobs = DBSession.query(model.JobAlchemy) \
+            .order_by(model.JobAlchemy.publication_datetime.desc()) \
             .limit(limit)
 
         if source is not None:
-            jobs = jobs.filter(JobOfferSQLAlchemy.source == source)
+            jobs = jobs.filter(model.JobAlchemy.source == source)
 
         for job in jobs:
             job_slug = slugify(job.title)
@@ -236,7 +236,7 @@ class RootController(BaseController):
         :return: dict
         """
         try:
-            job = DBSession.query(JobOfferSQLAlchemy).filter_by(id=job_id).one()
+            job = DBSession.query(model.JobAlchemy).filter_by(id=job_id).one()
         except NoResultFound:
             pass  # TODO: TubroGears 404 ?
         return dict(

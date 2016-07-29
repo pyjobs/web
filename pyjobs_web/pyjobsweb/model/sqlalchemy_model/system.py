@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyjobsweb.model import DeclarativeBase
-from sqlalchemy import Column, Text, String, Integer, DateTime
+from sqlalchemy import Column, String, Integer, DateTime
 
 
 class Log(DeclarativeBase):

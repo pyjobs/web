@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-import elasticsearch_dsl
+import elasticsearch_dsl as es
 
 
-class Geocomplete(elasticsearch_dsl.DocType):
+class Geocomplete(es.DocType):
     class Meta:
         index = 'geocomplete'
         doc_type = 'geoloc-entry'
 
-    french_elision = elasticsearch_dsl.token_filter(
+    french_elision = es.token_filter(
         'french_elision',
         type='elision',
         articles_case=True,
@@ -18,7 +18,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
         ]
     )
 
-    geocompletion_ngram_filter = elasticsearch_dsl.token_filter(
+    geocompletion_ngram_filter = es.token_filter(
         'geocompletion_ngram',
         type='edgeNGram',
         min_gram=1,
@@ -26,7 +26,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
         side='front'
     )
 
-    geocompletion_index_analyzer = elasticsearch_dsl.analyzer(
+    geocompletion_index_analyzer = es.analyzer(
         'geocompletion_index_analyzer',
         type='custom',
         tokenizer='standard',
@@ -39,7 +39,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
         ]
     )
 
-    geocompletion_search_analyzer = elasticsearch_dsl.analyzer(
+    geocompletion_search_analyzer = es.analyzer(
         'geocompletion_search_analyzer',
         type='custom',
         tokenizer='standard',
@@ -49,16 +49,16 @@ class Geocomplete(elasticsearch_dsl.DocType):
         ]
     )
 
-    name = elasticsearch_dsl.String(
+    name = es.String(
         index='analyzed',
         analyzer=geocompletion_index_analyzer,
         search_analyzer=geocompletion_search_analyzer,
-        fields=dict(raw=elasticsearch_dsl.String(index='not_analyzed'))
+        fields=dict(raw=es.String(index='not_analyzed'))
     )
 
-    complement = elasticsearch_dsl.String(index='not_analyzed')
+    complement = es.String(index='not_analyzed')
 
-    postal_code_ngram_filter = elasticsearch_dsl.token_filter(
+    postal_code_ngram_filter = es.token_filter(
         'postal_code_ngram',
         type='edgeNGram',
         min_gram=1,
@@ -66,7 +66,7 @@ class Geocomplete(elasticsearch_dsl.DocType):
         side='front'
     )
 
-    postal_code_index_analyzer = elasticsearch_dsl.analyzer(
+    postal_code_index_analyzer = es.analyzer(
         'postal_code_index_analyzer',
         type='custom',
         tokenizer='standard',
@@ -75,18 +75,18 @@ class Geocomplete(elasticsearch_dsl.DocType):
         ]
     )
 
-    postal_code_search_analyzer = elasticsearch_dsl.analyzer(
+    postal_code_search_analyzer = es.analyzer(
         'postal_code_search_analyzer',
         type='custom',
         tokenizer='standard'
     )
 
-    postal_code = elasticsearch_dsl.String(
+    postal_code = es.String(
         index='analyzed',
         analyzer=postal_code_index_analyzer,
         search_analyzer=postal_code_search_analyzer
     )
 
-    geolocation = elasticsearch_dsl.GeoPoint()
+    geolocation = es.GeoPoint()
 
-    weight = elasticsearch_dsl.Float()
+    weight = es.Float()

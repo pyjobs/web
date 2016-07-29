@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import elasticsearch.exceptions
 import elasticsearch_dsl
-import transaction
 import logging
 
 from pyjobsweb.commands import AppContextCommand
@@ -53,14 +52,14 @@ class PurgeESCommand(AppContextCommand):
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def purge_jobs_index(self):
-        self._purge_index('jobs', dict(), model.JobOfferElasticsearch)
+        self._purge_index('jobs', dict(), model.JobElastic)
 
         # Update the Postgresql database
         log_msg = "Resetting the 'indexed_in_elasticsearch'" \
                   " field of the Postgresql database."
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
-        model.JobOfferSQLAlchemy.reset_indexed_in_elasticsearch()
+        model.JobAlchemy.reset_indexed_in_elasticsearch()
 
         log_msg = "Postgresql database's 'indexed_in_elasticsearch' field" \
                   " has been reset."

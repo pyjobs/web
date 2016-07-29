@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """The application's model objects"""
 
-from zope.sqlalchemy import ZopeTransactionExtension
-from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
+from zope.sqlalchemy import ZopeTransactionExtension
 
 # Global session manager: DBSession() returns the Thread-local
 # session object appropriate for the current web request.
@@ -57,11 +57,12 @@ def init_model(engine):
     # mapper(Reflected, t_reflected)
 
 # Import your model modules here.
-from pyjobsweb.model.auth import User, Group, Permission
-from pyjobsweb.model.data import JobOfferSQLAlchemy
-from pyjobsweb.model.data import JobOfferElasticsearch
-from pyjobsweb.model.data import ElasticsearchQuery
-from pyjobsweb.model.geocomplete import Geocomplete
-from pyjobsweb.model.system import Log
+from .sqlalchemy_model.job import Job as JobAlchemy
+from .sqlalchemy_model.auth import User, Group, Permission
+from .sqlalchemy_model.system import Log
+from .elasticsearch_model.job import Job as JobElastic
+from .elasticsearch_model.geocomplete import Geocomplete
+from .elasticsearch_model.query import ElasticsearchQuery
+
 
 __all__ = ('User', 'Group', 'Permission')

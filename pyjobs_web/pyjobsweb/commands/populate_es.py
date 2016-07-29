@@ -7,8 +7,9 @@ from elasticsearch.helpers import parallel_bulk
 
 from tg import config
 
-import pyjobsweb.model as model
 import pyjobsweb.lib.geolocation as geolocation
+import pyjobsweb.lib.search_query as sq
+from pyjobsweb import model
 from pyjobsweb.commands import AppContextCommand
 
 
@@ -50,13 +51,11 @@ class PopulateESCommand(AppContextCommand):
                   'to be computed.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
-        to_geoloc_query = \
-            model.ElasticsearchQuery(model.JobOfferElasticsearch, 0, 10000)
-        import pyjobsweb.lib.search_query as sq
+        to_geoloc_query = model.ElasticsearchQuery(model.JobElastic, 0, 10000)
         to_geoloc_query. \
             add_elem(sq.BooleanFilter('geolocation_is_valid', False))
         to_geoloc_query. \
-            add_elem(sq.BooleanFilter('address_is_valid', True))
+            add_elem(sq.BooleanFilter('is_valid_address', True))
         to_geoloc = to_geoloc_query.execute_query()
 
         log_msg = 'Computing geolocations of documents requiring it.'
@@ -79,8 +78,8 @@ class PopulateESCommand(AppContextCommand):
                                                  lon=location.longitude),
                                 geolocation_is_valid=True)
             except geolocation.GeolocationFailure as e:
-                model.JobOfferSQLAlchemy.set_address_is_valid(job_id, False)
-                document.update(address_is_valid=False)
+                model.JobAlchemy.set_is_valid_address(job_id, False)
+                document.update(is_valid_address=False)
                 self._job_id_logging(job_id, e, logging.ERROR)
             except geolocation.TemporaryError as e:
                 self._job_id_logging(job_id, e, logging.WARNING)
@@ -92,7 +91,7 @@ class PopulateESCommand(AppContextCommand):
 
     @staticmethod
     def _compute_job_offers_elasticsearch_documents():
-        offers_to_index = model.JobOfferSQLAlchemy.get_offers_to_index()
+        offers_to_index = model.JobAlchemy.get_offers_to_index()
 
         res = list()
 
@@ -149,8 +148,7 @@ class PopulateESCommand(AppContextCommand):
 
             if ok:
                 # Mark the task as handled so we don't retreat it next time
-                model.JobOfferSQLAlchemy \
-                    .set_indexed_in_elasticsearch(job_id, True)
+                model.JobAlchemy.set_indexed_in_elasticsearch(job_id, True)
             else:
                 doc_id = info['create']['_id']
                 doc_type = info['create']['_type']
