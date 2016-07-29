@@ -13,6 +13,9 @@ from tg.exceptions import HTTPFound
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.controller import AdminController
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
+from tgext.admin import CrudRestControllerConfig
+from tgext.admin.layouts import BootstrapAdminLayout
+from tgext.crud import EasyCrudRestController
 from elasticsearch_dsl.aggs import A
 from elasticsearch_dsl.query import Q, SF
 
@@ -38,6 +41,40 @@ existing_fields = (
 )
 
 
+class JobCrudConfig(CrudRestControllerConfig):
+    layout = BootstrapAdminLayout
+
+    class defaultCrudRestController(EasyCrudRestController):
+        __table_options__ = {
+            '__omit_fields__': ['description', 'company', 'company_url', 'tags',
+                                'publication_datetime',
+                                'publication_datetime_is_fake', 'title',
+                                'crawl_datetime', 'indexed_in_elasticsearch'],
+            '__field_order__': ['url', 'id', 'source', 'address',
+                                'is_valid_address'],
+            '__xml_fields__': ['url'],
+            'url': lambda filler, row: '<a class="btn btn-default" '
+                                       'target="_blank" href="%(url)s">'
+                                       '<span class="glyphicon glyphicon-link">'
+                                       '</span>'
+                                       '</a>' % dict(url=row.url)
+        }
+
+        @expose(inherit=True)
+        def get_all(self, *args, **kw):
+            cls = JobCrudConfig.defaultCrudRestController
+            # kw['is_valid_address'] = False
+
+            return super(cls, self).get_all(*args, **kw)
+
+
+class PyJobsAdminConfig(TGAdminConfig):
+    job = JobCrudConfig
+
+    def __init__(self, models, translations=None):
+        super(PyJobsAdminConfig, self).__init__(models, translations)
+
+
 class RootController(BaseController):
     """
     The root controller for the pyjobsweb application.
@@ -53,7 +90,7 @@ class RootController(BaseController):
 
     """
     secc = SecureController()
-    admin = AdminController(model, DBSession, config_type=TGAdminConfig)
+    admin = AdminController(model, DBSession, config_type=PyJobsAdminConfig)
 
     error = ErrorController()
 
