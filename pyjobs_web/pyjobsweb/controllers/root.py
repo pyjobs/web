@@ -11,13 +11,12 @@ from tg import request, redirect, tmpl_context
 from tg.decorators import paginate
 from tg.exceptions import HTTPFound
 from tg.i18n import ugettext as _, lazy_ugettext as l_
-from elasticsearch_dsl.aggs import A
-from elasticsearch_dsl.query import Q, SF
 
 from pyjobsweb import model
 from pyjobsweb.controllers.error import ErrorController
 from pyjobsweb.controllers.secure import SecureController
 from pyjobsweb.controllers.admin import PyJobsAdminController
+from pyjobsweb.controllers.search import SearchController
 from pyjobsweb.controllers.geocomplete import GeocompleteController
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
@@ -54,6 +53,7 @@ class RootController(BaseController):
     """
     secc = SecureController()
     admin = PyJobsAdminController()
+    search = SearchController()
     geocomplete = GeocompleteController()
 
     error = ErrorController()
@@ -63,65 +63,19 @@ class RootController(BaseController):
 
     items_per_page = 20
 
+    @expose()
+    def index(self):
+        redirect('/jobs')
+
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=items_per_page)
-    def index(self, query=None, radius=None, center=None):
-        if not query and not center and not radius:
-            job_offers = model.JobAlchemy.get_all_job_offers()
-        else:
-            search_query = model.JobElastic.search()
-
-            search_on = ['description', 'title^10', 'company^20']
-
-            keyword_query = Q()
-
-            if query:
-                query = query.replace(',', ' ')
-
-                keyword_query = Q('multi_match',
-                                  type='cross_fields',
-                                  query=query,
-                                  fields=search_on,
-                                  minimum_should_match='2<50%')
-
-            decay_function = SF('gauss',
-                                publication_datetime=dict(origin='now',
-                                                          scale='120d',
-                                                          offset='7d',
-                                                          decay='0.1'))
-            search_query.query = Q('function_score',
-                                   query=keyword_query,
-                                   functions=[decay_function])
-
-            try:
-                geoloc_query = json.loads(center)
-                lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
-
-                search_query = \
-                    search_query.filter('geo_distance',
-                                        geolocation=[lon, lat],
-                                        distance='%skm' % float(radius))
-
-                search_query = \
-                    search_query.filter('term', geolocation_is_valid=True)
-            except ValueError:
-                # One of the following case has occurred:
-                #     - Center wasn't a valid json string
-                #     - Radius couldn't be converted to float
-                # Since both these information are required to set a geolocation
-                # filter are required, we ignore it.
-                pass
-
-            job_offers = search_query[0:self.items_per_page * 50].execute()
+    def jobs(self):
+        job_offers = model.JobAlchemy.get_all_job_offers()
 
         search_form = ResearchForm(action='/', method='POST').req()
 
-        return dict(
-            sources=SOURCES,
-            jobs=job_offers,
-            job_offer_search_form=search_form
-        )
-
+        return dict(sources=SOURCES, jobs=job_offers,
+                    job_offer_search_form=search_form)
 
     @expose()
     def rss(self, limit=50, source=None):

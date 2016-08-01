@@ -201,4 +201,7 @@ class ResearchForm(twf.Form):
         submit.value = "J'effectue ma recherche"
         submit.css_class = "btn btn-default form-control"
 
-    submit = None
+    def __init__(self, **kwargs):
+        super(ResearchForm, self).__init__(**kwargs)
+        self.action = '/search/jobs'
+        self.submit = None
