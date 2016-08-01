@@ -58,18 +58,18 @@ class RootController(BaseController):
 
     error = ErrorController()
 
-    def _before(self, *args, **kw):
+    def _before(self, *args, **kwargs):
         tmpl_context.project_name = "Algoo"
 
     items_per_page = 20
 
     @expose()
-    def index(self):
+    def index(self, *args, **kwargs):
         redirect('/jobs')
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=items_per_page)
-    def jobs(self):
+    def jobs(self, *args, **kwargs):
         job_offers = model.JobAlchemy.get_all_job_offers()
 
         search_form = ResearchForm(action='/', method='POST').req()
@@ -78,7 +78,7 @@ class RootController(BaseController):
                     job_offer_search_form=search_form)
 
     @expose()
-    def rss(self, limit=50, source=None):
+    def rss(self, limit=50, source=None, *args, **kwargs):
         """
         RSS feed of jobs
         :param source: source name
@@ -114,7 +114,7 @@ class RootController(BaseController):
         return feed.writeString('utf-8')
 
     @expose('pyjobsweb.templates.job')
-    def job(self, job_id, job_title=None, previous=None):
+    def job(self, job_id, job_title=None, previous=None, *args, **kwargs):
         """
         Job detail page
         :param job_id: Job identifier
@@ -131,7 +131,7 @@ class RootController(BaseController):
         )
 
     @expose('pyjobsweb.templates.sources')
-    def sources(self):
+    def sources(self, *args, **kwargs):
         sources_last_crawl = {}
         sorted_sources = collections.OrderedDict(
             sorted(SOURCES.items(), key=lambda x: x[1].label))
@@ -152,7 +152,7 @@ class RootController(BaseController):
         )
 
     @expose('pyjobsweb.templates.stats')
-    def stats(self, since_months=4):
+    def stats(self, since_months=4, *args, **kwargs):
         stats = StatsQuestioner
         stats_questioner = stats(DBSession)
         date_from, date_to = stats.get_month_period(int(since_months))
@@ -199,7 +199,7 @@ class RootController(BaseController):
         )
 
     @expose('pyjobsweb.templates.logs')
-    def logs(self, source=None, last_days=1):
+    def logs(self, source=None, last_days=1, *args, **kwargs):
 
         logs_query = DBSession.query(Log) \
             .order_by(Log.datetime.desc()) \
@@ -221,23 +221,24 @@ class RootController(BaseController):
         )
 
     @expose('pyjobsweb.templates.about')
-    def about(self):
+    def about(self, *args, **kwargs):
         return dict()
 
     @expose('pyjobsweb.templates.index')
     @require(predicates.has_permission('manage', msg=l_('Only for managers')))
-    def manage_permission_only(self, **kw):
+    def manage_permission_only(self, *args, **kwargs):
         """Illustrate how a page for managers only works."""
         return dict(page='managers stuff')
 
     @expose('pyjobsweb.templates.index')
     @require(predicates.is_user('editor', msg=l_('Only for the editor')))
-    def editor_user_only(self, **kw):
+    def editor_user_only(self, *args, **kwargs):
         """Illustrate how a page exclusive for the editor works."""
         return dict(page='editor stuff')
 
     @expose('pyjobsweb.templates.login')
-    def login(self, came_from=lurl('/'), failure=None, login=''):
+    def login(self, came_from=lurl('/'), failure=None, login='',
+              *args, **kwargs):
         """Start the user login."""
         if failure is not None:
             if failure == 'user-not-found':
@@ -253,7 +254,7 @@ class RootController(BaseController):
                     came_from=came_from, login=login)
 
     @expose()
-    def post_login(self, came_from=lurl('/')):
+    def post_login(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.
@@ -271,7 +272,7 @@ class RootController(BaseController):
         return HTTPFound(location=came_from)
 
     @expose()
-    def post_logout(self, came_from=lurl('/')):
+    def post_logout(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on logout and say
         goodbye as well.

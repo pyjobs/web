@@ -11,7 +11,7 @@ from pyjobsweb.lib.base import BaseController
 
 class GeocompleteController(BaseController):
     @expose('json')
-    def index(self, address=None):
+    def index(self, address=None, *args, **kwargs):
         if not address:
             return dict(results=[])
 

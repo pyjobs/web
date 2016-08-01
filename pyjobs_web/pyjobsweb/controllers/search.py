@@ -16,7 +16,7 @@ class SearchController(BaseController):
 
     @expose('pyjobsweb.templates.jobs')
     @paginate('jobs', items_per_page=items_per_page)
-    def jobs(self, query=None, radius=None, center=None):
+    def jobs(self, query=None, radius=None, center=None, *args, **kwargs):
         if not query and not radius and not center:
             redirect('/')
 
