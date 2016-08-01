@@ -83,6 +83,7 @@ class Job(DeclarativeBase):
             tags.append(tag)
 
         return JobElastic(
+            meta={'id': self.id},
             id=self.id,
             url=self.url,
             source=self.source,
