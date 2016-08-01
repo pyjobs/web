@@ -8,13 +8,12 @@ from sqlalchemy.orm.exc import NoResultFound
 from tg import expose, flash, require, lurl, config
 from tg import predicates
 from tg import request, redirect, tmpl_context
-from tg.decorators import paginate
+from tg.decorators import paginate, with_trailing_slash
 from tg.exceptions import HTTPFound
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.controller import AdminController
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 from tgext.admin import CrudRestControllerConfig
-from tgext.admin.layouts import BootstrapAdminLayout
 from tgext.crud import EasyCrudRestController
 from elasticsearch_dsl.aggs import A
 from elasticsearch_dsl.query import Q, SF
@@ -41,38 +40,80 @@ existing_fields = (
 )
 
 
-class JobCrudConfig(CrudRestControllerConfig):
-    layout = BootstrapAdminLayout
+class InvalidAddressesController(EasyCrudRestController):
+    from sprox.widgets import TextField
 
-    class defaultCrudRestController(EasyCrudRestController):
-        __table_options__ = {
-            '__omit_fields__': ['description', 'company', 'company_url', 'tags',
-                                'publication_datetime',
-                                'publication_datetime_is_fake', 'title',
-                                'crawl_datetime', 'indexed_in_elasticsearch'],
-            '__field_order__': ['url', 'id', 'source', 'address',
-                                'is_valid_address'],
-            '__xml_fields__': ['url'],
-            'url': lambda filler, row: '<a class="btn btn-default" '
-                                       'target="_blank" href="%(url)s">'
-                                       '<span class="glyphicon glyphicon-link">'
-                                       '</span>'
-                                       '</a>' % dict(url=row.url)
-        }
+    __table_options__ = {
+        '__omit_fields__': ['description', 'company', 'company_url', 'tags',
+                            'publication_datetime',
+                            'publication_datetime_is_fake', 'title',
+                            'crawl_datetime', 'indexed_in_elasticsearch'],
+        '__field_order__': ['url', 'id', 'source', 'address',
+                            'is_valid_address'],
+        '__xml_fields__': ['url'],
+        'url': lambda filler, row: '<a class="btn btn-default" '
+                                   'target="_blank" href="%(url)s">'
+                                   '<span class="glyphicon glyphicon-link">'
+                                   '</span>'
+                                   '</a>' % dict(url=row.url)
+    }
 
-        @expose(inherit=True)
-        def get_all(self, *args, **kw):
-            cls = JobCrudConfig.defaultCrudRestController
-            # kw['is_valid_address'] = False
+    __form_options__ = {
+        '__hide_fields__': ['description', 'company', 'company_url', 'tags',
+                            'publication_datetime',
+                            'publication_datetime_is_fake', 'title',
+                            'crawl_datetime', 'indexed_in_elasticsearch',
+                            'url', 'id', 'source', 'is_valid_address'],
+        '__field_widget_types__': {'address': TextField}
+    }
 
-            return super(cls, self).get_all(*args, **kw)
+    @expose(inherit=True)
+    def get_all(self, *args, **kw):
+        # Since this controller is only meant to fix invalid addresses, we only
+        # request job offers with invalid addresses.
+        kw['is_valid_address'] = False
+        return super(InvalidAddressesController, self).get_all(*args, **kw)
+
+    @expose(inherit=True)
+    def post(self, *args, **kw):
+        return EasyCrudRestController.post(self, *args, **kw)
+
+    @expose(inherit=True)
+    def put(self, *args, **kw):
+        # TODO: Mark the corresponding item as dirty in Postgresql
+        return EasyCrudRestController.put(self, *args, **kw)
 
 
 class PyJobsAdminConfig(TGAdminConfig):
-    job = JobCrudConfig
-
     def __init__(self, models, translations=None):
         super(PyJobsAdminConfig, self).__init__(models, translations)
+
+    class job(CrudRestControllerConfig):
+        defaultCrudRestController = InvalidAddressesController
+
+
+class AdminAddressesController(AdminController):
+    def __init__(self):
+        super(AdminAddressesController, self).__init__(
+            [model.JobAlchemy],
+            DBSession,
+            config_type=PyJobsAdminConfig
+        )
+
+
+class PyJobsAdminController(AdminController):
+    def __init__(self):
+        super(PyJobsAdminController, self).__init__(model, DBSession,
+                                                    config_type=TGAdminConfig)
+
+        self.addresses = AdminAddressesController()
+
+    @with_trailing_slash
+    @expose()
+    def index(self):
+        res = super(PyJobsAdminController, self).index()
+        res['models'].append('Addresse')
+        return res
 
 
 class RootController(BaseController):
@@ -90,7 +131,7 @@ class RootController(BaseController):
 
     """
     secc = SecureController()
-    admin = AdminController(model, DBSession, config_type=PyJobsAdminConfig)
+    admin = PyJobsAdminController()
 
     error = ErrorController()
 
