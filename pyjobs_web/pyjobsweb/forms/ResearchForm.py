@@ -110,35 +110,33 @@ class ResearchForm(twf.Form):
         template = \
             u'''
             <h2>Rechercher une offre d'emploi</h2>
-            <form class="form-horizontal" role="form">
-                <div class="form-group">
-                    <label class="control-label col-sm-2" for="query">Requête :</label>
-                    <div class="col-xs-10 col-sm-10">
-                        ${w.children.query.display()|n}
-                    </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="query">Requête :</label>
+                <div class="col-xs-10 col-sm-10">
+                    ${w.children.query.display()|n}
                 </div>
-                <div class="col-xs-12" style="height:3px;"></div>
-                <div class="form-group">
-                    <label class="control-label col-sm-2" for="center">Autour de :</label>
-                    <div class="col-xs-10 col-sm-10">
-                        ${w.children.center.display()|n}
-                    </div>
+            </div>
+            <div class="col-xs-12" style="height:3px;"></div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="center">Autour de :</label>
+                <div class="col-xs-10 col-sm-10">
+                    ${w.children.center.display()|n}
                 </div>
-                <div class="col-xs-12" style="height:3px;"></div>
-                <div class="form-group">
-                    <label class="control-label col-sm-2" for="radius">Dans un rayon de :</label>
-                    <div class="col-xs-10 col-sm-10">
-                        ${w.children.radius.display()|n}
-                    </div>
+            </div>
+            <div class="col-xs-12" style="height:3px;"></div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="radius">Dans un rayon de :</label>
+                <div class="col-xs-10 col-sm-10">
+                    ${w.children.radius.display()|n}
                 </div>
-                <div class="col-xs-12" style="height:3px;"></div>
-                <div class="form-group">
-                    <label class="control-label col-sm-2" for="submit"> </label>
-                    <div class="col-xs-10 col-md-10">
-                        ${w.submit.display()|n}
-                    </div>
+            </div>
+            <div class="col-xs-12" style="height:3px;"></div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="submit"> </label>
+                <div class="col-xs-10 col-md-10">
+                    ${w.submit.display()|n}
                 </div>
-            </form>
+            </div>
             '''
 
         query = twsel.Select2MultipleSelectField(
