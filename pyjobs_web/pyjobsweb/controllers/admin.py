@@ -16,9 +16,9 @@ class InvalidAddressesController(EasyCrudRestController):
         '__omit_fields__': ['description', 'company', 'company_url', 'tags',
                             'publication_datetime',
                             'publication_datetime_is_fake', 'title',
-                            'crawl_datetime', 'indexed_in_elasticsearch'],
+                            'crawl_datetime', 'dirty'],
         '__field_order__': ['url', 'id', 'source', 'address',
-                            'is_valid_address'],
+                            'address_is_valid'],
         '__xml_fields__': ['url'],
         'url': lambda filler, row: '<a class="btn btn-default" '
                                    'target="_blank" href="%(url)s">'
@@ -33,8 +33,8 @@ class InvalidAddressesController(EasyCrudRestController):
         '__hide_fields__': ['description', 'company', 'company_url', 'tags',
                             'publication_datetime',
                             'title', 'publication_datetime_is_fake',
-                            'crawl_datetime', 'indexed_in_elasticsearch',
-                            'url', 'id', 'source', 'is_valid_address'],
+                            'crawl_datetime', 'dirty',
+                            'url', 'id', 'source', 'address_is_valid'],
         '__field_widget_types__': {'address': TextField}
     }
 
@@ -65,7 +65,7 @@ class InvalidAddressesController(EasyCrudRestController):
     def get_all(self, *args, **kw):
         # Since this controller is only meant to fix invalid addresses, we only
         # request job offers with invalid addresses.
-        kw['is_valid_address'] = False
+        kw['address_is_valid'] = False
         return super(InvalidAddressesController, self).get_all(*args, **kw)
 
     @expose(inherit=True)

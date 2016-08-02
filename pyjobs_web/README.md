@@ -74,4 +74,4 @@ These documents are required for the geocompletion in the research form to work.
 
 Run ``gearbox purge-es [-j|--jobs] [-g|--geocomplete]`` command. The command will delete both the ``jobs`` and/or ``geocomplete`` Elasticsearch indices depending on
 the specified arguments. After deleting them it will recreate them along with their mappings. Also, after purging the ``jobs`` index, the command will also set back
-the ``indexed_in_elasticsearch`` column to ``False`` for every entry in the Postgresql ``jobs`` table.
+the ``dirty`` column to ``True`` for every entry in the Postgresql ``jobs`` table.

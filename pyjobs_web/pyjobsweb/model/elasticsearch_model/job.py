@@ -74,7 +74,7 @@ class Job(es.DocType):
     company_url = es.String(index='no')
 
     address = es.String(index='no')
-    is_valid_address = es.Boolean()
+    address_is_valid = es.Boolean()
 
     tags = es.Nested(doc_class=Tag,
                      properties=dict(tag=es.String(index='not_analyzed'),
@@ -85,8 +85,8 @@ class Job(es.DocType):
 
     crawl_datetime = es.Date()
 
-    is_valid_geolocation = es.Boolean()
     geolocation = es.GeoPoint()
+    geolocation_is_valid = es.Boolean()
 
     def __init__(self, meta=None, **kwargs):
         super(Job, self).__init__(meta, **kwargs)

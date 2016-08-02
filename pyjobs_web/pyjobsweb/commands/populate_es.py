@@ -55,7 +55,7 @@ class PopulateESCommand(AppContextCommand):
         to_geoloc_query. \
             add_elem(sq.BooleanFilter('geolocation_is_valid', False))
         to_geoloc_query. \
-            add_elem(sq.BooleanFilter('is_valid_address', True))
+            add_elem(sq.BooleanFilter('address_is_valid', True))
         to_geoloc = to_geoloc_query.execute_query()
 
         log_msg = 'Computing geolocations of documents requiring it.'
@@ -78,8 +78,8 @@ class PopulateESCommand(AppContextCommand):
                                                  lon=location.longitude),
                                 geolocation_is_valid=True)
             except geolocation.GeolocationFailure as e:
-                model.JobAlchemy.set_is_valid_address(job_id, False)
-                document.update(is_valid_address=False)
+                model.JobAlchemy.set_address_is_valid(job_id, False)
+                document.update(address_is_valid=False)
                 self._job_id_logging(job_id, e, logging.ERROR)
             except geolocation.TemporaryError as e:
                 self._job_id_logging(job_id, e, logging.WARNING)
@@ -91,7 +91,7 @@ class PopulateESCommand(AppContextCommand):
 
     @staticmethod
     def _compute_job_offers_elasticsearch_documents():
-        offers_to_index = model.JobAlchemy.get_offers_to_index()
+        offers_to_index = model.JobAlchemy.get_dirty_offers()
 
         res = list()
 
@@ -140,15 +140,14 @@ class PopulateESCommand(AppContextCommand):
 
         for i, (ok, info) in bulk_results:
             if i == 0:
-                log_msg = 'Marking indexed documents as ' \
-                          'indexed_in_elasticsearch in the Postgresql database.'
+                log_msg = 'Removing dirty flags in the Postgresql database.'
                 logging.getLogger(__name__).log(logging.INFO, log_msg)
 
             job_id = pending_insertions[i].id
 
             if ok:
                 # Mark the task as handled so we don't retreat it next time
-                model.JobAlchemy.set_indexed_in_elasticsearch(job_id, True)
+                model.JobAlchemy.set_dirty(job_id, False)
             else:
                 doc_id = info['create']['_id']
                 doc_type = info['create']['_type']

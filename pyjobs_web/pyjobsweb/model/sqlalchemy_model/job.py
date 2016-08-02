@@ -25,7 +25,7 @@ class Job(DeclarativeBase):
     company_url = sa.Column(sa.String(1024), nullable=True, default='')
 
     address = sa.Column(sa.String(2048), nullable=False, default='')
-    is_valid_address = sa.Column(sa.Boolean, nullable=False, default=True)
+    address_is_valid = sa.Column(sa.Boolean, nullable=False, default=True)
 
     tags = sa.Column(sa.Text(), nullable=False, default='')  # JSON
 
@@ -34,8 +34,7 @@ class Job(DeclarativeBase):
 
     crawl_datetime = sa.Column(sa.DateTime)
 
-    indexed_in_elasticsearch = sa.Column(sa.Boolean,
-                                         nullable=False, default=False)
+    dirty = sa.Column(sa.Boolean, nullable=False, default=True)
 
     def __init__(self):
         pass
@@ -92,7 +91,7 @@ class Job(DeclarativeBase):
             company=self.company,
             company_url=self.company_url,
             address=self.address,
-            is_valid_address=self.is_valid_address,
+            address_is_valid=self.address_is_valid,
             tags=tags,
             publication_datetime=self.publication_datetime,
             publication_datetime_is_fake=self.publication_datetime_is_fake,
@@ -104,35 +103,33 @@ class Job(DeclarativeBase):
         return DBSession.query(cls).filter(cls.url == url).count()
 
     @classmethod
-    def set_indexed_in_elasticsearch(cls, offer_id, inserted):
+    def set_dirty(cls, offer_id, dirty):
         transaction.begin()
-        DBSession.query(cls) \
-            .filter(cls.id == offer_id) \
-            .update({'indexed_in_elasticsearch': inserted})
+        DBSession.query(cls).filter(cls.id == offer_id).update({'dirty': dirty})
         transaction.commit()
 
     @classmethod
-    def reset_indexed_in_elasticsearch(cls):
+    def reset_dirty_flags(cls):
         transaction.begin()
-        DBSession.query(cls).update({'indexed_in_elasticsearch': False})
+        DBSession.query(cls).update({'dirty': True})
         transaction.commit()
 
     @classmethod
-    def get_offers_to_index(cls):
-        return DBSession.query(cls).filter_by(indexed_in_elasticsearch=False)
+    def get_dirty_offers(cls):
+        return DBSession.query(cls).filter_by(dirty=True)
 
     @classmethod
     def get_all_job_offers(cls):
         return DBSession.query(cls).order_by(cls.publication_datetime.desc())
 
     @classmethod
-    def set_is_valid_address(cls, offer_id, is_valid):
+    def set_address_is_valid(cls, offer_id, is_valid):
         transaction.begin()
         DBSession.query(cls) \
             .filter(cls.id == offer_id) \
-            .update({'is_valid_address': is_valid})
+            .update({'address_is_valid': is_valid})
         transaction.commit()
 
     @classmethod
     def get_invalid_addresses(cls):
-        return DBSession.query(cls).filter_by(is_valid_address=False)
+        return DBSession.query(cls).filter_by(address_is_valid=False)

@@ -35,16 +35,11 @@ class PurgeESCommand(AppContextCommand):
         index.settings(**index_settings)
         index.doc_type(doc_type_class)
 
-        if not index.exists():
-            log_msg = "Nothing to do. '%s' index does not exist." % index_name
-            logging.getLogger(__name__).log(logging.INFO, log_msg)
-            return
-
         try:
             index.delete()
             index.create()
         except elasticsearch.exceptions.ElasticsearchException as e:
-            log_msg = "'%s' index: %s." % e
+            log_msg = "Error while dropping '%s' index: %s." % (index_name, e)
             logging.getLogger(__name__).log(logging.ERROR, log_msg)
             return
 
@@ -55,14 +50,12 @@ class PurgeESCommand(AppContextCommand):
         self._purge_index('jobs', dict(), model.JobElastic)
 
         # Update the Postgresql database
-        log_msg = "Resetting the 'indexed_in_elasticsearch'" \
-                  " field of the Postgresql database."
+        log_msg = "Resetting 'jobs' table 'dirty' flags in Postgresql."
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
-        model.JobAlchemy.reset_indexed_in_elasticsearch()
+        model.JobAlchemy.reset_dirty_flags()
 
-        log_msg = "Postgresql database's 'indexed_in_elasticsearch' field" \
-                  " has been reset."
+        log_msg = "Postgresql's 'jobs' table 'dirty' flags have been reset."
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def purge_geocomplete_index(self):
