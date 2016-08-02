@@ -41,7 +41,7 @@ class PopulateESCommand(AppContextCommand):
         logging.getLogger(__name__).log(logging_level, message)
 
     def _job_id_logging(self, job_id, message, logging_level):
-        log_msg = u'[Job offer id: %s] %s.' % (job_id, message)
+        log_msg = u'[Job offer id: %s] %s' % (job_id, message)
         self._logging(log_msg, logging_level)
 
     def _compute_geoloc(self):
@@ -60,7 +60,7 @@ class PopulateESCommand(AppContextCommand):
 
                 location = self._geolocator.geocode(job.address)
 
-                log_msg = 'Successful address resolution: (lat: %s, lon: %s).' \
+                log_msg = 'Successful resolution: (lat: %s, lon: %s).' \
                           % (location.latitude, location.longitude)
                 self._job_id_logging(job_id, log_msg, logging.INFO)
 
