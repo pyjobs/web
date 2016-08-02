@@ -162,7 +162,7 @@ class PopulateESCommand(AppContextCommand):
         log_msg = 'Index jobs is now synchronized.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
-    def populate_geocomplete_index(self):
+    def _populate_geocomplete_index(self):
         log_msg = 'Populating geocomplete index.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
@@ -196,7 +196,7 @@ class PopulateESCommand(AppContextCommand):
         super(PopulateESCommand, self).take_action(parsed_args)
 
         if parsed_args.populate_geocomplete_index:
-            self.populate_geocomplete_index()
+            self._populate_geocomplete_index()
 
         if parsed_args.populate_jobs_index:
             self._synchronise_jobs_index()

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
-import json
 import datetime
 import collections
 import webhelpers.feedgenerator as feedgenerator
