@@ -4,19 +4,19 @@ from tgext.admin.controller import AdminController
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 from tgext.admin import CrudRestControllerConfig
 from tgext.crud import EasyCrudRestController
+from sprox.widgets import TextField
 
 from pyjobsweb import model
 from pyjobsweb.model import DBSession
 
 
 class InvalidAddressesController(EasyCrudRestController):
-    from sprox.widgets import TextField
-
     __table_options__ = {
         '__omit_fields__': ['description', 'company', 'company_url', 'tags',
                             'publication_datetime',
                             'publication_datetime_is_fake', 'title',
-                            'crawl_datetime', 'dirty'],
+                            'crawl_datetime', 'dirty', 'geolocation_is_valid',
+                            'latitude', 'longitude'],
         '__field_order__': ['url', 'id', 'source', 'address',
                             'address_is_valid'],
         '__xml_fields__': ['url'],
@@ -34,7 +34,8 @@ class InvalidAddressesController(EasyCrudRestController):
                             'publication_datetime',
                             'title', 'publication_datetime_is_fake',
                             'crawl_datetime', 'dirty',
-                            'url', 'id', 'source', 'address_is_valid'],
+                            'url', 'id', 'source', 'address_is_valid',
+                            'geolocation_is_valid', 'latitude', 'longitude'],
         '__field_widget_types__': {'address': TextField}
     }
 
@@ -79,13 +80,19 @@ class InvalidAddressesController(EasyCrudRestController):
         if not kw['publication_datetime_is_fake']:
             kw['publication_datetime_is_fake'] = False
 
-        # TODO: Mark the corresponding item as dirty in Postgresql
+        # The address has been modified, therefore this row is now dirty, and
+        # should be resynchronized with Elasticsearch. Also, the geolocation
+        # should be recomputed too, so we mark the address as valid, so that
+        # the geolocation program will try and recompute it later on.
+        kw['dirty'] = True
+        kw['address_is_valid'] = True
+        # TODO: Implement kw['geolocation_is_valid'] = False
         return EasyCrudRestController.put(self, *args, **kw)
 
 
-class PyJobsAdminConfig(TGAdminConfig):
+class InvalidAddressesAdminConfig(TGAdminConfig):
     def __init__(self, models, translations=None):
-        super(PyJobsAdminConfig, self).__init__(models, translations)
+        super(InvalidAddressesAdminConfig, self).__init__(models, translations)
 
     class job(CrudRestControllerConfig):
         defaultCrudRestController = InvalidAddressesController
@@ -96,8 +103,47 @@ class AdminAddressesController(AdminController):
         super(AdminAddressesController, self).__init__(
             [model.JobAlchemy],
             DBSession,
-            config_type=PyJobsAdminConfig
+            config_type=InvalidAddressesAdminConfig
         )
+
+
+class JobsController(EasyCrudRestController):
+    __table_options__ = {
+        '__omit_fields__': [],
+        '__field_order__': ['url', 'id', 'source', 'address',
+                            'address_is_valid'],
+        '__xml_fields__': ['url'],
+        'url': lambda filler, row: '<a class="btn btn-default" '
+                                   'target="_blank" href="%(url)s">'
+                                   '<span class="glyphicon glyphicon-link">'
+                                   '</span>'
+                                   '</a>' % dict(url=row.url)
+    }
+
+    def __init__(self, session, menu_items=None):
+        super(JobsController, self).__init__(session, menu_items)
+
+    @expose(inherit=True)
+    def put(self, *args, **kw):
+        # TODO: Could this test be removed if 'publication_datetime_is_fake'
+        # TODO: was False by default and un-nullable
+        if not kw['publication_datetime_is_fake']:
+            kw['publication_datetime_is_fake'] = False
+
+        # The row has been modified, therefore this row is now dirty, and
+        # should be resynchronized with Elasticsearch. Also, the geolocation
+        # should be recomputed too, so we mark the address as valid, so that
+        # the geolocation program will try and recompute it later on.
+        kw['dirty'] = True
+        return EasyCrudRestController.put(self, *args, **kw)
+
+
+class PyJobsAdminConfig(TGAdminConfig):
+    def __init__(self, models, translations=None):
+        super(PyJobsAdminConfig, self).__init__(models, translations)
+
+    class job(CrudRestControllerConfig):
+        defaultCrudRestController = JobsController
 
 
 class PyJobsAdminController(AdminController):

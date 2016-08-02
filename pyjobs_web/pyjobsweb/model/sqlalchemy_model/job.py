@@ -30,9 +30,14 @@ class Job(DeclarativeBase):
     tags = sa.Column(sa.Text(), nullable=False, default='')  # JSON
 
     publication_datetime = sa.Column(sa.DateTime)
-    publication_datetime_is_fake = sa.Column(sa.Boolean)
+    publication_datetime_is_fake = sa.Column(sa.Boolean,
+                                             nullable=False, default=False)
 
     crawl_datetime = sa.Column(sa.DateTime)
+
+    latitude = sa.Column(sa.Float, nullable=False, default=0.0)
+    longitude = sa.Column(sa.Float, nullable=False, default=0.0)
+    geolocation_is_valid = sa.Column(sa.Boolean, nullable=False, default=False)
 
     dirty = sa.Column(sa.Boolean, nullable=False, default=True)
 
@@ -95,7 +100,9 @@ class Job(DeclarativeBase):
             tags=tags,
             publication_datetime=self.publication_datetime,
             publication_datetime_is_fake=self.publication_datetime_is_fake,
-            crawl_datetime=self.publication_datetime
+            crawl_datetime=self.publication_datetime,
+            geolocation=dict(lat=self.latitude, lon=self.longitude),
+            geolocation_is_valid=self.geolocation_is_valid
         )
 
     @classmethod
@@ -116,7 +123,7 @@ class Job(DeclarativeBase):
 
     @classmethod
     def get_dirty_offers(cls):
-        return DBSession.query(cls).filter_by(dirty=True)
+        return DBSession.query(cls).filter(cls.dirty).order_by(cls.id.asc())
 
     @classmethod
     def get_all_job_offers(cls):
@@ -133,3 +140,28 @@ class Job(DeclarativeBase):
     @classmethod
     def get_invalid_addresses(cls):
         return DBSession.query(cls).filter_by(address_is_valid=False)
+
+    @classmethod
+    def get_pending_geolocations(cls):
+        return DBSession.query(cls) \
+            .filter_by(address_is_valid=True) \
+            .filter_by(geolocation_is_valid=False) \
+            .order_by(cls.id.asc())
+
+    @classmethod
+    def set_geolocation(cls, offer_id, lat, lon):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == offer_id) \
+            .update({'latitude': lat,
+                     'longitude': lon,
+                     'geolocation_is_valid': True})
+        transaction.commit()
+
+    @classmethod
+    def set_geolocation_is_valid(cls, offer_id, is_valid):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == offer_id) \
+            .update({'geolocation_is_valid': is_valid})
+        transaction.commit()

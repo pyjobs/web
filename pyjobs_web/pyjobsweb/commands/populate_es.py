@@ -4,11 +4,11 @@ import logging
 import json
 from elasticsearch_dsl.connections import connections
 from elasticsearch.helpers import parallel_bulk
+from elasticsearch.exceptions import NotFoundError
 
 from tg import config
 
 import pyjobsweb.lib.geolocation as geolocation
-import pyjobsweb.lib.search_query as sq
 from pyjobsweb import model
 from pyjobsweb.commands import AppContextCommand
 
@@ -45,45 +45,38 @@ class PopulateESCommand(AppContextCommand):
         self._logging(log_msg, logging_level)
 
     def _compute_geoloc(self):
-        # We first try to recompute the geolocation of job offers whose
-        # geolocation could not be computed earlier. (Timeout...).
-        log_msg = 'Computing document requiring their geolocation ' \
-                  'to be computed.'
+        to_geoloc = model.JobAlchemy.get_pending_geolocations()
+
+        log_msg = 'Computing required geolocations.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
-        to_geoloc_query = model.ElasticsearchQuery(model.JobElastic, 0, 10000)
-        to_geoloc_query. \
-            add_elem(sq.BooleanFilter('geolocation_is_valid', False))
-        to_geoloc_query. \
-            add_elem(sq.BooleanFilter('address_is_valid', True))
-        to_geoloc = to_geoloc_query.execute_query()
-
-        log_msg = 'Computing geolocations of documents requiring it.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
-
-        for document in to_geoloc:
-            job_id = document.id
-            job_address = document.address
+        for job in to_geoloc:
+            job_id = job.id
+            job_address = job.address
 
             try:
-                log_msg = "Resolving address: '%s'." % job_address
+                log_msg = 'Resolving address: %s.' % job_address
                 self._job_id_logging(job_id, log_msg, logging.INFO)
 
-                location = self._geolocator.geocode(document.address)
+                location = self._geolocator.geocode(job.address)
 
-                log_msg = "Successful resolution: '%s'." % location
+                log_msg = 'Successful address resolution: (lat: %s, lon: %s).' \
+                          % (location.latitude, location.longitude)
                 self._job_id_logging(job_id, log_msg, logging.INFO)
 
-                document.update(geolocation=dict(lat=location.latitude,
-                                                 lon=location.longitude),
-                                geolocation_is_valid=True)
+                model.JobAlchemy.set_geolocation(job_id,
+                                                 location.latitude,
+                                                 location.longitude)
+                model.JobAlchemy.set_dirty(job_id, True)
             except geolocation.GeolocationFailure as e:
                 model.JobAlchemy.set_address_is_valid(job_id, False)
-                document.update(address_is_valid=False)
+                model.JobAlchemy.set_geolocation_is_valid(job_id, False)
                 self._job_id_logging(job_id, e, logging.ERROR)
             except geolocation.TemporaryError as e:
+                model.JobAlchemy.set_geolocation_is_valid(job_id, False)
                 self._job_id_logging(job_id, e, logging.WARNING)
             except geolocation.GeolocationError as e:
+                model.JobAlchemy.set_geolocation_is_valid(job_id, False)
                 self._job_id_logging(job_id, e, logging.ERROR)
 
         log_msg = 'Geolocations computed.'
@@ -93,16 +86,8 @@ class PopulateESCommand(AppContextCommand):
     def _compute_job_offers_elasticsearch_documents():
         offers_to_index = model.JobAlchemy.get_dirty_offers()
 
-        res = list()
-
         for job_offer in offers_to_index:
-            es_job_offer = job_offer.to_elasticsearch_job_offer()
-            es_job_offer.geolocation = dict(lat=0.0, lon=0.0)
-            es_job_offer.geolocation_is_valid = False
-
-            res.append(es_job_offer)
-
-        return res
+            yield job_offer.to_elasticsearch_job_offer()
 
     @staticmethod
     def _geocompletion_documents():
@@ -121,57 +106,71 @@ class PopulateESCommand(AppContextCommand):
                                         ),
                                         weight=place['weight'])
 
-    def populate_jobs_index(self):
-        log_msg = "Populating 'jobs' index."
+    @staticmethod
+    def _synchronisation_op(pending_insertions):
+        for p in pending_insertions:
+            doc_dict = p.to_dict(True)
+
+            try:
+                model.JobElastic.get(p.id)
+                update_op = doc_dict
+                update_op['_op_type'] = 'update'
+                update_op['doc'] = doc_dict['_source']
+                del update_op['_source']
+                sync_op = update_op
+            except NotFoundError:
+                add_op = doc_dict
+                add_op['_op_type'] = 'index'
+                sync_op = add_op
+
+            yield sync_op
+
+    def _synchronise_jobs_index(self):
+        log_msg = 'Synchronizing index jobs.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
         elasticsearch_conn = connections.get_connection()
 
-        log_msg = "Computing required 'job-offer' documents."
+        log_msg = 'Computing out of sync job-offer documents.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
         pending_insertions = self._compute_job_offers_elasticsearch_documents()
 
-        to_index = (d.to_dict(True) for d in pending_insertions)
-
-        bulk_results = enumerate(parallel_bulk(elasticsearch_conn, to_index))
-
-        log_msg = 'Indexing documents in elasticsearch.'
+        log_msg = 'Computing required operations to sync job-offer documents.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
-        for i, (ok, info) in bulk_results:
-            if i == 0:
-                log_msg = 'Removing dirty flags in the Postgresql database.'
-                logging.getLogger(__name__).log(logging.INFO, log_msg)
+        bulk_op = self._synchronisation_op(pending_insertions)
 
-            job_id = pending_insertions[i].id
+        log_msg = 'Performing synchronisation.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
+        for ok, info in parallel_bulk(elasticsearch_conn, bulk_op):
+            job_id = info['index']['_id'] \
+                if 'index' in info else info['update']['_id']
 
             if ok:
                 # Mark the task as handled so we don't retreat it next time
+                log_msg = 'Document %s has been synced successfully.' % job_id
+                logging.getLogger(__name__).log(logging.INFO, log_msg)
                 model.JobAlchemy.set_dirty(job_id, False)
             else:
-                doc_id = info['create']['_id']
-                doc_type = info['create']['_type']
-                doc_index = info['create']['_index']
-
-                err_msg = "Couldn't index document: '%s', of type: %s, " \
-                          "under index: %s." % (doc_id, doc_type, doc_index)
+                err_msg = 'Error while syncing document %s index.' % job_id
                 self._job_id_logging(job_id, err_msg, logging.ERROR)
 
         # Refresh indices to increase research speed
         elasticsearch_dsl.Index('jobs').refresh()
 
-        log_msg = "'jobs' index populated and refreshed."
+        log_msg = 'Index jobs is now synchronized.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def populate_geocomplete_index(self):
-        log_msg = "Populating 'geocomplete' index."
+        log_msg = 'Populating geocomplete index.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
         elasticsearch_conn = connections.get_connection()
 
-        log_msg = "Computing required 'geoloc-entry' documents."
+        log_msg = 'Computing required geoloc-entry documents.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
-        to_index = (d.to_dict(True) for d in self._geocompletion_documents())
+        to_index = [d.to_dict(True) for d in self._geocompletion_documents()]
 
         log_msg = 'Indexing documents.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
@@ -190,7 +189,7 @@ class PopulateESCommand(AppContextCommand):
 
         elasticsearch_dsl.Index('geocomplete').refresh()
 
-        log_msg = "'gecomplete' index populated and refreshed."
+        log_msg = 'gecomplete index populated and refreshed.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def take_action(self, parsed_args):
@@ -200,5 +199,6 @@ class PopulateESCommand(AppContextCommand):
             self.populate_geocomplete_index()
 
         if parsed_args.populate_jobs_index:
-            self.populate_jobs_index()
+            self._synchronise_jobs_index()
             self._compute_geoloc()
+            self._synchronise_jobs_index()
