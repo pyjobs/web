@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import geopy.geocoders as geocoders
 import geopy.exc as exc
+import geopy.geocoders as geocoders
 
 
 class BaseError(Exception):

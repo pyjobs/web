@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 import json
+
+from elasticsearch_dsl.function import SF
+from elasticsearch_dsl.query import Q
 from tg import redirect
 from tg.decorators import expose, paginate
-from elasticsearch_dsl.query import Q
-from elasticsearch_dsl.function import SF
 
 from pyjobsweb import model
-from pyjobsweb.model.data import SOURCES
-from pyjobsweb.lib.base import BaseController
 from pyjobsweb.forms.ResearchForm import ResearchForm
+from pyjobsweb.lib.base import BaseController
+from pyjobsweb.model.data import SOURCES
 
 
 class SearchController(BaseController):

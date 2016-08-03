@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Error controller"""
 from tg import request, expose
+
 from pyjobsweb.lib.base import BaseController
 
 __all__ = ['ErrorController']

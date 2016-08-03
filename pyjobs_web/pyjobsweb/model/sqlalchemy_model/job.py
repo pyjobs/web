@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-import sqlalchemy as sa
-import elasticsearch_dsl as es
-import transaction
 from datetime import datetime
-from babel.dates import format_date, format_timedelta
 
+import elasticsearch_dsl as es
+import sqlalchemy as sa
+import transaction
+from babel.dates import format_date, format_timedelta
 from pyjobs_crawlers.tools import condition_tags
-from pyjobsweb.model.data import Tag2
+
 from pyjobsweb.model import DeclarativeBase, DBSession
+from pyjobsweb.model.data import Tag2
 from pyjobsweb.model.elasticsearch_model.job import Job as JobElastic
 
 

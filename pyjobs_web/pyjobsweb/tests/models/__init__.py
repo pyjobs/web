@@ -2,6 +2,7 @@
 """Unit test suite for the models of the application."""
 
 from nose.tools import eq_
+
 from pyjobsweb.model import DBSession
 from pyjobsweb.tests import load_app
 from pyjobsweb.tests import setup_db, teardown_db

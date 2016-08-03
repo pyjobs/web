@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import elasticsearch_dsl
-import logging
 import json
-from elasticsearch_dsl.connections import connections
-from elasticsearch.helpers import parallel_bulk
-from elasticsearch.exceptions import NotFoundError
+import logging
 
+import elasticsearch_dsl
+from elasticsearch.exceptions import NotFoundError
+from elasticsearch.helpers import parallel_bulk
+from elasticsearch_dsl.connections import connections
 from tg import config
 
 from pyjobsweb import model

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 
 from pyjobs_crawlers.run import start_crawlers
 

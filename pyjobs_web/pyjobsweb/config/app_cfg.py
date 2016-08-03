@@ -8,7 +8,7 @@ This file complements development/deployment.ini.
 from tg.configuration import AppConfig
 
 import pyjobsweb
-from pyjobsweb import model, lib
+from pyjobsweb import model
 
 base_config = AppConfig()
 base_config.renderers = []

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """Setup the pyjobsweb application"""
 from __future__ import print_function, unicode_literals
+
 import transaction
+
 from pyjobsweb import model
 
 

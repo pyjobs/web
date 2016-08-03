@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-import elasticsearch_dsl as es
 from datetime import datetime
-from babel.dates import format_date, format_timedelta
 
+import elasticsearch_dsl as es
+from babel.dates import format_date, format_timedelta
 from pyjobs_crawlers.tools import condition_tags
+
 from pyjobsweb.model.data import Tag2
 
 

@@ -2,11 +2,12 @@
 """Unit and functional test suite for pyjobsweb."""
 
 from os import getcwd
-from paste.deploy import loadapp
-from webtest import TestApp
+
 from gearbox.commands.setup_app import SetupAppCommand
+from paste.deploy import loadapp
 from tg import config
 from tg.util import Bunch
+from webtest import TestApp
 
 from pyjobsweb import model
 

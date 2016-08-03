@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import elasticsearch.exceptions
-import elasticsearch_dsl
 import logging
 
-from pyjobsweb.commands import AppContextCommand
+import elasticsearch.exceptions
+import elasticsearch_dsl
+
 from pyjobsweb import model
+from pyjobsweb.commands import AppContextCommand
 
 
 class PurgeESCommand(AppContextCommand):

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+from sprox.widgets import TextField
 from tg.decorators import expose, with_trailing_slash
+from tgext.admin import CrudRestControllerConfig
 from tgext.admin.controller import AdminController
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
-from tgext.admin import CrudRestControllerConfig
 from tgext.crud import EasyCrudRestController
-from sprox.widgets import TextField
 
 from pyjobsweb import model
 from pyjobsweb.model import DBSession

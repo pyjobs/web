@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
-from tg.decorators import expose
+
 from elasticsearch_dsl.aggs import A
-from elasticsearch_dsl.query import Q
 from elasticsearch_dsl.function import SF
+from elasticsearch_dsl.query import Q
+from tg.decorators import expose
 
 from pyjobsweb import model
 from pyjobsweb.lib.base import BaseController

@@ -2,8 +2,8 @@
 import logging
 
 import pyjobsweb.lib.geolocation as geolocation
-from pyjobsweb.commands import AppContextCommand
 from pyjobsweb import model
+from pyjobsweb.commands import AppContextCommand
 
 
 class GeocodeCommand(AppContextCommand):

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
-import datetime
 import collections
+import datetime
+
 import webhelpers.feedgenerator as feedgenerator
 from sqlalchemy.orm.exc import NoResultFound
 from tg import expose, flash, require, lurl, config
@@ -12,17 +13,17 @@ from tg.exceptions import HTTPFound
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 
 from pyjobsweb import model
-from pyjobsweb.controllers.error import ErrorController
-from pyjobsweb.controllers.secure import SecureController
 from pyjobsweb.controllers.admin import PyJobsAdminController
-from pyjobsweb.controllers.search import SearchController
+from pyjobsweb.controllers.error import ErrorController
 from pyjobsweb.controllers.geocomplete import GeocompleteController
+from pyjobsweb.controllers.search import SearchController
+from pyjobsweb.controllers.secure import SecureController
+from pyjobsweb.forms.ResearchForm import ResearchForm
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
 from pyjobsweb.model import DBSession, Log
 from pyjobsweb.model.data import SOURCES
-from pyjobsweb.forms.ResearchForm import ResearchForm
 
 __all__ = ['RootController']
 existing_fields = (

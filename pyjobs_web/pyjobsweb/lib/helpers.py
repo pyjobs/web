@@ -2,10 +2,10 @@
 """Template Helpers used in pyjobsweb."""
 import json
 import logging
+from datetime import datetime
 from urllib import quote_plus
 
 from markupsafe import Markup
-from datetime import datetime
 from slugify import slugify as base_slugify
 from tg import config
 
@@ -54,7 +54,6 @@ def get_job_url(job_id, job_title=None, previous=None, absolute=False):
     return job_url
 
 # Import commonly used helpers from WebHelpers2 and TG
-from tg.util.html import script_json_encode
 
 try:
     from webhelpers2 import date, html, number, misc, text

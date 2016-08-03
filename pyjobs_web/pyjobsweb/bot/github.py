@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+
+import codecs
 import os
+from os.path import expanduser
+
 import sqlalchemy
 from git import Repo, Actor
-from os.path import expanduser
-from pyjobsweb import model
 from mako.template import Template
-import codecs
 from tg import config
 
+from pyjobsweb import model
 from pyjobsweb.lib.helpers import get_job_url
 
 home = expanduser("~")
