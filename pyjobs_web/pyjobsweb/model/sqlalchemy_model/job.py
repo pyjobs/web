@@ -155,7 +155,8 @@ class Job(DeclarativeBase):
             .filter(cls.id == offer_id) \
             .update({'latitude': lat,
                      'longitude': lon,
-                     'geolocation_is_valid': True})
+                     'geolocation_is_valid': True,
+                     'dirty': True})
         transaction.commit()
 
     @classmethod
@@ -163,5 +164,5 @@ class Job(DeclarativeBase):
         transaction.begin()
         DBSession.query(cls) \
             .filter(cls.id == offer_id) \
-            .update({'geolocation_is_valid': is_valid})
+            .update({'geolocation_is_valid': is_valid, 'dirty': True})
         transaction.commit()

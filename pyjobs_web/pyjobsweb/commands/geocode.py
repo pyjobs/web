@@ -46,7 +46,6 @@ class GeocodeCommand(AppContextCommand):
                 model.JobAlchemy.set_geolocation(job_id,
                                                  location.latitude,
                                                  location.longitude)
-                model.JobAlchemy.set_dirty(job_id, True)
             except geolocation.GeolocationFailure as e:
                 model.JobAlchemy.set_address_is_valid(job_id, False)
                 model.JobAlchemy.set_geolocation_is_valid(job_id, False)
