@@ -10,23 +10,14 @@ class DryRunCrawlCommand(pyjobsweb.commands.AppContextCommand):
 
         parser = super(DryRunCrawlCommand, self).get_parser(prog_name)
 
-        parser.add_argument(
-                "-s", "--spider",
-                help='Spider name.',
-                dest='spider_name'
-        )
+        parser.add_argument("-s", "--spider",
+                            help='Spider name.', dest='spider_name')
 
-        parser.add_argument(
-                "-t", "--type",
-                help='Mandatory value : (list|offer).',
-                dest='page_type'
-        )
+        parser.add_argument("-t", "--type",
+                            help='Mandatory value : (list|offer).',
+                            dest='page_type')
 
-        parser.add_argument(
-                "-u", "--url",
-                help='Page url.',
-                dest='url'
-        )
+        parser.add_argument("-u", "--url", help='Page url.', dest='url')
 
         return parser
 
