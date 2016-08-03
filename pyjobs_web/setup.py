@@ -87,7 +87,8 @@ setup(
             'crawl-dry = pyjobsweb.commands.crawl_dry:DryRunCrawlCommand',
             'bots = pyjobsweb.commands.bots:BotsCommand',
             'populate-es = pyjobsweb.commands.populate_es:PopulateESCommand',
-            'purge-es = pyjobsweb.commands.purge_es:PurgeESCommand'
+            'purge-es = pyjobsweb.commands.purge_es:PurgeESCommand',
+            'geocode = pyjobsweb.commands.geocode:GeocodeCommand'
         ]
     },
     zip_safe=False,
