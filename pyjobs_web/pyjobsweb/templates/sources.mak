@@ -69,7 +69,7 @@
                                target="_blank"
                                class="btn btn-primary improve">
                                 Améliorer la collecte d'informations depuis
-                                    <span class="badge">${source.label}
+                                    <span class="badge">${source.label}</span>
                             </a>
                         % endif
                     </p>
