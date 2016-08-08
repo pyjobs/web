@@ -16,11 +16,9 @@ class CrawlCommand(AppContextCommand):
                                  'process)',
                             dest='processes', default=0)
 
-        parser.add_argument('--debug', help='Enable debug', action='store_true')
         return parser
 
     def take_action(self, parsed_args):
         super(CrawlCommand, self).take_action(parsed_args)
         start_crawlers(connector_class=PyJobsWebConnector,
-                       processes=parsed_args.processes,
-                       debug=parsed_args.debug)
+                       num_processes=parsed_args.processes)
