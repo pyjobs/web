@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import json
 
 import transaction
 from pyjobs_crawlers.run import Connector
@@ -30,8 +31,9 @@ class PyJobsWebConnector(Connector):
 
         # Populate attributes which do not require special treatments before
         # population
-        attributes = ['title', 'description', 'company', 'address', 'company_url',
-                      'publication_datetime', 'publication_datetime_is_fake']
+        attributes = ['title', 'description', 'company', 'address',
+                      'company_url', 'publication_datetime',
+                      'publication_datetime_is_fake']
 
         # Populate job attributes if item contain it
         for attribute in attributes:
@@ -44,8 +46,8 @@ class PyJobsWebConnector(Connector):
 
         # Populate attributes which require special treatments before population
         if 'tags' in job_item:
-            import json
-            tags = [{'tag': t.tag, 'weight': t.weight} for t in job_item['tags']]
+            tags = [{'tag': t.tag, 'weight': t.weight}
+                    for t in job_item['tags']]
             job.tags = json.dumps(tags)
 
         # Insert the job offer in the Postgresql database
@@ -83,6 +85,6 @@ class PyJobsWebConnector(Connector):
                 .filter(model.JobAlchemy.source == source)\
                 .order_by(model.JobAlchemy.publication_datetime.desc())\
                 .limit(1)\
-                .one()[0]  # First element is publication_datetime datetime value
+                .one()[0]  # First element is publication_datetime value
         except NoResultFound:
             return datetime.datetime(1970, 1, 1, 0, 0, 0)
