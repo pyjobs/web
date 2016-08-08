@@ -11,35 +11,6 @@ from pyjobsweb.model import DBSession, Log
 __all__ = ('helpers', 'app_globals')
 
 
-class PyJobsWebDryRunCrawlConnector(Connector):
-    def job_exist(self, job_public_id):
-        """
-        This method is of no use when running a dry-run
-        :param job_public_id:
-        :return: Always returns False during a dry-run
-        """
-        return False
-
-    def get_most_recent_job_date(self, source):
-        """
-        This method is of no use when running a dry-run
-        :param source: source name (eg. 'afpy', 'lolix', ...)
-        :type source: str
-        :return: 1st of January 1970
-        :rtype: datetime.datetime
-        """
-        return datetime.datetime(1970, 1, 1, 0, 0, 0)
-
-    def add_job(self, job_item):
-        """
-        Outputs debugging informations about what's been parsed by the crawler
-        :param job_item: the scrapy job item
-        :type job_item: pyjobs_crawlers.items.JobItem
-        :return:
-        """
-        print job_item
-
-
 class PyJobsWebConnector(Connector):
     def add_job(self, job_item):
         """
