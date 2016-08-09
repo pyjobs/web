@@ -124,11 +124,13 @@ class RootController(BaseController):
         try:
             job = DBSession.query(model.JobAlchemy).filter_by(id=job_id).one()
         except NoResultFound:
-            pass  # TODO: TubroGears 404 ?
-        return dict(
-            job=job,
-            sources=SOURCES
-        )
+            # Causes a 404 error
+            redirect('/job')
+        else:
+            return dict(
+                job=job,
+                sources=SOURCES
+            )
 
     @expose('pyjobsweb.templates.sources')
     def sources(self, *args, **kwargs):
