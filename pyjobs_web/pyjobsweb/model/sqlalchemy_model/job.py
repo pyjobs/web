@@ -42,6 +42,8 @@ class Job(DeclarativeBase):
 
     dirty = sa.Column(sa.Boolean, nullable=False, default=True)
 
+    pushed_on_twitter = sa.Column(sa.Boolean, nullable=False, default=False)
+
     def __init__(self):
         pass
 
@@ -166,4 +168,24 @@ class Job(DeclarativeBase):
         DBSession.query(cls) \
             .filter(cls.id == offer_id) \
             .update({'geolocation_is_valid': is_valid, 'dirty': True})
+        transaction.commit()
+
+    @classmethod
+    def get_not_pushed_on_twitter(cls, limit=None):
+        if limit:
+            return DBSession.query(cls) \
+                .filter_by(pushed_on_twitter=False) \
+                .order_by(cls.id.asc()) \
+                .limit(limit)
+        else:
+            return DBSession.query(cls) \
+                .filter_by(pushed_on_twitter=False) \
+                .order_by(cls.id.asc())
+
+    @classmethod
+    def set_pushed_on_twitter(cls, offer_id, pushed_on_twitter):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == offer_id) \
+            .update({'pushed_on_twitter': pushed_on_twitter})
         transaction.commit()

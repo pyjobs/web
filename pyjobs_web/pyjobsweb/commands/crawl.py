@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from pyjobs_crawlers.run import start_crawlers
 
 from crawlers import PyJobsWebConnector
