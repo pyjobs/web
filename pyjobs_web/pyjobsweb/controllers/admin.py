@@ -16,7 +16,7 @@ class InvalidAddressesController(EasyCrudRestController):
                             'publication_datetime',
                             'publication_datetime_is_fake', 'title',
                             'crawl_datetime', 'dirty', 'geolocation_is_valid',
-                            'latitude', 'longitude'],
+                            'latitude', 'longitude', 'pushed_on_twitter'],
         '__field_order__': ['url', 'id', 'source', 'address',
                             'address_is_valid'],
         '__xml_fields__': ['url'],
@@ -35,7 +35,8 @@ class InvalidAddressesController(EasyCrudRestController):
                             'title', 'publication_datetime_is_fake',
                             'crawl_datetime', 'dirty',
                             'url', 'id', 'source', 'address_is_valid',
-                            'geolocation_is_valid', 'latitude', 'longitude'],
+                            'geolocation_is_valid', 'latitude', 'longitude',
+                            'pushed_on_twitter'],
         '__field_widget_types__': {'address': TextField}
     }
 
