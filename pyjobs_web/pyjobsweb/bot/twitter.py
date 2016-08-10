@@ -44,16 +44,13 @@ class TwitterBot(object):
         # The Twitter API automatically shrinks URLs to 23 characters
         url = get_job_url(job_id, job_title, absolute=True)
 
-        prefix = u"Nouvelle offre d'emploi:"
-
         # Tweet format string
-        tweet_format = u'%s %s. %s'
+        tweet_format = u'%s. %s'
 
         # The number of punctuation characters in the tweet string format
         punctuation = len(tweet_format.replace(u'%s', u''))
 
-        total_length = \
-            len(prefix) + len(job_title) + self.MAX_URL_LENGTH + punctuation
+        total_length = len(job_title) + self.MAX_URL_LENGTH + punctuation
 
         # Make sure our tweet doesn't exceed max_length
         if total_length > self.MAX_TWEET_LENGTH:
@@ -61,7 +58,7 @@ class TwitterBot(object):
             job_title = job_title[:-diff]
 
         # Return the formatted tweet
-        return tweet_format % (prefix, job_title, url)
+        return tweet_format % (job_title, url)
 
     def _push_job_offers_to_twitter(self, num_tweets_to_push):
         # Do not push every job offer at once. The Twitter API won't allow it.
