@@ -14,7 +14,7 @@ class BotsCommand(AppContextCommand):
 
         bot_parser = parser.add_subparsers(
             title='Choose your bot',
-            description='Use one of these command to setup and start the '
+            description='Use one of these commands to setup and start the '
                         'corresponding bot.',
             help='You must choose between one of these subcommands.',
             dest='bot_command'
