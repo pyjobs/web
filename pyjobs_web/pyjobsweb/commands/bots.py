@@ -97,9 +97,11 @@ class BotsCommand(AppContextCommand):
                 credentials = self._get_twitter_credentials(credentials_path)
                 twitter_bot = TwitterBot(credentials)
                 twitter_bot.run(num_tweets)
-            except Exception as exc:
-                # TODO: Proper exception handling
-                exit()
+            except Exception:
+                err_msg = 'A critical error occurred while ' \
+                          'configuring/running the Twitter bot. Aborting now.'
+                logging.getLogger(__name__).log(logging.ERROR, err_msg)
+                exit(-1)
 
         if parsed_args.bot_command == 'github':
             github_bot = GitHubBot()
