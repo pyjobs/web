@@ -11,7 +11,7 @@ from pyjobsweb.lib.helpers import get_job_url
 class TwitterBot(object):
     MAX_TWEET_LENGTH = 140
     MAX_URL_LENGTH = 23
-    MAX_TWEETS_TO_PUSH = 3  # TODO: set back to a more realistic value (250 ?)
+    MAX_TWEETS_TO_PUSH = 250
 
     def __init__(self, credentials):
         err_msg = ''
