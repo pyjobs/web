@@ -70,9 +70,9 @@ class BotsCommand(AppContextCommand):
         credentials = None
 
         try:
-            credentials_file = open(credentials_path)
-            credentials_json = credentials_file.read()
-            credentials = json.loads(credentials_json)
+            with open(credentials_path) as credentials_file:
+                credentials_json = credentials_file.read()
+                credentials = json.loads(credentials_json)
         except ValueError as exc:
             err_msg = 'Malformed credentials file: %s.' % exc
             exception = exc
