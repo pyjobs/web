@@ -64,15 +64,22 @@ class GitHubBot(object):
         Update job file if new jobs. Then make a push.
         :return:
         """
-        lasts_jobs = self._get_lasts_jobs()
-        new_jobs = self._get_new_jobs(lasts_jobs)
+        last_jobs = self._get_lasts_jobs()
+        new_jobs = self._get_new_jobs(last_jobs)
 
-        if new_jobs:
-            self._write_jobs(lasts_jobs)
-            message = self._get_commit_message(new_jobs)
+        if not new_jobs:
+            return
+
+        new_jobs.reverse()
+
+        for job in new_jobs:
+            last_jobs = [job] + last_jobs[:-1]
+            self._write_jobs(last_jobs)
+            message = self._get_commit_message(job)
             self._commit(message)
-            self._push()
-    
+
+        self._push()
+
     def _get_lasts_jobs(self):
         """
         :return: x last jobs, where x is _last_jobs_count class attribute
@@ -106,16 +113,17 @@ class GitHubBot(object):
         """
         template = Template(filename=self._jobs_template_file_path)
         with codecs.open(self._jobs_file_path, 'w', 'utf-8') as jobs_file:
-            print(template.render(jobs=jobs, get_job_url=get_job_url), file=jobs_file)
+            print(template.render(jobs=jobs, get_job_url=get_job_url),
+                  file=jobs_file)
     
-    def _get_commit_message(self, jobs):
+    def _get_commit_message(self, job):
         """
-        :param jobs:
-        :return: Message rended from message template, where template file is specified in
-         _jobs_message_file_path class attribute
+        :param job:
+        :return: Message rendered from message template, where template file is
+        specified in _jobs_message_file_path class attribute
         """
         template = Template(filename=self._jobs_message_file_path)
-        return template.render(jobs=jobs)
+        return template.render(job=job)
     
     def _commit(self, message):
         """
