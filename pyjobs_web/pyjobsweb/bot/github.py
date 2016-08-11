@@ -100,7 +100,7 @@ class GitHubBot(object):
 
     def _write_jobs(self, jobs):
         """
-        Write jobs in jpobs file
+        Write jobs in jobs file
         :param jobs: list of jobs
         :return:
         """
@@ -131,17 +131,18 @@ class GitHubBot(object):
 
     def _pull(self):
         origin = self._get_origin()
-        with self._get_remote_environnement():
+        with self._get_remote_environment():
             origin.pull()
 
     def _push(self):
         origin = self._get_origin()
-        with self._get_remote_environnement():
+        with self._get_remote_environment():
             origin.push()
 
-    def _get_remote_environnement(self):
+    def _get_remote_environment(self):
         """
-        :return: Return an environment who specify to use class attribute _deployment_key_file_path key
+        :return: Return an environment who specify to use class attribute
+        _deployment_key_file_path key
         """
         ssh_cmd = 'ssh -i %s' % self._deployment_key_file_path
         return self._repo.git.custom_environment(GIT_SSH_COMMAND=ssh_cmd)
