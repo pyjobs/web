@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import re
 import codecs
 import os
 from os.path import expanduser
@@ -72,10 +73,10 @@ class GitHubBot(object):
 
         new_jobs.reverse()
 
-        for job in new_jobs:
-            last_jobs = [job] + last_jobs[:-1]
-            self._write_jobs(last_jobs)
-            message = self._get_commit_message(job)
+        for new_job in new_jobs:
+            old_jobs = self._get_old_jobs()[:-1]
+            self._write_jobs(new_job, old_jobs)
+            message = self._get_commit_message(new_job)
             self._commit(message)
 
         self._push()
@@ -105,15 +106,31 @@ class GitHubBot(object):
                     cleaned_jobs.append(job)
         return cleaned_jobs
 
-    def _write_jobs(self, jobs):
+    def _get_old_jobs(self):
+        old_jobs = []
+
+        with codecs.open(self._jobs_file_path, 'r', 'utf-8') as jobs_file:
+            job_offer_re = u'^\*'
+            pattern = re.compile(job_offer_re, re.UNICODE)
+            for line in jobs_file.readlines():
+                if re.search(pattern, line):
+                    old_jobs.append(line[:-1])
+
+        return old_jobs
+
+    def _write_jobs(self, new_job, old_jobs):
         """
-        Write jobs in jobs file
-        :param jobs: list of jobs
+        Append a new job offer at the beginning of an old job list
+        :param new_job: the new jobs offer to append at the beginning of the
+        old list
+        :param old_jobs: the old job offer list
         :return:
         """
         template = Template(filename=self._jobs_template_file_path)
         with codecs.open(self._jobs_file_path, 'w', 'utf-8') as jobs_file:
-            print(template.render(jobs=jobs, get_job_url=get_job_url),
+            print(template.render(new_job=new_job,
+                                  get_job_url=get_job_url,
+                                  old_jobs=old_jobs),
                   file=jobs_file)
     
     def _get_commit_message(self, job):
