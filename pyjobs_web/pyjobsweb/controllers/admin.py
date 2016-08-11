@@ -12,11 +12,8 @@ from pyjobsweb.model import DBSession
 
 class InvalidAddressesController(EasyCrudRestController):
     __table_options__ = {
-        '__omit_fields__': ['description', 'company', 'company_url', 'tags',
-                            'publication_datetime',
-                            'publication_datetime_is_fake', 'title',
-                            'crawl_datetime', 'dirty', 'geolocation_is_valid',
-                            'latitude', 'longitude', 'pushed_on_twitter'],
+        '__limit_fields__': ['url', 'id', 'source', 'address',
+                             'address_is_valid'],
         '__field_order__': ['url', 'id', 'source', 'address',
                             'address_is_valid'],
         '__xml_fields__': ['url'],
