@@ -23,30 +23,21 @@
         <h1>
             Le job qu'il vous faut &mdash; en python
             <span class="btn-group pull-right" role="group">
-    ##          <button type="button" class="btn btn-default">
-    ##              <i class="fa fa-3x fa-twitter" style="color: #55ACEE;"></i>
-    ##          </button>
-                <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" class="btn btn-warning">
+                <a href="https://twitter.com/pyjobsfr" title="Annonces sur Twitter" target="_blank" class="btn btn-default">
+                    <i class="fa fa-3x fa-twitter" style="color: #55ACEE;"></i>
+                </a>
+
+                <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" target="_blank" class="btn btn-warning">
                     <i class="fa fa-3x fa-rss"></i>
                 </a>
 
-                <a href="https://github.com/pyjobs/annonces" title="Annonces sur GitHub"
-                   class="btn btn-default">
+                <a href="https://github.com/pyjobs/annonces" title="Annonces sur GitHub" target="_blank" class="btn btn-default">
                     <i class="fa fa-3x fa-github"></i>
                 </a>
             </span>
         </h1>
 
-        ##    <h2>
-            ##        <div class="row">
-    ##            <div class="col-md-6">
-    ##                <div class="input-group">
-    ##                    <input type="text" class="form-control" placeholder="Search for a job...">
-    ##                    <span class="input-group-btn">
-    ##                        <button class="btn btn-default" type="button">Go!</button>
-    ##                    </span>
-    ##                </div>
-    ##            </div>
+    ##    <h2>
     ##            <div class="col-md-6">
     ##                <div class="btn-group" role="group" aria-label="...">
     ##                    <button type="button" class="btn btn-small btn-default">Ma boîte recrute</button>
