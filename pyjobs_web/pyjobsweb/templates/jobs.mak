@@ -37,16 +37,7 @@
             </span>
         </h1>
 
-        ##    <h2>
-            ##        <div class="row">
-    ##            <div class="col-md-6">
-    ##                <div class="input-group">
-    ##                    <input type="text" class="form-control" placeholder="Search for a job...">
-    ##                    <span class="input-group-btn">
-    ##                        <button class="btn btn-default" type="button">Go!</button>
-    ##                    </span>
-    ##                </div>
-    ##            </div>
+    ##    <h2>
     ##            <div class="col-md-6">
     ##                <div class="btn-group" role="group" aria-label="...">
     ##                    <button type="button" class="btn btn-small btn-default">Ma boîte recrute</button>
