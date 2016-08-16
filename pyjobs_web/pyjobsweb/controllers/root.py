@@ -2,6 +2,7 @@
 """Main Controller"""
 import collections
 import datetime
+import logging
 
 import webhelpers.feedgenerator as feedgenerator
 from sqlalchemy.orm.exc import NoResultFound
@@ -125,6 +126,9 @@ class RootController(BaseController):
             job = DBSession.query(model.JobAlchemy).filter_by(id=job_id).one()
         except NoResultFound:
             # Causes a 404 error
+            redirect('/job')
+        except Exception as exc:
+            logging.getLogger(__name__).log(logging.ERROR, exc)
             redirect('/job')
         else:
             return dict(
