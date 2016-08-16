@@ -58,6 +58,7 @@ def init_model(engine):
 
 # Import your model modules here.
 from .sqlalchemy_model.job import Job as JobAlchemy
+from .sqlalchemy_model.company import Company
 from .sqlalchemy_model.auth import User, Group, Permission
 from .sqlalchemy_model.system import Log
 from .elasticsearch_model.job import Job as JobElastic
