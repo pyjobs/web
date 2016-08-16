@@ -43,8 +43,6 @@ class CompanyController(BaseController):
 
     @expose('pyjobsweb.templates.companies.details')
     def details(self, siren, *args, **kwargs):
-        company = None
-
         try:
             company = CompanyAlchemy.get_company(siren=siren)
         except NoResultFound:
@@ -52,6 +50,5 @@ class CompanyController(BaseController):
         except Exception as exc:
             logging.getLogger(__name__).log(logging.ERROR, exc)
             redirect('/company/details')
-
-        return dict(company=company)
-
+        else:
+            return dict(company=company)
