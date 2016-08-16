@@ -2,12 +2,14 @@
 import sqlalchemy as sa
 
 from pyjobsweb.model import DeclarativeBase
+from pyjobsweb.model.elasticsearch_model.company import Company \
+    as CompanyElastic
 
 
 class Company(DeclarativeBase):
     __tablename__ = 'companies'
 
-    id = sa.Column(sa.Integer, primary_key=True)
+    siren = sa.Column(sa.Integer, primary_key=True)
 
     name = sa.Column(sa.String(1024), nullable=False, default='')
     logo_url = sa.Column(sa.String(1024), nullable=False, default='')
