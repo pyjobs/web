@@ -23,3 +23,9 @@ class Company(DeclarativeBase):
     address = sa.Column(sa.String(1024), nullable=False, default='')
     email = sa.Column(sa.String(1024), nullable=False, default='')
     phone = sa.Column(sa.String(1024), nullable=False, default='')
+
+    latitude = sa.Column(sa.Float, nullable=False, default=0.0)
+    longitude = sa.Column(sa.Float, nullable=False, default=0.0)
+    geolocation_is_valid = sa.Column(sa.Boolean, nullable=False, default=False)
+
+    validated = sa.Column(sa.Boolean, nullable=False, default=False)
