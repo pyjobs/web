@@ -29,3 +29,23 @@ class Company(DeclarativeBase):
     geolocation_is_valid = sa.Column(sa.Boolean, nullable=False, default=False)
 
     validated = sa.Column(sa.Boolean, nullable=False, default=False)
+
+    dirty = sa.Column(sa.Boolean, nullable=False, default=True)
+
+    def to_elasticsearch_company(self):
+        result = CompanyElastic(
+            meta={'id': self.siren},
+            siren=self.siren,
+            name=self.name,
+            logo_url=self.logo_url,
+            description=self.description,
+            url=self.url,
+            technologies=self.technologies,
+            address=self.address,
+            email=self.email,
+            phone=self.phone,
+            geolocation=dict(lat=self.latitude, lon=self.longitude),
+            geolocation_is_valid=self.geolocation_is_valid
+        )
+
+        return result

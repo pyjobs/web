@@ -56,3 +56,13 @@ def setup_schema(command, conf, vars):
         geocomplete_index.create()
     except elasticsearch.ElasticsearchException as e:
         print("Exception while creating index 'geocomplete': %s." % e)
+
+    # Setup the company index
+    company_index = elasticsearch_dsl.Index('companies')
+    company_index.settings()
+    company_index.doc_type(model.CompanyElastic)
+
+    try:
+        company_index.create()
+    except elasticsearch.ElasticsearchException as e:
+        print("Exception while creating index 'companies': %s." % e)
