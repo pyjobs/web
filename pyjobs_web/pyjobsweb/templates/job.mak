@@ -13,7 +13,7 @@
         % if request.params.get('previous'):
             <a href="${request.params.get('previous')}"
                title="Retour à la page de listes"
-               class="btn btn-default btn-xs">
+               class="btn btn-default btn-xs" style="margin-bottom: 20px;">
                 retour
             </a>
         % endif
