@@ -55,3 +55,7 @@ class Company(DeclarativeBase):
         return DBSession.query(cls) \
             .filter_by(validated=True) \
             .order_by(cls.name.asc())
+
+    @classmethod
+    def get_company(cls, siren):
+        return DBSession.query(cls).filter(cls.siren == siren).one()

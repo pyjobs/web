@@ -105,7 +105,17 @@
     clear: both;
 }
 
+.company-source-link {
+    width: 425px;
+    margin-top: 25px;
+    clear: both;
+}
+
 h1.job {
+    margin-top: 0px;
+}
+
+h1.company {
     margin-top: 0px;
 }
 
