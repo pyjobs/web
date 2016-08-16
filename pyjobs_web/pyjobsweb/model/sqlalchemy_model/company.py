@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sqlalchemy as sa
 
-from pyjobsweb.model import DeclarativeBase
+from pyjobsweb.model import DeclarativeBase, DBSession
 from pyjobsweb.model.elasticsearch_model.company import Company \
     as CompanyElastic
 
@@ -49,3 +49,9 @@ class Company(DeclarativeBase):
         )
 
         return result
+
+    @classmethod
+    def get_validated_companies(cls):
+        return DBSession.query(cls) \
+            .filter_by(validated=True) \
+            .order_by(cls.name.asc())

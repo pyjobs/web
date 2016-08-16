@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from tg.decorators import expose, redirect
+from tg.decorators import expose, redirect, paginate
 
+from pyjobsweb.model import CompanyAlchemy
 from pyjobsweb.lib.base import BaseController
 
 
@@ -33,8 +34,10 @@ class CompanyController(BaseController):
         redirect('/company/list')
 
     @expose('pyjobsweb.templates.companies.list')
+    @paginate('companies')
     def list(self):
-        raise NotImplementedError('TODO')
+        companies = CompanyAlchemy.get_validated_companies()
+        return dict(companies=companies)
 
     @expose('pyjobsweb.templates.companies.details')
     def details(self, company_id, *args, **kwargs):

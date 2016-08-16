@@ -45,11 +45,19 @@
 
 }
 
+.company-item {
+
+}
+
 .no-job-found {
     margin-top: 21px;
     display: inline-block;
 }
 
+.no-company-found {
+    margin-top: 21px;
+    display: inline-block;
+}
 
 .row-even {
     background-color: #FFF;
@@ -134,6 +142,10 @@ div.job.row > div.col-md-12 {
 }
 
 .job-tag {
+    line-height: 1.8em;
+}
+
+.company-technology{
     line-height: 1.8em;
 }
 

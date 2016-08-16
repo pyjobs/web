@@ -53,6 +53,18 @@ def get_job_url(job_id, job_title=None, previous=None, absolute=False):
         job_url = "%s%s" % (config.get('site.domain_base_url'), job_url)
     return job_url
 
+
+def get_company_url(siren, name=None, previous=None, absolute=False):
+    company_url = '/company/details/%s' % siren
+    if name:
+        company_url = '%s/%s' % (company_url, slugify(name))
+    if previous:
+        company_url = '%s?previous=%s' % (company_url, quote_plus(previous))
+    if absolute:
+        company_url = '%s%s' % (config.get('site.domain_base_url'), company_url)
+
+    return company_url
+
 # Import commonly used helpers from WebHelpers2 and TG
 
 try:
