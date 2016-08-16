@@ -38,7 +38,11 @@ class CompanyController(BaseController):
     @expose('pyjobsweb.templates.companies.list')
     @paginate('companies')
     def list(self):
-        companies = CompanyAlchemy.get_validated_companies()
+        try:
+            companies = CompanyAlchemy.get_validated_companies()
+        except NoResultFound:
+            companies = None
+
         return dict(companies=companies)
 
     @expose('pyjobsweb.templates.companies.details')
