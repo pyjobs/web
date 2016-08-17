@@ -203,5 +203,4 @@ class ResearchForm(twf.Form):
 
     def __init__(self, **kwargs):
         super(ResearchForm, self).__init__(**kwargs)
-        self.action = '/search/jobs'
         self.submit = None

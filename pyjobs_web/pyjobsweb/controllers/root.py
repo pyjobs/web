@@ -73,7 +73,7 @@ class RootController(BaseController):
     def jobs(self, *args, **kwargs):
         job_offers = model.JobAlchemy.get_all_job_offers()
 
-        search_form = ResearchForm(action='/', method='POST').req()
+        search_form = ResearchForm(action='/search/jobs', method='POST').req()
 
         return dict(sources=SOURCES, jobs=job_offers,
                     job_offer_search_form=search_form)
