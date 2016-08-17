@@ -23,11 +23,11 @@ class AddCompanyController(BaseController):
 
 class SearchCompanyController(BaseController):
     @expose('pyjobsweb.templates.companies.search')
-    def index(self):
+    def index(self, *args, **kwargs):
         raise NotImplementedError('TODO')
 
     @expose()
-    def submit(self):
+    def submit(self, *args, **kwargs):
         raise NotImplementedError('TODO')
 
 
@@ -36,12 +36,12 @@ class CompanyController(BaseController):
     search = SearchCompanyController()
 
     @expose()
-    def index(self):
+    def index(self, *args, **kwargs):
         redirect('/company/list')
 
     @expose('pyjobsweb.templates.companies.list')
     @paginate('companies')
-    def list(self):
+    def list(self, *args, **kwargs):
         try:
             companies = CompanyAlchemy.get_validated_companies()
         except NoResultFound:
