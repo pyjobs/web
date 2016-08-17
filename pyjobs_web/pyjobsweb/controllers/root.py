@@ -19,7 +19,7 @@ from pyjobsweb.controllers.error import ErrorController
 from pyjobsweb.controllers.geocomplete import GeocompleteController
 from pyjobsweb.controllers.search import SearchController
 from pyjobsweb.controllers.secure import SecureController
-from pyjobsweb.forms.ResearchForm import ResearchForm
+from pyjobsweb.forms.research_form import ResearchForm
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
