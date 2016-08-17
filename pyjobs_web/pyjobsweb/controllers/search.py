@@ -7,7 +7,7 @@ from tg import redirect
 from tg.decorators import expose, paginate
 
 from pyjobsweb import model
-from pyjobsweb.forms.ResearchForm import ResearchForm
+from pyjobsweb.forms.research_form import ResearchForm
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.model.data import SOURCES
 
