@@ -9,9 +9,8 @@ from tw2.core.validation import ValidationError
 
 
 class PhoneNumberValidator(twc.RegexValidator):
-    def __init__(self, required=False, **kwargs):
+    def __init__(self, **kwargs):
         super(PhoneNumberValidator, self).__init__(**kwargs)
-        self.required = required
 
     msgs = {
         'regex': ('badphone', u'Numéro de téléphone invalide'),
@@ -31,19 +30,18 @@ class SirenValidator(twc.Validator):
         'invalid_siren': u'Numéro de Siren invalide',
     }
 
-    def __init__(self, required=False, **kwargs):
+    def __init__(self, **kwargs):
         super(SirenValidator, self).__init__(**kwargs)
-        self.required = required
 
     def _validate_python(self, value, state=None):
         regex = re.compile('^[0-9]{3}(\-[0-9]{3}){2}$', re.IGNORECASE)
 
         # We first check the string format
-        if not value or not value[1] or not regex.match(value[1]):
+        if not value or not regex.match(value[1]):
             raise ValidationError('wrong_format', self)
 
         # The Siren number is formatted correctly, perform the validity check
-        digits = [int(x) for x in value[1].replace('-', '')]
+        digits = [int(x) for x in value.replace('-', '')]
         validity = 0
 
         for i, digit in enumerate(digits):
@@ -62,70 +60,63 @@ class NewCompanyForm(twf.Form):
         inline_engine_name = 'mako'
         template = \
             u'''
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_name">Nom de l'entreprise:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_name.display()|n}
                 </div>
             </div>
             <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_siren">Numéro de Siren:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_siren.display()|n}
                 </div>
             </div>
             <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_address">Adresse de l'entreprise:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_address.display()|n}
                 </div>
             </div>
             <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_url">Site web de l'entreprise:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_url.display()|n}
                 </div>
             </div>
             <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_email">Adresse email de contact:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_email.display()|n}
                 </div>
             </div>
             <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_phone">Numéro de téléphone:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_phone.display()|n}
                 </div>
             </div>
             <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
-                <label class="control-label col-sm-12" for="company_siren">Numéro de Siren:</label>
-                <div class="col-xs-12 col-sm-12">
-                    ${w.children.company_siren.display()|n}
-                </div>
-            </div>
-            <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_logo">Logo de l'entreprise:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_logo.display()|n}
                 </div>
             </div>
             <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_description">Description de l'entreprise:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_description.display()|n}
                 </div>
             </div>
             <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
+            <div class="form-group required">
                 <label class="control-label col-sm-12" for="company_technologies">Technologies utilisées par l'entreprise:</label>
                 <div class="col-xs-12 col-sm-12">
                     ${w.children.company_technologies.display()|n}
@@ -140,53 +131,69 @@ class NewCompanyForm(twf.Form):
             </div>
             '''
 
-        company_name = twf.TextField(id='company_name',
-                                     placeholder=u"Mon entreprise qui recrute",
-                                     maxlength=100,
-                                     css_class='form-control',
-                                     validator=twc.Required)
+        company_name = twf.TextField(
+            id='company_name',
+            placeholder=u"Mon entreprise qui recrute",
+            maxlength=100,
+            css_class='form-control',
+            validator=twc.Required
+        )
 
-        company_siren = twf.TextField(id='company_siren',
-                                      placeholder=u"XXX-XXX-XXX",
-                                      maxlength=11,
-                                      css_class='form-control',
-                                      validator=SirenValidator)
+        company_siren = twf.TextField(
+            id='company_siren',
+            placeholder=u"XXX-XXX-XXX",
+            maxlength=11,
+            css_class='form-control',
+            validator=SirenValidator(required=True)
+        )
 
-        company_address = twf.TextField(id='company_address',
-                                        placeholder=u"Adresse l'entreprise",
-                                        maxlength=1024,
-                                        css_class='form-control',
-                                        validator=twc.Required)
+        company_address = twf.TextField(
+            id='company_address',
+            placeholder=u"Adresse l'entreprise",
+            maxlength=1024,
+            css_class='form-control',
+            validator=twc.Required
+        )
 
-        company_url = twf.TextField(id='company_url',
-                                    placeholder=u"www.pyjobs.fr",
-                                    maxlength=1024,
-                                    css_class='form-control',
-                                    validator=twc.UrlValidator)
+        company_url = twf.TextField(
+            id='company_url',
+            placeholder=u"www.pyjobs.fr",
+            maxlength=1024,
+            css_class='form-control',
+            validator=twc.UrlValidator
+        )
 
-        company_email = twf.TextField(id='company_email',
-                                      placeholder=u"email@exemple.fr",
-                                      maxlength=1024,
-                                      css_class='form-control',
-                                      validator=twc.EmailValidator)
+        company_email = twf.TextField(
+            id='company_email',
+            placeholder=u"email@exemple.fr",
+            maxlength=1024,
+            css_class='form-control',
+            validator=twc.EmailValidator(required=True)
+        )
 
-        company_phone = twf.TextField(id='company_phone',
-                                      placeholder=u"XX-XX-XX-XX-XX ou +33X-XX-XX-XX-XX ou 0033X-XX-XX-XX-XX",
-                                      maxlength=17,
-                                      css_class='form-control',
-                                      validator=PhoneNumberValidator)
+        company_phone = twf.TextField(
+            id='company_phone',
+            placeholder=u"0X-XX-XX-XX-XX ou +33X-XX-XX-XX-XX ou 0033X-XX-XX-XX-XX",
+            maxlength=17,
+            css_class='form-control',
+            validator=PhoneNumberValidator(required=True)
+        )
 
-        company_logo = twf.TextField(id='company_logo',
-                                     placeholder=u"www.pyjobs.fr/img/pyjobs_logo_square.png",
-                                     maxlength=1024,
-                                     css_class='form-control',
-                                     validator=twc.UrlValidator)
+        company_logo = twf.TextField(
+            id='company_logo',
+            placeholder=u"www.pyjobs.fr/img/pyjobs_logo_square.png",
+            maxlength=1024,
+            css_class='form-control',
+            validator=twc.UrlValidator(required=True)
+        )
 
-        company_description = twf.TextArea(id='company_description',
-                                           placeholder=u"Description de l'entreprise...",
-                                           maxlength=5000,
-                                           css_class='form-control',
-                                           validator=twc.Required)
+        company_description = twf.TextArea(
+            id='company_description',
+            placeholder=u"Description de l'entreprise...",
+            maxlength=5000,
+            css_class='form-control',
+            validator=twc.Required
+        )
 
         company_technologies = twsel.Select2MultipleSelectField(
             name='technologies',
@@ -199,7 +206,6 @@ class NewCompanyForm(twf.Form):
                 tags=[
                     'Python', 'Django', 'Flask', 'Pyramid', 'Turbogears'
                 ],
-                minimumSelectionSize=1,
                 maximumSelectionSize=10,
                 tokenSeparators=[','],
                 formatSelectionTooBig=twc.js_callback(

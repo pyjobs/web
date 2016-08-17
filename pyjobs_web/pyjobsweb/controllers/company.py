@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import tg
 import logging
 from sqlalchemy.orm.exc import NoResultFound
 from tg.decorators import expose, redirect, paginate, validate
@@ -11,9 +12,24 @@ from pyjobsweb.forms.new_form import NewCompanyForm
 class AddCompanyController(BaseController):
     @expose('pyjobsweb.templates.companies.new')
     def index(self, *args, **kwargs):
-        new_form = NewCompanyForm(action='/company/new/submit',
-                                  method='POST').req()
-        return dict(new_company_form=new_form)
+        values = tg.request.validation['values']
+        errors = tg.request.validation['errors']
+
+        form = NewCompanyForm(action='/company/new/submit',
+                              method='POST', value=values, error=errors)
+
+        error_msg = u''
+
+        for i, (field, err) in enumerate(errors.iteritems()):
+            if err:
+                error_msg = u'Il a eu des erreurs lors de la saisie du ' \
+                            u'formulaire. Merci de bien vouloir les corriger.'
+                break
+
+        if error_msg:
+            tg.flash(error_msg, 'error')
+
+        return dict(new_company_form=form)
 
     @expose()
     @validate(NewCompanyForm, error_handler=index)
