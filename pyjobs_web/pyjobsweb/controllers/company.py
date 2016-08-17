@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
 import logging
 from sqlalchemy.orm.exc import NoResultFound
-from tg.decorators import expose, redirect, paginate
+from tg.decorators import expose, redirect, paginate, validate
 
 from pyjobsweb.model import CompanyAlchemy
 from pyjobsweb.lib.base import BaseController
+from pyjobsweb.forms.new_form import NewCompanyForm
 
 
 class AddCompanyController(BaseController):
     @expose('pyjobsweb.templates.companies.new')
-    def index(self):
-        raise NotImplementedError('TODO')
+    def index(self, *args, **kwargs):
+        new_form = NewCompanyForm(action='/company/new/submit',
+                                  method='POST').req()
+        return dict(new_company_form=new_form)
 
     @expose()
-    def submit(self):
+    @validate(NewCompanyForm, error_handler=index)
+    def submit(self, *args, **kwargs):
         raise NotImplementedError('TODO')
 
 
