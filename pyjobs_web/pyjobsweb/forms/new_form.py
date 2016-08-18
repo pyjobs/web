@@ -33,14 +33,18 @@ class SirenValidator(twc.Validator):
         super(SirenValidator, self).__init__(**kwargs)
 
     def _validate_python(self, value, state=None):
-        regex = re.compile('^[0-9]{3}(\-[0-9]{3}){2}$', re.IGNORECASE)
+        regex = re.compile('^[0-9]{3}((\-[0-9]{3}){2}|( [0-9]{3}){2})$',
+                           re.IGNORECASE)
 
         # We first check the string format
         if not value or not regex.match(value):
             raise ValidationError('wrong_format', self)
 
         # The Siren number is formatted correctly, perform the validity check
-        digits = [int(x) for x in value.replace('-', '')]
+        value = value.replace('-', '')
+        value = value.replace(' ', '')
+
+        digits = [int(x) for x in value]
         validity = 0
 
         for i, digit in enumerate(digits):
@@ -58,7 +62,7 @@ class TechnologiesValidator(twc.RegexValidator):
     def __init__(self, **kwargs):
         super(TechnologiesValidator, self).__init__(**kwargs)
 
-    regex = re.compile('^(\w|\W)+((,|, | )(\w|\W)+){0,9}$',
+    regex = re.compile('^[^\,,\, , ]+((\,|\, | )[^\,,\, , ]+){0,9}$',
                        re.IGNORECASE | re.UNICODE)
 
 
