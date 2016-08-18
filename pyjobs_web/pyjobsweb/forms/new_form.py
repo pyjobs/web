@@ -90,7 +90,10 @@ class NewCompanyForm(twf.Form):
                 <div class="form-group required
                 ${'has-success' if field.value and not field.error_msg else ''}
                 ${'has-error' if field.error_msg else ''}">
-                    <label class="control-label col-sm-12" for="${field.compound_id}">${field.label}</label>
+                    <label class="control-label col-sm-12" for="${field.compound_id}">
+                        ${field.label}
+                        ${field.error_msg if field.error_msg else ''}
+                    </label>
                     <div class="col-xs-12 col-sm-12">
                         ${field.display()}
                     </div>
