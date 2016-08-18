@@ -166,7 +166,7 @@ class NewCompanyForm(twf.Form):
         company_logo = twf.TextField(
             id='company_logo',
             label=u"Logo de l'entreprise:",
-            placeholder=u"www.pyjobs.fr/img/pyjobs_logo_square.png",
+            placeholder=u"http://www.pyjobs.fr/img/pyjobs_logo_square.png",
             maxlength=1024,
             css_class='form-control',
             validator=twc.UrlValidator(required=True)
