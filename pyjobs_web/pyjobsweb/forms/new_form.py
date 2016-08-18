@@ -183,7 +183,7 @@ class NewCompanyForm(twf.Form):
 
         company_technologies = twf.TextArea(
             name='company_technologies',
-            label=u"Technologies utilisées par l'entreprise:",
+            label=u"Technologies utilisées par l'entreprise: (maximum 10)",
             placeholder=u"Technologie 1, Technologie 2, ..., Technologie 10",
             maxlength=200,
             css_class='form-control',
