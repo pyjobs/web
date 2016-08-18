@@ -6,6 +6,8 @@ import tw2.forms as twf
 import tw2.forms.widgets as tww
 from tw2.core.validation import ValidationError
 
+from pyjobsweb.model import CompanyAlchemy
+
 
 class PhoneNumberValidator(twc.RegexValidator):
     def __init__(self, **kwargs):
@@ -42,10 +44,10 @@ class SirenValidator(twc.Validator):
             raise ValidationError('wrong_format', self)
 
         # The Siren number is formatted correctly, perform the validity check
-        value = value.replace('-', '')
-        value = value.replace(' ', '')
+        tmp = value.replace('-', '')
+        tmp = tmp.replace(' ', '')
 
-        digits = [int(x) for x in value]
+        digits = [int(x) for x in tmp]
         digits.reverse()
         validity = 0
 
@@ -57,6 +59,10 @@ class SirenValidator(twc.Validator):
 
         if validity % 10 != 0:
             raise ValidationError('invalid_siren', self)
+
+        # Check for duplicates in the database
+        if CompanyAlchemy.get_company(value.replace('-', ' ')):
+            raise ValidationError('duplicate_siren', self)
 
 
 class TechnologiesValidator(twc.RegexValidator):
