@@ -12,7 +12,7 @@ class PhoneNumberValidator(twc.RegexValidator):
         super(PhoneNumberValidator, self).__init__(**kwargs)
 
     msgs = {
-        'regex': ('badphone', u'Numéro de téléphone invalide'),
+        'badregex': ('badphone', u'Numéro de téléphone invalide'),
     }
 
     regex = re.compile('^(0|\+33|0033)'
@@ -24,9 +24,10 @@ class PhoneNumberValidator(twc.RegexValidator):
 
 
 class SirenValidator(twc.Validator):
-    msg = {
-        'wrong_format': u'Format de saisie non respecté',
-        'invalid_siren': u'Numéro de Siren invalide',
+    msgs = {
+        'wrong_format': (u'Format de saisie non respecté'),
+        'invalid_siren': (u'Numéro de Siren invalide'),
+        'duplicate_siren': (u'Numéro de Siren déjà utilisé')
     }
 
     def __init__(self, **kwargs):
@@ -60,7 +61,7 @@ class SirenValidator(twc.Validator):
 
 class TechnologiesValidator(twc.RegexValidator):
     msgs = {
-        'regex': ('badtech', u'Format du champ invalide'),
+        'badregex': ('badtech', u'Format du champ invalide'),
     }
 
     def __init__(self, **kwargs):
