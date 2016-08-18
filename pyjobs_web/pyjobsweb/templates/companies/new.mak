@@ -21,5 +21,5 @@
 </%def>
 
 <div id="new_company_form" class="row">
-    ${new_company_form.display()|n}
+    ${new_company_form.display()}
 </div>
