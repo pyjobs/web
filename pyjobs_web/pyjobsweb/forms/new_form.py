@@ -143,7 +143,7 @@ class NewCompanyForm(twf.Form):
         company_url = twf.TextField(
             id='company_url',
             label=u"Site web de l'entreprise:",
-            placeholder=u"www.pyjobs.fr",
+            placeholder=u"http://www.pyjobs.fr",
             maxlength=1024,
             css_class='form-control',
             validator=twc.UrlValidator(required=True)
