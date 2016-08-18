@@ -5,6 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tg.decorators import expose, redirect, paginate, validate
 
 from pyjobsweb.model import CompanyAlchemy
+from pyjobsweb.model import DBSession
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.forms.new_form import NewCompanyForm
 
@@ -30,7 +31,36 @@ class AddCompanyController(BaseController):
     @expose()
     @validate(NewCompanyForm, error_handler=index)
     def submit(self, *args, **kwargs):
-        raise NotImplementedError('TODO')
+        company = CompanyAlchemy()
+
+        # TODO: Export all of this code into setters ?
+        company.siren = kwargs['company_siren']
+        company.siren = company.siren.replace('-', ' ')
+        company.name = kwargs['company_name']
+        company.logo_url = kwargs['company_logo']
+        company.url = kwargs['company_url']
+        company.description = kwargs['company_description']
+        company.technologies = kwargs['company_technologies']
+        company.technologies = company.technologies.replace(', ', ',')
+        company.technologies = company.technologies.replace(' ', ',')
+        company.address = kwargs['company_address']
+        company.email = kwargs['company_email']
+        company.phone = kwargs['company_phone']
+        company.phone = company.phone.replace('-', '.')
+        company.phone = company.phone.replace(' ', '.')
+
+        redirect_to = '/company/list'
+        redirect_msg = u"Votre demande d'ajout d'entreprise a bien été " \
+                       u"soumis à modération. L'entreprise sera ajoutée à " \
+                       u"cette liste sous peu si elle satisfait les critères " \
+                       u"attendus."
+        redirect_status = 'ok'
+
+        DBSession.add(company)
+        DBSession.commit()
+
+        tg.flash(redirect_msg, redirect_status)
+        redirect(redirect_to)
 
 
 class SearchCompanyController(BaseController):
