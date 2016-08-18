@@ -45,10 +45,14 @@ class SirenValidator(twc.Validator):
         value = value.replace(' ', '')
 
         digits = [int(x) for x in value]
+        digits.reverse()
         validity = 0
 
         for i, digit in enumerate(digits):
-            validity += digit * 2 if (i + 1) % 2 == 0 else digit
+            to_sum = str(digit * 2) if (i + 1) % 2 == 0 else str(digit)
+
+            for figure in to_sum:
+                validity += int(figure)
 
         if validity % 10 != 0:
             raise ValidationError('invalid_siren', self)
