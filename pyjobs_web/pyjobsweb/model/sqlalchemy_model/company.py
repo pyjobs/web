@@ -9,7 +9,7 @@ from pyjobsweb.model.elasticsearch_model.company import Company \
 class Company(DeclarativeBase):
     __tablename__ = 'companies'
 
-    siren = sa.Column(sa.Integer, primary_key=True)
+    siren = sa.Column(sa.String(11), primary_key=True)
 
     name = sa.Column(sa.String(1024), nullable=False, default='')
     logo_url = sa.Column(sa.String(1024), nullable=False, default='')
