@@ -43,9 +43,9 @@
     </header>
 </%def>
 
-## <div id="research_form">
-##     ${company_search_form.display()|n}
-## </div>
+<div id="company_search_form">
+     ${company_search_form.display(action='/company/search', method='POST')}
+</div>
 
 ${company_pagination()}
 
