@@ -75,10 +75,8 @@ class RootController(BaseController):
     def jobs(self, *args, **kwargs):
         job_offers = model.JobAlchemy.get_all_job_offers()
 
-        search_form = ResearchForm(action='/search/jobs', method='POST').req()
-
         return dict(sources=SOURCES, jobs=job_offers,
-                    job_offer_search_form=search_form)
+                    job_offer_search_form=ResearchForm)
 
     @expose()
     def rss(self, limit=50, source=None, *args, **kwargs):

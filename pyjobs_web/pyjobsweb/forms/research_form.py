@@ -109,7 +109,6 @@ class ResearchForm(twf.Form):
         inline_engine_name = "mako"
         template = \
             u'''
-            <h2>Rechercher une offre d'emploi</h2>
             <div class="form-group">
                 <label class="control-label col-sm-2" for="query">Requête :</label>
                 <div class="col-xs-10 col-sm-10">

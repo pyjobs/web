@@ -44,6 +44,7 @@
 </%def>
 
 <div id="company_search_form">
+    <h2>Rechercher une entreprise</h2>
      ${company_search_form.display(action='/company/search', method='POST')}
 </div>
 
