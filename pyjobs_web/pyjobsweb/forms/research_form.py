@@ -109,38 +109,37 @@ class ResearchForm(twf.Form):
         inline_engine_name = "mako"
         template = \
             u'''
-            <div class="form-group">
-                <label class="control-label col-sm-2" for="query">Requête :</label>
-                <div class="col-xs-10 col-sm-10">
-                    ${w.children.query.display()|n}
+            % for c in w.children_hidden:
+                ${c.display()}
+            % endfor
+
+            <%def name="display_field(field)">
+                <div class="form-group">
+                    <label class="control-label col-sm-12" for="${field.compound_id}">
+                        ${field.label}
+                    </label>
+                    <div class="col-xs-12 col-sm-12">
+                        ${field.display()}
+                    </div>
                 </div>
-            </div>
-            <div class="col-xs-12" style="height:3px;"></div>
+                <div class="col-xs-12" style="height:7px;"></div>
+            </%def>
+
+            % for child in w.children:
+                ${display_field(child)}
+            % endfor
+
             <div class="form-group">
-                <label class="control-label col-sm-2" for="center">Autour de :</label>
-                <div class="col-xs-10 col-sm-10">
-                    ${w.children.center.display()|n}
-                </div>
-            </div>
-            <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
-                <label class="control-label col-sm-2" for="radius">Dans un rayon de :</label>
-                <div class="col-xs-10 col-sm-10">
-                    ${w.children.radius.display()|n}
-                </div>
-            </div>
-            <div class="col-xs-12" style="height:3px;"></div>
-            <div class="form-group">
-                <label class="control-label col-sm-2" for="submit"> </label>
-                <div class="col-xs-10 col-md-10">
-                    ${w.submit.display()|n}
+                <label class="control-label col-sm-12" for="submit"> </label>
+                <div class="col-xs-12 col-md-12">
+                    ${w.submit.display()}
                 </div>
             </div>
             '''
 
         query = twsel.Select2MultipleSelectField(
             name='query',
-            label='',
+            label=u'Requête :',
             options=[],
             value='',
             attrs=dict(style='width: 100%;'),
@@ -162,7 +161,7 @@ class ResearchForm(twf.Form):
             ondemand=True
         )
 
-        center = GeocompleteField(name="center", label="")
+        center = GeocompleteField(name="center", label=u'Autour de :')
 
         distances = [
             "5", "10", "25", "50", "100", "200", "200+"
@@ -179,7 +178,7 @@ class ResearchForm(twf.Form):
 
         radius = twsel.Select2SingleSelectField(
             name='radius',
-            label='',
+            label=u'Dans un rayon de :',
             options=tmp_options,
             value='',
             attrs=dict(style='width: 100%'),
