@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import tg
 import logging
+import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from tg.decorators import expose, redirect, paginate, validate
 
@@ -56,8 +57,9 @@ class AddCompanyController(BaseController):
                        u"attendus."
         redirect_status = 'ok'
 
+        transaction.begin()
         DBSession.add(company)
-        DBSession.commit()
+        transaction.commit()
 
         tg.flash(redirect_msg, redirect_status)
         redirect(redirect_to)
