@@ -9,15 +9,20 @@ from tw2.core.validation import ValidationError
 from pyjobsweb.model import CompanyAlchemy
 from sqlalchemy.orm.exc import NoResultFound
 
+french_validation_messages = {
+    'required': (u'Veuillez saisir une valeur'),
+    'decode': (u'Mauvais jeu de caractère reçu; devrait être $encoding'),
+    'corrupt': (u"Données du formulaire reçues corrompues; veuillez réessayer "
+                u"s'il vous plaît."),
+    'childerror': '',  # Children of this widget have errors
+}
 
 
 class PhoneNumberValidator(twc.RegexValidator):
     def __init__(self, **kwargs):
         super(PhoneNumberValidator, self).__init__(**kwargs)
-
-    msgs = {
-        'badregex': ('badphone', u'Numéro de téléphone invalide'),
-    }
+        self.msgs = dict(french_validation_messages)
+        self.msgs['badregex'] = (u'Numéro de téléphone invalide')
 
     regex = re.compile('^(0|\+33|0033)'
                        '([0-9](\-[0-9]{2}){4}'
@@ -28,14 +33,12 @@ class PhoneNumberValidator(twc.RegexValidator):
 
 
 class SirenValidator(twc.Validator):
-    msgs = {
-        'wrong_format': (u'Format de saisie non respecté'),
-        'invalid_siren': (u'Numéro de Siren invalide'),
-        'duplicate_siren': (u'Numéro de Siren déjà utilisé')
-    }
-
     def __init__(self, **kwargs):
         super(SirenValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.msgs['wrong_format'] = (u'Format de saisie non respecté')
+        self.msgs['invalid_siren'] = (u'Numéro de Siren invalide')
+        self.msgs['duplicate_siren'] = (u'Numéro de Siren déjà utilisé')
 
     def _validate_python(self, value, state=None):
         regex = re.compile('^[0-9]{3}((\-[0-9]{3}){2}|( [0-9]{3}){2})$',
@@ -75,15 +78,34 @@ class SirenValidator(twc.Validator):
 
 
 class TechnologiesValidator(twc.RegexValidator):
-    msgs = {
-        'badregex': ('badtech', u'Format du champ invalide'),
-    }
-
     def __init__(self, **kwargs):
         super(TechnologiesValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.msgs['badregex'] = (u'Format du champ invalide')
 
     regex = re.compile('^[^\,,\, , ]+((\,|\, | )[^\,,\, , ]+){0,9}$',
                        re.IGNORECASE | re.UNICODE)
+
+
+class RequiredValidator(twc.Validator):
+    def __init__(self, **kwargs):
+        super(RequiredValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.required = True
+
+
+class UrlValidator(twc.UrlValidator):
+    def __init__(self, **kwargs):
+        super(UrlValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.msgs['badregex'] = u'URL invalide'
+
+
+class EmailValidator(twc.EmailValidator):
+    def __init__(self, **kwargs):
+        super(EmailValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.msgs['badregex'] = u'Adresse email invalide'
 
 
 class NewCompanyForm(twf.Form):
@@ -134,7 +156,7 @@ class NewCompanyForm(twf.Form):
             placeholder=u"Mon entreprise qui recrute",
             maxlength=100,
             css_class='form-control',
-            validator=twc.Required
+            validator=RequiredValidator
         )
 
         company_siren = twf.TextField(
@@ -152,16 +174,16 @@ class NewCompanyForm(twf.Form):
             placeholder=u"Adresse l'entreprise",
             maxlength=1024,
             css_class='form-control',
-            validator=twc.Required
+            validator=RequiredValidator
         )
 
         company_url = twf.TextField(
             id='company_url',
             label=u"Site web de l'entreprise:",
-            placeholder=u"http://www.pyjobs.fr",
+            placeholder=u"http://pyjobs.fr",
             maxlength=1024,
             css_class='form-control',
-            validator=twc.UrlValidator(required=True)
+            validator=UrlValidator(required=True)
         )
 
         company_email = twf.TextField(
@@ -170,7 +192,7 @@ class NewCompanyForm(twf.Form):
             placeholder=u"email@exemple.fr",
             maxlength=1024,
             css_class='form-control',
-            validator=twc.EmailValidator(required=True)
+            validator=EmailValidator(required=True)
         )
 
         company_phone = twf.TextField(
@@ -185,10 +207,10 @@ class NewCompanyForm(twf.Form):
         company_logo = twf.TextField(
             id='company_logo',
             label=u"Logo de l'entreprise:",
-            placeholder=u"http://www.pyjobs.fr/img/pyjobs_logo_square.png",
+            placeholder=u"http://pyjobs.fr/img/pyjobs_logo_square.png",
             maxlength=1024,
             css_class='form-control',
-            validator=twc.UrlValidator(required=True)
+            validator=UrlValidator(required=True)
         )
 
         company_description = twf.TextArea(
@@ -197,7 +219,7 @@ class NewCompanyForm(twf.Form):
             placeholder=u"Description de l'entreprise...",
             maxlength=5000,
             css_class='form-control',
-            validator=twc.Required
+            validator=RequiredValidator
         )
 
         company_technologies = twf.TextArea(
