@@ -7,6 +7,8 @@ import tw2.forms.widgets as tww
 from tw2.core.validation import ValidationError
 
 from pyjobsweb.model import CompanyAlchemy
+from sqlalchemy.orm.exc import NoResultFound
+
 
 
 class PhoneNumberValidator(twc.RegexValidator):
@@ -61,7 +63,14 @@ class SirenValidator(twc.Validator):
             raise ValidationError('invalid_siren', self)
 
         # Check for duplicates in the database
-        if CompanyAlchemy.get_company(value.replace('-', ' ')):
+        try:
+            CompanyAlchemy.get_company(value.replace('-', ' '))
+        except NoResultFound:
+            # There are no duplicates, the validation is therefore successful
+            pass
+        else:
+            # This Siren number is already present in the database, notify the
+            # user that the company he's trying to register already exists.
             raise ValidationError('duplicate_siren', self)
 
 
