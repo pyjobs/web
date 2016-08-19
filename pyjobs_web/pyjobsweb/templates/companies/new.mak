@@ -21,5 +21,5 @@
 </%def>
 
 <div id="new_company_form" class="row">
-    ${new_company_form.display()}
+    ${new_company_form.display(action='/company/new/submit', method='POST')}
 </div>

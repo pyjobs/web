@@ -111,8 +111,6 @@ class EmailValidator(twc.EmailValidator):
 class NewCompanyForm(twf.Form):
     def __init__(self, **kwargs):
         super(NewCompanyForm, self).__init__(**kwargs)
-        self.action = '/company/new/submit'
-        self.method = 'POST'
         self.submit = None
 
     class child(tww.BaseLayout):
