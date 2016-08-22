@@ -77,7 +77,7 @@ class SearchCompanyController(BaseController):
 
         search_query = CompanyElastic.search()
 
-        search_on = ['description', 'technologies^20', 'name^20']
+        search_on = ['description', 'technologies^10', 'name^50']
 
         keyword_query = Q()
 
