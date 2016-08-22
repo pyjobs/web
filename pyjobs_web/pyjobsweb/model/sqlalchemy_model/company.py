@@ -72,3 +72,38 @@ class Company(DeclarativeBase):
         transaction.begin()
         DBSession.query(cls).update({'dirty': True})
         transaction.commit()
+
+    @classmethod
+    def get_pending_geolocations(cls):
+        return DBSession.query(cls) \
+            .filter_by(address_is_valid=True) \
+            .filter_by(geolocation_is_valid=False) \
+            .filter_by(validated=True) \
+            .order_by(cls.id.asc())
+
+    @classmethod
+    def set_geolocation(cls, company_id, lat, lon):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == company_id) \
+            .update({'latitude': lat,
+                     'longitude': lon,
+                     'geolocation_is_valid': True,
+                     'dirty': True})
+        transaction.commit()
+
+    @classmethod
+    def set_geolocation_is_valid(cls, company_id, is_valid):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == company_id) \
+            .update({'geolocation_is_valid': is_valid, 'dirty': True})
+        transaction.commit()
+
+    @classmethod
+    def set_address_is_valid(cls, company_id, is_valid):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == company_id) \
+            .update({'address_is_valid': is_valid})
+        transaction.commit()

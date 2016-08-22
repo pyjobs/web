@@ -47,6 +47,7 @@ class AddCompanyController(BaseController):
         company.description = kwargs['company_description']
         company.technologies = kwargs['company_technologies']
         company.address = kwargs['company_address']
+        company.address_is_valid = True
         company.email = kwargs['company_email']
         company.phone = kwargs['company_phone']
 
