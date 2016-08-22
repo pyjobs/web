@@ -24,12 +24,7 @@ class PhoneNumberValidator(twc.RegexValidator):
         self.msgs = dict(french_validation_messages)
         self.msgs['badregex'] = (u'Numéro de téléphone invalide')
 
-    regex = re.compile('^(0|\+33|0033)'
-                       '([0-9](\-[0-9]{2}){4}'
-                       '|[0-9](\.[0-9]{2}){4}'
-                       '|[0-9]( [0-9]{2}){4}'
-                       '|[0-9]{9})$',
-                       re.IGNORECASE)
+    regex = re.compile('^0([0-9](\.[0-9]{2}){4})$', re.IGNORECASE)
 
 
 class SirenValidator(twc.Validator):
@@ -41,16 +36,14 @@ class SirenValidator(twc.Validator):
         self.msgs['duplicate_siren'] = (u'Numéro de Siren déjà utilisé')
 
     def _validate_python(self, value, state=None):
-        regex = re.compile('^[0-9]{3}((\-[0-9]{3}){2}|( [0-9]{3}){2})$',
-                           re.IGNORECASE)
+        regex = re.compile('^[0-9]{3}(( [0-9]{3}){2})$', re.IGNORECASE)
 
         # We first check the string format
         if not value or not regex.match(value):
             raise ValidationError('wrong_format', self)
 
         # The Siren number is formatted correctly, perform the validity check
-        tmp = value.replace('-', '')
-        tmp = tmp.replace(' ', '')
+        tmp = value.replace(' ', '')
 
         digits = [int(x) for x in tmp]
         digits.reverse()
@@ -67,7 +60,7 @@ class SirenValidator(twc.Validator):
 
         # Check for duplicates in the database
         try:
-            CompanyAlchemy.get_company(value.replace('-', ' '))
+            CompanyAlchemy.get_company(value)
         except NoResultFound:
             # There are no duplicates, the validation is therefore successful
             pass
@@ -83,7 +76,7 @@ class TechnologiesValidator(twc.RegexValidator):
         self.msgs = dict(french_validation_messages)
         self.msgs['badregex'] = (u'Format du champ invalide')
 
-    regex = re.compile('^[^\,,\, , ]+((\,|\, | )[^\,,\, , ]+){0,9}$',
+    regex = re.compile('^(\w|\+|\-)+(\, (\w|\+|\-){0,9})$',
                        re.IGNORECASE | re.UNICODE)
 
 

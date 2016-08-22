@@ -40,19 +40,14 @@ class AddCompanyController(BaseController):
 
         # TODO: Export all of this code into setters ?
         company.siren = kwargs['company_siren']
-        company.siren = company.siren.replace('-', ' ')
         company.name = kwargs['company_name']
         company.logo_url = kwargs['company_logo']
         company.url = kwargs['company_url']
         company.description = kwargs['company_description']
         company.technologies = kwargs['company_technologies']
-        company.technologies = company.technologies.replace(', ', ',')
-        company.technologies = company.technologies.replace(' ', ',')
         company.address = kwargs['company_address']
         company.email = kwargs['company_email']
         company.phone = kwargs['company_phone']
-        company.phone = company.phone.replace('-', '.')
-        company.phone = company.phone.replace(' ', '.')
 
         redirect_to = '/company/list'
         redirect_msg = u"Votre demande d'ajout d'entreprise a bien été " \

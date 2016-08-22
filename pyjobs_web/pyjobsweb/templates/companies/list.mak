@@ -106,7 +106,7 @@ ${company_pagination()}
                 </div>
 
                 <div class="col-md-12">
-                    % for technology in company.technologies.split(','):
+                    % for technology in company.technologies.split(', '):
                         <span class="label label-default label-pyjob company-technology">${technology}</span>
                     % endfor
                 </div>
