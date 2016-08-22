@@ -58,7 +58,7 @@ class Company(es.DocType):
     technologies_analyzer = es.analyzer('technologies_analyzer',
                                         tokenizer=technologies_tokenizer)
 
-    siren = es.String(index='no')
+    id = es.String(index='no')
 
     name = es.String(index='not_analyzed')
     logo_url = es.String(index='no')

@@ -9,7 +9,8 @@ from pyjobsweb.model.elasticsearch_model.company import Company \
 class Company(DeclarativeBase):
     __tablename__ = 'companies'
 
-    siren = sa.Column(sa.String(11), primary_key=True)
+    # The id column stores the company name column slug
+    id = sa.Column(sa.String(1024), primary_key=True)
 
     name = sa.Column(sa.String(1024), nullable=False, default='')
     logo_url = sa.Column(sa.String(1024), nullable=False, default='')
@@ -34,8 +35,8 @@ class Company(DeclarativeBase):
 
     def to_elasticsearch_company(self):
         result = CompanyElastic(
-            meta={'id': self.siren},
-            siren=self.siren,
+            meta={'id': self.id},
+            id=self.id,
             name=self.name,
             logo_url=self.logo_url,
             description=self.description,
@@ -57,5 +58,5 @@ class Company(DeclarativeBase):
             .order_by(cls.name.asc())
 
     @classmethod
-    def get_company(cls, siren):
-        return DBSession.query(cls).filter(cls.siren == siren).one()
+    def get_company(cls, company_id):
+        return DBSession.query(cls).filter(cls.id == company_id).one()

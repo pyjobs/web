@@ -56,13 +56,13 @@ ${company_pagination()}
     </div>
 % else:
     % for company in companies:
-        <div id="company-${company.siren}" class="company-item ${loop.cycle('row-even', 'row-odd')}"
+        <div id="company-${company.id}" class="company-item ${loop.cycle('row-even', 'row-odd')}"
              style="padding: 1em 1em 3em 1em;">
-            <div class="row" id="company-post-head-${company.siren}">
+            <div class="row" id="company-post-head-${company.id}">
                 <div class="col-md-9">
                     <h3 style="margin-top: 0; padding-top: 0;">
                         <a style="color: #555; font-weight: bold;"
-                           href="${h.get_company_url(company.siren, company.name, previous=request.url)}">
+                           href="${h.get_company_url(company.id, previous=request.url)}">
                             <i style="color: #555;" class="fa fa-fw fa-building-o"></i>
                             ${company.name}
                         </a>
@@ -121,7 +121,7 @@ ${company_pagination()}
                             ${company.description[0:139].rstrip()}
                             % if len(company.description) > 140:
                                 ...
-                                <a href="${h.get_company_url(company.siren, company.name, previous=request.url)}">
+                                <a href="${h.get_company_url(company.id, previous=request.url)}">
                                     (cliquez ici pour lire la suite)
                                 </a>
                             % endif

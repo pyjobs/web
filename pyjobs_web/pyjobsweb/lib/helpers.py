@@ -54,10 +54,9 @@ def get_job_url(job_id, job_title=None, previous=None, absolute=False):
     return job_url
 
 
-def get_company_url(siren, name=None, previous=None, absolute=False):
-    company_url = '/company/details/%s' % siren
-    if name:
-        company_url = '%s/%s' % (company_url, slugify(name))
+def get_company_url(company_id, previous=None, absolute=False):
+    company_url = '/company/details/%s' % company_id
+
     if previous:
         company_url = '%s?previous=%s' % (company_url, quote_plus(previous))
     if absolute:

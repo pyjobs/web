@@ -3,6 +3,8 @@ import tg
 import json
 import logging
 import transaction
+from slugify import slugify
+
 from sqlalchemy.orm.exc import NoResultFound
 from tg.decorators import expose, redirect, paginate, validate
 from elasticsearch_dsl import Q
@@ -38,8 +40,7 @@ class AddCompanyController(BaseController):
     def submit(self, *args, **kwargs):
         company = CompanyAlchemy()
 
-        # TODO: Export all of this code into setters ?
-        company.siren = kwargs['company_siren']
+        company.id = slugify(kwargs['company_name'])
         company.name = kwargs['company_name']
         company.logo_url = kwargs['company_logo']
         company.url = kwargs['company_url']
@@ -134,9 +135,9 @@ class CompanyController(BaseController):
         return dict(companies=companies, company_search_form=ResearchForm)
 
     @expose('pyjobsweb.templates.companies.details')
-    def details(self, siren, *args, **kwargs):
+    def details(self, company_id, *args, **kwargs):
         try:
-            company = CompanyAlchemy.get_company(siren=siren)
+            company = CompanyAlchemy.get_company(company_id=company_id)
         except NoResultFound:
             redirect('/company/details')
         except Exception as exc:

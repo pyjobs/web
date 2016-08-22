@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+from slugify import slugify
 
 import tw2.core as twc
 import tw2.forms as twf
@@ -16,6 +17,28 @@ french_validation_messages = {
                 u"s'il vous plaît."),
     'childerror': '',  # Children of this widget have errors
 }
+
+
+class CompanyNameValidator(twc.Validator):
+    def __init__(self, **kwargs):
+        super(CompanyNameValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.msgs['already_exists'] = (u'Cette entreprise existe déjà dans '
+                                       u'notre base')
+
+    def _validate_python(self, value, state=None):
+        name_slug = slugify(value)
+
+        # Check for duplicates in the database
+        try:
+            CompanyAlchemy.get_company(name_slug)
+        except NoResultFound:
+            # There are no duplicates, the validation is therefore successful
+            pass
+        else:
+            # This company slug name is already present in the database, notify
+            # the user that the company he's trying to register already exists.
+            raise ValidationError('already_exists', self)
 
 
 class PhoneNumberValidator(twc.RegexValidator):
@@ -151,19 +174,19 @@ class NewCompanyForm(twf.Form):
             help_text=u"Le nom de l'entreprise que vous souhaitez ajouter",
             maxlength=100,
             css_class='form-control',
-            validator=RequiredValidator
+            validator=CompanyNameValidator(required=True)
         )
 
-        company_siren = twf.TextField(
-            id='company_siren',
-            label=u"Numéro de Siren:",
-            placeholder=u"XXX XXX XXX",
-            help_text=u"Le numéro de Siren de l'entreprise que vous souhaitez "
-                      u"ajouter, au format XXX XXX XXX",
-            maxlength=11,
-            css_class='form-control',
-            validator=SirenValidator(required=True)
-        )
+        # company_siren = twf.TextField(
+        #     id='company_siren',
+        #     label=u"Numéro de Siren:",
+        #     placeholder=u"XXX XXX XXX",
+        #     help_text=u"Le numéro de Siren de l'entreprise que vous souhaitez"
+        #               u" ajouter, au format XXX XXX XXX",
+        #     maxlength=11,
+        #     css_class='form-control',
+        #     validator=SirenValidator(required=True)
+        # )
 
         # TODO: split this field into several subfields for validation
         # TODO: and formatting purposes
