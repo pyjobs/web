@@ -121,4 +121,7 @@ class Company(DeclarativeBase):
 
     @classmethod
     def get_dirty_rows(cls):
-        return DBSession.query(cls).filter(cls.dirty).order_by(cls.id.asc())
+        return DBSession.query(cls) \
+            .filter(cls.dirty) \
+            .filter(cls.validated) \
+            .order_by(cls.id.asc())
