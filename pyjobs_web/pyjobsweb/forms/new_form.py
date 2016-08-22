@@ -164,8 +164,9 @@ class NewCompanyForm(twf.Form):
         company_siren = twf.TextField(
             id='company_siren',
             label=u"Numéro de Siren:",
-            placeholder=u"XXX-XXX-XXX",
-            help_text=u"Le numéro de Siren de l'entreprise que vous souhaitez ajouter, au format XXX-XXX-XXX",
+            placeholder=u"XXX XXX XXX",
+            help_text=u"Le numéro de Siren de l'entreprise que vous souhaitez "
+                      u"ajouter, au format XXX XXX XXX",
             maxlength=11,
             css_class='form-control',
             validator=SirenValidator(required=True)
@@ -176,7 +177,7 @@ class NewCompanyForm(twf.Form):
         company_address = twf.TextField(
             id='company_address',
             label=u"Adresse de l'entreprise:",
-            placeholder=u"Adresse l'entreprise",
+            placeholder=u"Adresse de l'entreprise",
             help_text=u"L'adresse de l'entreprise",
             maxlength=1024,
             css_class='form-control',
@@ -197,7 +198,8 @@ class NewCompanyForm(twf.Form):
             id='company_email',
             label=u"Adresse email de contact:",
             placeholder=u"email@exemple.fr",
-            help_text=u"L'adresse email de contact de l'entreprise pour les personnes souhaitant candidater",
+            help_text=u"L'adresse email de contact de l'entreprise pour les "
+                      u"personnes souhaitant candidater",
             maxlength=1024,
             css_class='form-control',
             validator=EmailValidator(required=True)
@@ -206,8 +208,10 @@ class NewCompanyForm(twf.Form):
         company_phone = twf.TextField(
             id='company_phone',
             label=u"Numéro de téléphone:",
-            placeholder=u"0X-XX-XX-XX-XX ou +33X-XX-XX-XX-XX ou 0033X-XX-XX-XX-XX",
-            help_text=u"Le numéro de téléphone de contact de l'entreprise pour les personnes souhaitant candidater",
+            placeholder=u"0X.XX.XX.XX.XX",
+            help_text=u"Le numéro de téléphone de contact de l'entreprise pour "
+                      u"les personnes souhaitant candidater au format "
+                      u"0X.XX.XX.XX.XX",
             maxlength=17,
             css_class='form-control',
             validator=PhoneNumberValidator(required=True)
@@ -237,7 +241,8 @@ class NewCompanyForm(twf.Form):
             name='company_technologies',
             label=u"Technologies utilisées par l'entreprise: (maximum 10)",
             placeholder=u"Technologie 1, Technologie 2, ..., Technologie 10",
-            help_text=u"La liste de technologies utiliées par l'entreprise (max. 10)",
+            help_text=u"La liste de technologies utiliées par l'entreprise "
+                      u"(max. 10)",
             maxlength=200,
             css_class='form-control',
             validator=TechnologiesValidator(required=True)
