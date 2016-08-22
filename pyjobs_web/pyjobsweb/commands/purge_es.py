@@ -18,6 +18,13 @@ class PurgeESCommand(AppContextCommand):
                             dest='purge_jobs_index',
                             action='store_const', const=True)
 
+        companies_help_msg = 'purges the companies index of the elasticsearch' \
+                             'database'
+        parser.add_argument('-co', '--companies',
+                            help=companies_help_msg,
+                            dest='purge_companies_index',
+                            action='store_const', const=True)
+
         geocomplete_help_msg = \
             'purges the geocomplete index of the elasticsearch database'
         parser.add_argument('-g', '--geocomplete',
@@ -59,6 +66,18 @@ class PurgeESCommand(AppContextCommand):
         log_msg = 'Postgresql jobs table dirty flags have been reset.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
+    def purge_companies_index(self):
+        self._purge_index('companies', dict(), model.CompanyElastic)
+
+        # Update the Postgresql database
+        log_msg = 'Resetting companies table dirty flags in Postgresql.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
+        model.CompanyAlchemy.reset_dirty_flags()
+
+        log_msg = 'Postgresql companies table dirty flags have been reset.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
     def purge_geocomplete_index(self):
         self._purge_index('geocomplete', dict(), model.Geocomplete)
 
@@ -67,6 +86,9 @@ class PurgeESCommand(AppContextCommand):
 
         if parsed_args.purge_jobs_index:
             self.purge_jobs_index()
+
+        if parsed_args.purge_companies_index:
+            self.purge_companies_index()
 
         if parsed_args.purge_geocomplete_index:
             self.purge_geocomplete_index()

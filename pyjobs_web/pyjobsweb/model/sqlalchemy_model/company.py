@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import transaction
+
 import sqlalchemy as sa
 
 from pyjobsweb.model import DeclarativeBase, DBSession
@@ -60,3 +62,9 @@ class Company(DeclarativeBase):
     @classmethod
     def get_company(cls, company_id):
         return DBSession.query(cls).filter(cls.id == company_id).one()
+
+    @classmethod
+    def reset_dirty_flags(cls):
+        transaction.begin()
+        DBSession.query(cls).update({'dirty': True})
+        transaction.commit()
