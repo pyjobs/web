@@ -114,6 +114,8 @@ class NewCompanyForm(twf.Form):
         self.submit = None
 
     class child(tww.BaseLayout):
+        hover_help = True
+
         inline_engine_name = 'mako'
         template = \
             u'''
@@ -124,7 +126,8 @@ class NewCompanyForm(twf.Form):
             <%def name="display_field(field)">
                 <div class="form-group required
                 ${'has-success' if field.value and not field.error_msg else ''}
-                ${'has-error' if field.error_msg else ''}">
+                ${'has-error' if field.error_msg else ''}"
+                title="${field.help_text if field.help_text else ''}">
                     <label class="control-label col-sm-12" for="${field.compound_id}">
                         ${field.label}
                         ${field.error_msg if field.error_msg else ''}
@@ -152,6 +155,7 @@ class NewCompanyForm(twf.Form):
             id='company_name',
             label=u"Nom de l'entreprise:",
             placeholder=u"Mon entreprise qui recrute",
+            help_text=u"Le nom de l'entreprise que vous souhaitez ajouter",
             maxlength=100,
             css_class='form-control',
             validator=RequiredValidator
@@ -161,15 +165,19 @@ class NewCompanyForm(twf.Form):
             id='company_siren',
             label=u"Numéro de Siren:",
             placeholder=u"XXX-XXX-XXX",
+            help_text=u"Le numéro de Siren de l'entreprise que vous souhaitez ajouter, au format XXX-XXX-XXX",
             maxlength=11,
             css_class='form-control',
             validator=SirenValidator(required=True)
         )
 
+        # TODO: split this field into several subfields for validation
+        # TODO: and formatting purposes
         company_address = twf.TextField(
             id='company_address',
             label=u"Adresse de l'entreprise:",
             placeholder=u"Adresse l'entreprise",
+            help_text=u"L'adresse de l'entreprise",
             maxlength=1024,
             css_class='form-control',
             validator=RequiredValidator
@@ -179,6 +187,7 @@ class NewCompanyForm(twf.Form):
             id='company_url',
             label=u"Site web de l'entreprise:",
             placeholder=u"http://pyjobs.fr",
+            help_text=u"L'url du site web de l'entreprise",
             maxlength=1024,
             css_class='form-control',
             validator=UrlValidator(required=True)
@@ -188,6 +197,7 @@ class NewCompanyForm(twf.Form):
             id='company_email',
             label=u"Adresse email de contact:",
             placeholder=u"email@exemple.fr",
+            help_text=u"L'adresse email de contact de l'entreprise pour les personnes souhaitant candidater",
             maxlength=1024,
             css_class='form-control',
             validator=EmailValidator(required=True)
@@ -197,6 +207,7 @@ class NewCompanyForm(twf.Form):
             id='company_phone',
             label=u"Numéro de téléphone:",
             placeholder=u"0X-XX-XX-XX-XX ou +33X-XX-XX-XX-XX ou 0033X-XX-XX-XX-XX",
+            help_text=u"Le numéro de téléphone de contact de l'entreprise pour les personnes souhaitant candidater",
             maxlength=17,
             css_class='form-control',
             validator=PhoneNumberValidator(required=True)
@@ -206,6 +217,7 @@ class NewCompanyForm(twf.Form):
             id='company_logo',
             label=u"Logo de l'entreprise:",
             placeholder=u"http://pyjobs.fr/img/pyjobs_logo_square.png",
+            help_text=u"Une url pointant sur une image du logo de l'entreprise",
             maxlength=1024,
             css_class='form-control',
             validator=UrlValidator(required=True)
@@ -215,6 +227,7 @@ class NewCompanyForm(twf.Form):
             id='company_description',
             label=u"Description de l'entreprise:",
             placeholder=u"Description de l'entreprise...",
+            help_text=u"Une description succinte de l'entreprise",
             maxlength=5000,
             css_class='form-control',
             validator=RequiredValidator
@@ -224,6 +237,7 @@ class NewCompanyForm(twf.Form):
             name='company_technologies',
             label=u"Technologies utilisées par l'entreprise: (maximum 10)",
             placeholder=u"Technologie 1, Technologie 2, ..., Technologie 10",
+            help_text=u"La liste de technologies utiliées par l'entreprise (max. 10)",
             maxlength=200,
             css_class='form-control',
             validator=TechnologiesValidator(required=True)
