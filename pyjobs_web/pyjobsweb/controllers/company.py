@@ -56,7 +56,7 @@ class AddCompanyController(BaseController):
 
         redirect_to = '/company/list'
         redirect_msg = u"Votre demande d'ajout d'entreprise a bien été " \
-                       u"soumis à modération. L'entreprise sera ajoutée à " \
+                       u"soumise à modération. L'entreprise sera ajoutée à " \
                        u"cette liste sous peu si elle satisfait les critères " \
                        u"attendus."
         redirect_status = 'ok'
