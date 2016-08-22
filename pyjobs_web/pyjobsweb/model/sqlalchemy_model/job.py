@@ -81,7 +81,7 @@ class Job(DeclarativeBase):
                     tags.append(tag)
         return tags
 
-    def to_elasticsearch_job_offer(self):
+    def to_elasticsearch_document(self):
         deserialize = es.serializer.serializer.loads
         job_tags = deserialize(self.tags)
         tags = []
@@ -125,7 +125,7 @@ class Job(DeclarativeBase):
         transaction.commit()
 
     @classmethod
-    def get_dirty_offers(cls):
+    def get_dirty_rows(cls):
         return DBSession.query(cls).filter(cls.dirty).order_by(cls.id.asc())
 
     @classmethod

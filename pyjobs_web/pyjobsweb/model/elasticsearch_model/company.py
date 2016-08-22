@@ -77,3 +77,11 @@ class Company(es.DocType):
 
     def __init__(self, meta=None, **kwargs):
         super(Company, self).__init__(meta, **kwargs)
+
+    @property
+    def index(self):
+        return self._doc_type.index
+
+    @property
+    def doc_type(self):
+        return self._doc_type.name

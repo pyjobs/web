@@ -15,14 +15,25 @@ from pyjobsweb.commands import AppContextCommand
 class PopulateESCommand(AppContextCommand):
     def __init__(self, *args, **kwargs):
         super(PopulateESCommand, self).__init__(args, kwargs)
+        self._logger = logging.getLogger(__name__)
 
     def get_parser(self, prog_name):
         parser = super(PopulateESCommand, self).get_parser(prog_name)
 
-        jobs_help_msg = 'populates the jobs index of the elasticsearch database'
+        jobs_help_msg = 'synchronizes the jobs index from the Elasticsearch ' \
+                        'database with the jobs table from the Postgresql ' \
+                        'database'
         parser.add_argument('-j', '--jobs',
                             help=jobs_help_msg,
-                            dest='populate_jobs_index',
+                            dest='synchronize_jobs_index',
+                            action='store_const', const=True)
+
+        companies_help_msg = 'synchronizes the companies index from the ' \
+                             'Elasticsearch database with the companies ' \
+                             'table from the Postgresql database'
+        parser.add_argument('-co', '--companies',
+                            help=companies_help_msg,
+                            dest='synchronize_companies_index',
                             action='store_const', const=True)
 
         geocomplete_help_msg = \
@@ -34,20 +45,23 @@ class PopulateESCommand(AppContextCommand):
 
         return parser
 
-    @staticmethod
-    def _logging(message, logging_level):
-        logging.getLogger(__name__).log(logging_level, message)
+    def _logging(self, logging_level, message):
+        self._logger.log(logging_level, message)
 
-    def _job_id_logging(self, job_id, message, logging_level):
+    def _job_id_logging(self, job_id, logging_level, message):
         log_msg = u'[Job offer id: %s] %s' % (job_id, message)
-        self._logging(log_msg, logging_level)
+        self._logging(logging_level, log_msg)
+
+    def _company_id_logging(self, company_id, logging_level, message):
+        log_msg = u'[Company: %s] %s' % (company_id, message)
+        self._logging(logging_level, log_msg)
 
     @staticmethod
-    def _compute_job_offers_elasticsearch_documents():
-        offers_to_index = model.JobAlchemy.get_dirty_offers()
+    def _compute_dirty_documents(sql_table):
+        dirty_rows = sql_table.get_dirty_rows()
 
-        for job_offer in offers_to_index:
-            yield job_offer.to_elasticsearch_job_offer()
+        for row in dirty_rows:
+            yield row.to_elasticsearch_document()
 
     @staticmethod
     def _geocompletion_documents():
@@ -67,12 +81,12 @@ class PopulateESCommand(AppContextCommand):
                                         weight=place['weight'])
 
     @staticmethod
-    def _synchronisation_op(pending_insertions):
+    def _synchronisation_op(elasticsearch_doctype, pending_insertions):
         for p in pending_insertions:
             doc_dict = p.to_dict(True)
 
             try:
-                model.JobElastic.get(p.id)
+                elasticsearch_doctype.get(p.id)
                 update_op = doc_dict
                 update_op['_op_type'] = 'update'
                 update_op['doc'] = doc_dict['_source']
@@ -85,42 +99,52 @@ class PopulateESCommand(AppContextCommand):
 
             yield sync_op
 
-    def _synchronise_jobs_index(self):
-        log_msg = 'Synchronizing index jobs.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
+    def _synchronise_index(self, sql_table, es_doc, id_logger):
+        log_msg = 'Synchronizing %s index.' % es_doc().index
+        self._logging(logging.INFO, log_msg)
 
         elasticsearch_conn = connections.get_connection()
 
-        log_msg = 'Computing out of sync job-offer documents.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
-        pending_insertions = self._compute_job_offers_elasticsearch_documents()
+        self._logging(logging.INFO,
+                      'Computing out of sync %s documents.'
+                      % es_doc().doc_type)
 
-        log_msg = 'Computing required operations to sync job-offer documents.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
+        pending_insertions = self._compute_dirty_documents(sql_table)
 
-        bulk_op = self._synchronisation_op(pending_insertions)
+        self._logging(logging.INFO,
+                      'Computing required operations to synchronize documents.')
 
-        log_msg = 'Performing synchronisation.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
+        bulk_op = self._synchronisation_op(es_doc, pending_insertions)
+
+        self._logging(logging.INFO, 'Performing synchronisation.')
 
         for ok, info in parallel_bulk(elasticsearch_conn, bulk_op):
-            job_id = info['index']['_id'] \
+            obj_id = info['index']['_id'] \
                 if 'index' in info else info['update']['_id']
 
             if ok:
                 # Mark the task as handled so we don't retreat it next time
-                log_msg = 'Document %s has been synced successfully.' % job_id
-                logging.getLogger(__name__).log(logging.INFO, log_msg)
-                model.JobAlchemy.set_dirty(job_id, False)
+                self._logging(logging.INFO,
+                              'Document %s has been synced successfully.'
+                              % obj_id)
+                sql_table.set_dirty(obj_id, False)
             else:
-                err_msg = 'Error while syncing document %s index.' % job_id
-                self._job_id_logging(job_id, err_msg, logging.ERROR)
+                id_logger(obj_id, logging.ERROR,
+                          'Error while syncing document %s index.' % obj_id)
 
         # Refresh indices to increase research speed
-        elasticsearch_dsl.Index('jobs').refresh()
+        elasticsearch_dsl.Index(es_doc().index).refresh()
 
-        log_msg = 'Index jobs is now synchronized.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
+        self._logging(logging.INFO,
+                      'Index %s is now synchronized.' % es_doc().index)
+
+    def _synchronise_jobs_index(self):
+        self._synchronise_index(model.JobAlchemy,
+                                model.JobElastic, self._job_id_logging)
+
+    def _synchronise_companies_index(self):
+        self._synchronise_index(model.CompanyAlchemy,
+                                model.CompanyElastic, self._company_id_logging)
 
     def _populate_geocomplete_index(self):
         log_msg = 'Populating geocomplete index.'
@@ -158,5 +182,8 @@ class PopulateESCommand(AppContextCommand):
         if parsed_args.populate_geocomplete_index:
             self._populate_geocomplete_index()
 
-        if parsed_args.populate_jobs_index:
+        if parsed_args.synchronize_jobs_index:
             self._synchronise_jobs_index()
+
+        if parsed_args.synchronize_companies_index:
+            self._synchronise_companies_index()

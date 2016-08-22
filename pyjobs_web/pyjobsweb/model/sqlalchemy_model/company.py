@@ -38,7 +38,7 @@ class Company(DeclarativeBase):
 
     dirty = sa.Column(sa.Boolean, nullable=False, default=True)
 
-    def to_elasticsearch_company(self):
+    def to_elasticsearch_document(self):
         result = CompanyElastic(
             meta={'id': self.id},
             id=self.id,
@@ -69,6 +69,14 @@ class Company(DeclarativeBase):
             .filter(cls.id == company_id) \
             .filter_by(validated=True) \
             .one()
+
+    @classmethod
+    def set_dirty(cls, company_id, dirty):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == company_id) \
+            .update({'dirty': dirty})
+        transaction.commit()
 
     @classmethod
     def reset_dirty_flags(cls):
@@ -110,3 +118,7 @@ class Company(DeclarativeBase):
             .filter(cls.id == company_id) \
             .update({'address_is_valid': is_valid})
         transaction.commit()
+
+    @classmethod
+    def get_dirty_rows(cls):
+        return DBSession.query(cls).filter(cls.dirty).order_by(cls.id.asc())

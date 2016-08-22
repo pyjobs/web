@@ -93,6 +93,14 @@ class Job(es.DocType):
         super(Job, self).__init__(meta, **kwargs)
 
     @property
+    def index(self):
+        return self._doc_type.index
+
+    @property
+    def doc_type(self):
+        return self._doc_type.name
+
+    @property
     def published(self):
         return format_date(self.publication_datetime, locale='FR_fr')
 
