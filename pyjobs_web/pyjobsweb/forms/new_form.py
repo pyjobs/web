@@ -99,7 +99,7 @@ class TechnologiesValidator(twc.RegexValidator):
         self.msgs = dict(french_validation_messages)
         self.msgs['badregex'] = (u'Format du champ invalide')
 
-    regex = re.compile('^(\w|\+|\-)+(\, (\w|\+|\-){0,9})$',
+    regex = re.compile('^(\w|\+|\-)+(\, (\w|\+|\-)+){0,9}$',
                        re.IGNORECASE | re.UNICODE)
 
 
