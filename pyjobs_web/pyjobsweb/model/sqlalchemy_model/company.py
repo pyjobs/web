@@ -65,7 +65,10 @@ class Company(DeclarativeBase):
 
     @classmethod
     def get_company(cls, company_id):
-        return DBSession.query(cls).filter(cls.id == company_id).one()
+        return DBSession.query(cls) \
+            .filter(cls.id == company_id) \
+            .filter_by(validated=True) \
+            .one()
 
     @classmethod
     def reset_dirty_flags(cls):
