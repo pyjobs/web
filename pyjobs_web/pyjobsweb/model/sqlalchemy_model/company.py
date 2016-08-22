@@ -23,7 +23,10 @@ class Company(DeclarativeBase):
     # model into Elasticsearch to allow searching on this field (Elasticsearch
     # is really good at string research).
     technologies = sa.Column(sa.Text(), nullable=False, default='')
+
     address = sa.Column(sa.String(1024), nullable=False, default='')
+    address_is_valid = sa.Column(sa.Boolean, nullable=False, default=True)
+
     email = sa.Column(sa.String(1024), nullable=False, default='')
     phone = sa.Column(sa.String(1024), nullable=False, default='')
 
@@ -45,6 +48,7 @@ class Company(DeclarativeBase):
             url=self.url,
             technologies=self.technologies,
             address=self.address,
+            address_is_valid=self.address_is_valid,
             email=self.email,
             phone=self.phone,
             geolocation=dict(lat=self.latitude, lon=self.longitude),

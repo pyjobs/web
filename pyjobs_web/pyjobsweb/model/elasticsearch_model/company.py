@@ -65,7 +65,10 @@ class Company(es.DocType):
     description = es.String(analyzer=french_description_analyzer)
     url = es.String(index='no')
     technologies = es.String(analyzer=technologies_analyzer)
+
     address = es.String(index='no')
+    address_is_valid = es.Boolean()
+
     email = es.String(index='no')
     phone = es.String(index='no')
 
