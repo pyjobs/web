@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+from elasticsearch_dsl import Q, SF
 
 from sqlalchemy.orm.exc import NoResultFound
 from tg.decorators import expose, redirect, paginate
-from elasticsearch_dsl import Q, SF
 
 from pyjobsweb.model import JobAlchemy
 from pyjobsweb.model import JobElastic

@@ -4,10 +4,10 @@ import json
 import logging
 import transaction
 from slugify import slugify
+from elasticsearch_dsl import Q
 
 from sqlalchemy.orm.exc import NoResultFound
 from tg.decorators import expose, redirect, paginate, validate
-from elasticsearch_dsl import Q
 
 from pyjobsweb.model import CompanyAlchemy
 from pyjobsweb.model import CompanyElastic
