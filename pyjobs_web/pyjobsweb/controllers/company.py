@@ -8,6 +8,7 @@ from elasticsearch_dsl import Q
 
 from sqlalchemy.orm.exc import NoResultFound
 from tg.decorators import expose, redirect, paginate, validate
+from tg.exceptions import HTTPNotFound
 
 from pyjobsweb.model import CompanyAlchemy
 from pyjobsweb.model import CompanyElastic
@@ -140,9 +141,9 @@ class CompanyController(BaseController):
         try:
             company = CompanyAlchemy.get_company(company_id=company_id)
         except NoResultFound:
-            redirect('/company/details')
+            raise HTTPNotFound()
         except Exception as exc:
             logging.getLogger(__name__).log(logging.ERROR, exc)
-            redirect('/company/details')
+            raise HTTPNotFound()
         else:
             return dict(company=company)

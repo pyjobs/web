@@ -5,6 +5,7 @@ from elasticsearch_dsl import Q, SF
 
 from sqlalchemy.orm.exc import NoResultFound
 from tg.decorators import expose, redirect, paginate
+from tg.exceptions import HTTPNotFound
 
 from pyjobsweb.model import JobAlchemy
 from pyjobsweb.model import JobElastic
@@ -95,11 +96,10 @@ class JobController(BaseController):
         try:
             job = JobAlchemy.get_job_offer(offer_id)
         except NoResultFound:
-            # Causes a 404 error
-            redirect('/job/details')
+            raise HTTPNotFound()
         except Exception as exc:
             logging.getLogger(__name__).log(logging.ERROR, exc)
-            redirect('/job/details')
+            raise HTTPNotFound()
         else:
             return dict(
                 job=job,
