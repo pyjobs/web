@@ -17,7 +17,7 @@ from pyjobsweb.forms.new_form import NewCompanyForm
 from pyjobsweb.forms.research_form import ResearchForm
 
 
-class AddCompanyController(BaseController):
+class NewCompanyController(BaseController):
     @expose('pyjobsweb.templates.companies.new')
     def index(self, *args, **kwargs):
         errors = tg.request.validation['errors']
@@ -118,7 +118,7 @@ class SearchCompanyController(BaseController):
 
 
 class CompanyController(BaseController):
-    new = AddCompanyController()
+    new = NewCompanyController()
     search = SearchCompanyController()
 
     @expose()
