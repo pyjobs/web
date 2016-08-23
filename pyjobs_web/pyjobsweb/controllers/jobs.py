@@ -14,14 +14,14 @@ from pyjobsweb.lib.base import BaseController
 from pyjobsweb.forms.research_form import ResearchForm
 
 
-class SearchJobController(BaseController):
+class SearchJobsController(BaseController):
     items_per_page = 20
 
     @expose('pyjobsweb.templates.jobs.list')
     @paginate('jobs')
     def index(self, query=None, radius=None, center=None, *args, **kwargs):
         if not query and not radius and not center:
-            redirect('/job')
+            redirect('/jobs')
 
         search_query = JobElastic.search()
 
@@ -73,16 +73,12 @@ class SearchJobController(BaseController):
                     job_offer_search_form=ResearchForm)
 
 
-class JobController(BaseController):
-    search = SearchJobController()
-
-    @expose()
-    def index(self, *args, **kwargs):
-        redirect('/job/list')
+class JobsController(BaseController):
+    search = SearchJobsController()
 
     @expose('pyjobsweb.templates.jobs.list')
     @paginate('jobs')
-    def list(self, *args, **kwargs):
+    def index(self, *args, **kwargs):
         try:
             job_offers = JobAlchemy.get_all_job_offers()
         except NoResultFound:

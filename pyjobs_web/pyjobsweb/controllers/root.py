@@ -16,8 +16,8 @@ from pyjobsweb.controllers.admin import PyJobsAdminController
 from pyjobsweb.controllers.error import ErrorController
 from pyjobsweb.controllers.geocomplete import GeocompleteController
 from pyjobsweb.controllers.secure import SecureController
-from pyjobsweb.controllers.company import CompanyController
-from pyjobsweb.controllers.job import JobController
+from pyjobsweb.controllers.companies import CompaniesController
+from pyjobsweb.controllers.jobs import JobsController
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
@@ -53,8 +53,8 @@ class RootController(BaseController):
     secc = SecureController()
     admin = PyJobsAdminController()
 
-    job = JobController()
-    company = CompanyController()
+    jobs = JobsController()
+    companies = CompaniesController()
     geocomplete = GeocompleteController()
 
     error = ErrorController()
@@ -64,7 +64,7 @@ class RootController(BaseController):
 
     @expose()
     def index(self, *args, **kwargs):
-        redirect('/job')
+        redirect('/jobs')
 
     @expose()
     def rss(self, limit=50, source=None, *args, **kwargs):

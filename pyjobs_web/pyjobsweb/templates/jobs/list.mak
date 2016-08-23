@@ -35,7 +35,7 @@
                     <i class="fa fa-3x fa-github"></i>
                 </a>
 
-                <a href="/company/new" title="Ajouter une entreprise" class="btn btn-default">
+                <a href="/companies/new" title="Ajouter une entreprise" class="btn btn-default">
                     <i class="fa fa-3x fa-plus"></i>
                 </a>
             </span>
@@ -54,7 +54,7 @@
 
 <div id="job_offer_search_form">
     <h2>Rechercher une offre d'emploi</h2>
-    ${job_offer_search_form.display(action='/job/search', method='POST')}
+    ${job_offer_search_form.display(action='/jobs/search', method='POST')}
 </div>
 
 ${job_pagination()}

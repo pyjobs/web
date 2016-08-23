@@ -35,7 +35,7 @@
                     <i class="fa fa-3x fa-github"></i>
                 </a>
 
-                <a href="/company/new" title="Ajouter une entreprise" class="btn btn-default">
+                <a href="/companies/new" title="Ajouter une entreprise" class="btn btn-default">
                     <i class="fa fa-3x fa-plus"></i>
                 </a>
             </span>
@@ -45,7 +45,7 @@
 
 <div id="company_search_form">
     <h2>Rechercher une entreprise</h2>
-     ${company_search_form.display(action='/company/search', method='POST')}
+     ${company_search_form.display(action='/companies/search', method='POST')}
 </div>
 
 ${company_pagination()}

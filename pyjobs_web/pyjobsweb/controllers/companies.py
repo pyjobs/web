@@ -52,7 +52,7 @@ class NewCompanyController(BaseController):
         company.email = kwargs['company_email']
         company.phone = kwargs['company_phone']
 
-        redirect_to = '/company/list'
+        redirect_to = '/companies'
         redirect_msg = u"Votre demande d'ajout d'entreprise a bien été " \
                        u"soumise à modération. L'entreprise sera ajoutée à " \
                        u"cette liste sous peu si elle satisfait les critères " \
@@ -67,14 +67,14 @@ class NewCompanyController(BaseController):
         redirect(redirect_to)
 
 
-class SearchCompanyController(BaseController):
+class SearchCompaniesController(BaseController):
     items_per_page = 20
 
     @expose('pyjobsweb.templates.companies.list')
     @paginate('companies')
     def index(self, query=None, radius=None, center=None, *args, **kwargs):
         if not query and not radius and not center:
-            redirect('/company')
+            redirect('/companies')
 
         search_query = CompanyElastic.search()
 
@@ -118,17 +118,13 @@ class SearchCompanyController(BaseController):
         return dict(companies=companies, company_search_form=ResearchForm)
 
 
-class CompanyController(BaseController):
+class CompaniesController(BaseController):
     new = NewCompanyController()
-    search = SearchCompanyController()
-
-    @expose()
-    def index(self, *args, **kwargs):
-        redirect('/company/list')
+    search = SearchCompaniesController()
 
     @expose('pyjobsweb.templates.companies.list')
     @paginate('companies')
-    def list(self, *args, **kwargs):
+    def index(self, *args, **kwargs):
         try:
             companies = CompanyAlchemy.get_validated_companies()
         except NoResultFound:
