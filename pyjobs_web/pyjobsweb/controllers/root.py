@@ -2,14 +2,12 @@
 """Main Controller"""
 import collections
 import datetime
-import logging
 
 import webhelpers.feedgenerator as feedgenerator
 from sqlalchemy.orm.exc import NoResultFound
 from tg import expose, flash, require, lurl, config
 from tg import predicates
 from tg import request, redirect, tmpl_context
-from tg.decorators import paginate
 from tg.exceptions import HTTPFound
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 
