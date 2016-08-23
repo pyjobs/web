@@ -75,7 +75,8 @@
                     </p>
                 </div>
             </div>
-            <div class="col-md-1"></div>
         </article>
     </div>
 % endfor
+
+<div class="row"></div>
