@@ -129,6 +129,14 @@ class PopulateESCommand(AppContextCommand):
                 self._logging(logging.INFO,
                               'Document %s has been synced successfully.'
                               % obj_id)
+
+                # TODO: FIX --> There is a synchronisation problem here !
+                #       Indeed, at this point the document as already been
+                #       indexed in elasticsearch, and if someone has changed
+                #       its content on the admin interface (or somewhere else)
+                #       the row has been set to dirty, and we are going to set
+                #       it as not dirty here, even if it's still dirty, since
+                #       someone made a change !
                 sql_table_cls.set_dirty(obj_id, False)
             else:
                 id_logger(obj_id, logging.ERROR,
