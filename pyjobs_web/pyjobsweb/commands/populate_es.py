@@ -57,8 +57,8 @@ class PopulateESCommand(AppContextCommand):
         self._logging(logging_level, log_msg)
 
     @staticmethod
-    def _compute_dirty_documents(sql_table):
-        dirty_rows = sql_table.get_dirty_rows()
+    def _compute_dirty_documents(sql_table_cls):
+        dirty_rows = sql_table_cls.get_dirty_rows()
 
         for row in dirty_rows:
             yield row.to_elasticsearch_document()
@@ -99,17 +99,19 @@ class PopulateESCommand(AppContextCommand):
 
             yield sync_op
 
-    def _synchronise_index(self, sql_table, es_doc, id_logger):
-        log_msg = 'Synchronizing %s index.' % es_doc().index
+    def _synchronise_index(self, sql_table_cls, es_doc_cls, id_logger):
+        es_doc = es_doc_cls()
+
+        log_msg = 'Synchronizing %s index.' % es_doc.index
         self._logging(logging.INFO, log_msg)
 
         elasticsearch_conn = connections.get_connection()
 
         self._logging(logging.INFO,
                       'Computing out of sync %s documents.'
-                      % es_doc().doc_type)
+                      % es_doc.doc_type)
 
-        pending_insertions = self._compute_dirty_documents(sql_table)
+        pending_insertions = self._compute_dirty_documents(sql_table_cls)
 
         self._logging(logging.INFO,
                       'Computing required operations to synchronize documents.')
@@ -127,16 +129,16 @@ class PopulateESCommand(AppContextCommand):
                 self._logging(logging.INFO,
                               'Document %s has been synced successfully.'
                               % obj_id)
-                sql_table.set_dirty(obj_id, False)
+                sql_table_cls.set_dirty(obj_id, False)
             else:
                 id_logger(obj_id, logging.ERROR,
                           'Error while syncing document %s index.' % obj_id)
 
         # Refresh indices to increase research speed
-        elasticsearch_dsl.Index(es_doc().index).refresh()
+        elasticsearch_dsl.Index(es_doc.index).refresh()
 
         self._logging(logging.INFO,
-                      'Index %s is now synchronized.' % es_doc().index)
+                      'Index %s is now synchronized.' % es_doc.index)
 
     def _synchronise_jobs_index(self):
         self._synchronise_index(model.JobAlchemy,
