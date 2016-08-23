@@ -125,7 +125,7 @@ class ResearchForm(twf.Form):
                 <div class="col-xs-12" style="height:7px;"></div>
             </%def>
 
-            % for child in w.children:
+            % for child in w.children_non_hidden:
                 ${display_field(child)}
             % endfor
 
