@@ -44,7 +44,7 @@ def head_js():
 
 
 def get_job_url(job_id, job_title=None, previous=None, absolute=False):
-    job_url = "/job/%s" % job_id
+    job_url = "/job/details/%s" % job_id
     if job_title:
         job_url += "/%s" % slugify(job_title)
     if previous:

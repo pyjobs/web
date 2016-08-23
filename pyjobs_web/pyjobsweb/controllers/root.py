@@ -17,10 +17,9 @@ from pyjobsweb import model
 from pyjobsweb.controllers.admin import PyJobsAdminController
 from pyjobsweb.controllers.error import ErrorController
 from pyjobsweb.controllers.geocomplete import GeocompleteController
-from pyjobsweb.controllers.search import SearchController
 from pyjobsweb.controllers.secure import SecureController
 from pyjobsweb.controllers.company import CompanyController
-from pyjobsweb.forms.research_form import ResearchForm
+from pyjobsweb.controllers.job import JobController
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
@@ -55,28 +54,19 @@ class RootController(BaseController):
     """
     secc = SecureController()
     admin = PyJobsAdminController()
-    search = SearchController()
-    geocomplete = GeocompleteController()
+
+    job = JobController()
     company = CompanyController()
+    geocomplete = GeocompleteController()
 
     error = ErrorController()
 
     def _before(self, *args, **kwargs):
         tmpl_context.project_name = "Algoo"
 
-    items_per_page = 20
-
     @expose()
     def index(self, *args, **kwargs):
-        redirect('/jobs')
-
-    @expose('pyjobsweb.templates.jobs')
-    @paginate('jobs', items_per_page=items_per_page)
-    def jobs(self, *args, **kwargs):
-        job_offers = model.JobAlchemy.get_all_job_offers()
-
-        return dict(sources=SOURCES, jobs=job_offers,
-                    job_offer_search_form=ResearchForm)
+        redirect('/job')
 
     @expose()
     def rss(self, limit=50, source=None, *args, **kwargs):
@@ -113,28 +103,6 @@ class RootController(BaseController):
             )
 
         return feed.writeString('utf-8')
-
-    @expose('pyjobsweb.templates.job')
-    def job(self, job_id, job_title=None, previous=None, *args, **kwargs):
-        """
-        Job detail page
-        :param job_id: Job identifier
-        :param job_title: Job title (optional) for pretty url
-        :return: dict
-        """
-        try:
-            job = DBSession.query(model.JobAlchemy).filter_by(id=job_id).one()
-        except NoResultFound:
-            # Causes a 404 error
-            redirect('/job')
-        except Exception as exc:
-            logging.getLogger(__name__).log(logging.ERROR, exc)
-            redirect('/job')
-        else:
-            return dict(
-                job=job,
-                sources=SOURCES
-            )
 
     @expose('pyjobsweb.templates.sources')
     def sources(self, *args, **kwargs):

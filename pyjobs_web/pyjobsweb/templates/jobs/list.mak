@@ -52,9 +52,9 @@
     </header>
 </%def>
 
-<div id="research_form">
+<div id="job_offer_search_form">
     <h2>Rechercher une offre d'emploi</h2>
-    ${job_offer_search_form.display(action='/search/jobs', method='POST')}
+    ${job_offer_search_form.display(action='/job/search', method='POST')}
 </div>
 
 ${job_pagination()}

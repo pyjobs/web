@@ -1,27 +1,28 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 
-from elasticsearch_dsl.function import SF
-from elasticsearch_dsl.query import Q
-from tg import redirect
-from tg.decorators import expose, paginate
+from sqlalchemy.orm.exc import NoResultFound
+from tg.decorators import expose, redirect, paginate
+from elasticsearch_dsl import Q, SF
 
-from pyjobsweb import model
-from pyjobsweb.forms.research_form import ResearchForm
-from pyjobsweb.lib.base import BaseController
+from pyjobsweb.model import JobAlchemy
+from pyjobsweb.model import JobElastic
 from pyjobsweb.model.data import SOURCES
+from pyjobsweb.lib.base import BaseController
+from pyjobsweb.forms.research_form import ResearchForm
 
 
-class SearchController(BaseController):
+class SearchJobController(BaseController):
     items_per_page = 20
 
-    @expose('pyjobsweb.templates.jobs')
-    @paginate('jobs', items_per_page=items_per_page)
-    def jobs(self, query=None, radius=None, center=None, *args, **kwargs):
+    @expose('pyjobsweb.templates.jobs.list')
+    @paginate('jobs')
+    def index(self, query=None, radius=None, center=None, *args, **kwargs):
         if not query and not radius and not center:
-            redirect('/')
+            redirect('/job')
 
-        search_query = model.JobElastic.search()
+        search_query = JobElastic.search()
 
         search_on = ['description', 'title^10', 'company^20']
 
@@ -71,3 +72,39 @@ class SearchController(BaseController):
 
         return dict(sources=SOURCES, jobs=job_offers,
                     job_offer_search_form=search_form)
+
+
+class JobController(BaseController):
+    search = SearchJobController()
+
+    @expose()
+    def index(self, *args, **kwargs):
+        redirect('/job/list')
+
+    @expose('pyjobsweb.templates.jobs.list')
+    @paginate('jobs')
+    def list(self, *args, **kwargs):
+        try:
+            job_offers = JobAlchemy.get_all_job_offers()
+        except NoResultFound:
+            job_offers = None
+
+        return dict(sources=SOURCES, jobs=job_offers,
+                    job_offer_search_form=ResearchForm)
+
+    @expose('pyjobsweb.templates.jobs.details')
+    def details(self, offer_id, *args, **kwargs):
+        try:
+            job = JobAlchemy.get_job_offer(offer_id)
+        except NoResultFound:
+            # Causes a 404 error
+            redirect('/job/details')
+        except Exception as exc:
+            logging.getLogger(__name__).log(logging.ERROR, exc)
+            redirect('/job/details')
+        else:
+            return dict(
+                job=job,
+                sources=SOURCES
+            )
+

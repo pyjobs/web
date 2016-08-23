@@ -133,6 +133,10 @@ class Job(DeclarativeBase):
         return DBSession.query(cls).order_by(cls.publication_datetime.desc())
 
     @classmethod
+    def get_job_offer(cls, offer_id):
+        return DBSession.query(cls).filter(cls.id == offer_id).one()
+
+    @classmethod
     def set_address_is_valid(cls, offer_id, is_valid):
         transaction.begin()
         DBSession.query(cls) \
