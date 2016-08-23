@@ -68,10 +68,8 @@ class SearchJobController(BaseController):
         # TODO: result pagination
         job_offers = search_query[0:self.items_per_page * 50].execute()
 
-        search_form = ResearchForm(action='/', method='POST').req()
-
         return dict(sources=SOURCES, jobs=job_offers,
-                    job_offer_search_form=search_form)
+                    job_offer_search_form=ResearchForm)
 
 
 class JobController(BaseController):
