@@ -85,7 +85,17 @@ class JobGeocodingController(EasyCrudRestController):
         # the geolocation program will try and recompute it later on.
         kw['dirty'] = True
         kw['address_is_valid'] = True
-        # TODO: Implement kw['geolocation_is_valid'] = False
+
+        # We reset the geolocation related fields to their default values too.
+        # This bit isn't necessary, because the controller can only alter the
+        # content of rows with invalid addresses, and therefore rows which
+        # geolocation isn't valid by definition. But it doesn't hurt to put this
+        # additional code here. It just make the manipulation of the Jobs
+        # table consistent across the geocoding issues controller and the
+        # general crud controller.
+        kw['geolocation_is_valid'] = False
+        kw['latitude'] = 0.0
+        kw['longitude'] = 0.0
         return EasyCrudRestController.put(self, *args, **kw)
 
 
