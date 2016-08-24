@@ -25,15 +25,10 @@
     </div>
 
     <div class="col-md-10">
-        <h1 class="page-header">${model} Listing</h1>
+        <h1 class="page-header">Liste des "${model}" ayant des problèmes de géocoding</h1>
 
         <div class="row">
-            <div class="col-xs-3 col-md-2">
-                <a class="btn btn-success"
-                   href='${tg.url("new", params=tmpl_context.kept_params)}'>New ${model}</a>
-            </div>
-
-            <div class="col-xs-9 col-md-3">
+            <div class="col-xs-9 col-md-5">
                 % if tmpl_context.paginators:
                     <ul class="pagination pull-sm-right" style="margin:0;">
                         ${tmpl_context.paginators.value_list.pager(**PAGER_ARGS)}
@@ -80,5 +75,9 @@
         <div>
             ${tmpl_context.widget(value=value_list, action=mount_point+'.json')|n}
         </div>
+
+        <a href="/admin/geocoding" title="Page d'accueil de l'admin" class="btn btn-default">
+            Retour à la page d'accueil
+        </a>
     </div>
 </div>

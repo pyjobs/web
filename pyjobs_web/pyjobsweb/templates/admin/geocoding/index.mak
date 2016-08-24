@@ -31,6 +31,6 @@
 
 ${admin_index_list(geocoding_list)}
 
-<a href="/admin" title="Page d'acceuil de l'admin" class="btn btn-default">
-    Retour à la page d'acceuil
+<a href="/admin" title="Page d'accueil de l'admin" class="btn btn-default">
+    Retour à la page d'accueil
 </a>

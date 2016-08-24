@@ -20,5 +20,10 @@
     <div class="col-md-10">
         <h1 class="page-header">New ${model}</h1>
         ${tmpl_context.widget(value=value, action='./') | n}
+
+        <br/>
+        <a href="/admin/${model.lower()}s" title="Liste des ${model}" class="btn btn-default">
+            Retour à la liste des ${model}
+        </a>
     </div>
 </div>

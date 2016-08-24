@@ -18,7 +18,12 @@
     </div>
 
     <div class="col-md-10">
-        <h1 class="page-header">Edit ${model}</h1>
+        <h1 class="page-header">Résoudre les problèmes de géocoding - ${model}</h1>
         ${tmpl_context.widget(value=value, action='./') | n}
+
+        <br/>
+        <a href="/admin/geocoding/${model.lower()}s" title="Liste des ${model}" class="btn btn-default">
+            Retour à la liste des ${model}
+        </a>
     </div>
 </div>

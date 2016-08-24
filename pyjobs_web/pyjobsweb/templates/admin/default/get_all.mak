@@ -80,5 +80,9 @@
         <div>
             ${tmpl_context.widget(value=value_list, action=mount_point+'.json')|n}
         </div>
+
+        <a href="/admin" title="Page d'accueil de l'admin" class="btn btn-default">
+            Retour à la page d'accueil
+        </a>
     </div>
 </div>
