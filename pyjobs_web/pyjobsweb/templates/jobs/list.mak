@@ -83,7 +83,7 @@ ${job_pagination()}
                             <span style="color: #999;">
                                 <i class="fa fa-fw fa-building-o"></i> ${job.company}
                                 <br/>
-                                <a href="http://nominatim.openstreetmap.org/search.php?q=${job.address | u}">
+                                <a href="http://nominatim.openstreetmap.org/search.php?q=${job.address}">
                                     <i class="fa fa-fw fa-map-marker"></i>
                                     ${job.address}
                                 </a>

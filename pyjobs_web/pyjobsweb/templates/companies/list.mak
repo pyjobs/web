@@ -81,7 +81,7 @@ ${company_pagination()}
                             </span>
                         </span>
                         <br/>
-                        <a href="http://nominatim.openstreetmap.org/search.php?q=${company.address | u}">
+                        <a href="http://nominatim.openstreetmap.org/search.php?q=${company.address}">
                             <i class="fa fa-fw fa-map-marker"></i>
                             <span style="font-size: 0.9em;">
                                 ${company.address}
