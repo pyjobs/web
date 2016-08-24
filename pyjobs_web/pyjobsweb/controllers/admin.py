@@ -236,7 +236,7 @@ class GeocodingAdminLayout(BootstrapAdminLayout):
             'mako:pyjobsweb.templates.admin.geocoding.edit'
         ]
         # Notice how there is no 'new' crud template? It's because the
-        # moderation controller isn't meant to add new rows to the database,
+        # geocoding controller isn't meant to add new rows to the database,
         # it's just supposed to modify existing rows. The default crud
         # controller of PyJobs' admin already handles new row creations.
     }
