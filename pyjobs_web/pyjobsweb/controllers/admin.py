@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from sprox.widgets import TextField, TextArea
 from tg.decorators import expose, with_trailing_slash
+from tg.exceptions import HTTPNotFound
 from tgext.admin import CrudRestControllerConfig
 from tgext.admin.controller import AdminController
 from tgext.admin.tgadminconfig import TGAdminConfig, BootstrapTGAdminConfig
@@ -70,7 +71,11 @@ class JobGeocodingController(EasyCrudRestController):
 
     @expose(inherit=True)
     def post(self, *args, **kw):
-        return EasyCrudRestController.post(self, *args, **kw)
+        raise HTTPNotFound()
+
+    @expose(inherit=True)
+    def new(self, *args, **kwargs):
+        raise HTTPNotFound()
 
     @expose(inherit=True)
     def put(self, *args, **kw):
@@ -133,6 +138,14 @@ class CompanyGeocodingController(EasyCrudRestController):
         return super(CompanyGeocodingController, self).get_all(*args, **kw)
 
     @expose(inherit=True)
+    def post(self, *args, **kw):
+        raise HTTPNotFound()
+
+    @expose(inherit=True)
+    def new(self, *args, **kwargs):
+        raise HTTPNotFound()
+
+    @expose(inherit=True)
     def put(self, *args, **kw):
         # The address has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
@@ -189,6 +202,14 @@ class CompanyModerationController(EasyCrudRestController):
         return super(CompanyModerationController, self).get_all(*args, **kw)
 
     @expose(inherit=True)
+    def post(self, *args, **kw):
+        raise HTTPNotFound()
+
+    @expose(inherit=True)
+    def new(self, *args, **kwargs):
+        raise HTTPNotFound()
+
+    @expose(inherit=True)
     def put(self, *args, **kw):
         # Someone just validated this company. Therefore, mark it as such.
         kw['validated'] = True
@@ -200,6 +221,27 @@ class CompanyModerationController(EasyCrudRestController):
         return EasyCrudRestController.put(self, *args, **kw)
 
 
+class GeocodingAdminLayout(BootstrapAdminLayout):
+    """
+    Pyjobs' custom admin geocoding issues resolution interface layout. Redefines
+    template_index and crud_templates from the ones used in the
+    BootstrapAdminLayout, to match the needs of the moderation interfaces.
+    """
+    template_index = 'pyjobsweb.templates.admin.geocoding.index'
+    crud_templates = {
+        'get_all': [
+            'mako:pyjobsweb.templates.admin.geocoding.get_all'
+        ],
+        'edit': [
+            'mako:pyjobsweb.templates.admin.geocoding.edit'
+        ]
+        # Notice how there is no 'new' crud template? It's because the
+        # moderation controller isn't meant to add new rows to the database,
+        # it's just supposed to modify existing rows. The default crud
+        # controller of PyJobs' admin already handles new row creations.
+    }
+
+
 class GeocodingAdminConfig(BootstrapTGAdminConfig):
     """
     PyJobs' geocoding related issues admin controller configuration. Every
@@ -208,6 +250,8 @@ class GeocodingAdminConfig(BootstrapTGAdminConfig):
     See Turbogears 2's documentation for more details:
     http://turbogears.readthedocs.io/en/latest/turbogears/wikier/admin.html?highlight=crud
     """
+    layout = GeocodingAdminLayout
+
     def __init__(self, models, translations=None):
         super(GeocodingAdminConfig, self).__init__(models, translations)
 
@@ -218,6 +262,27 @@ class GeocodingAdminConfig(BootstrapTGAdminConfig):
         defaultCrudRestController = CompanyGeocodingController
 
 
+class ModerationAdminLayout(BootstrapAdminLayout):
+    """
+    Pyjobs' custom admin moderation interface layout. Redefines template_index
+    and crud_templates from the ones used in the BootstrapAdminLayout, to match
+    the needs of the moderation interfaces.
+    """
+    template_index = 'pyjobsweb.templates.admin.moderation.index'
+    crud_templates = {
+        'get_all': [
+            'mako:pyjobsweb.templates.admin.moderation.get_all'
+        ],
+        'edit': [
+            'mako:pyjobsweb.templates.admin.moderation.edit'
+        ]
+        # Notice how there is no 'new' crud template? It's because the
+        # moderation controller isn't meant to add new rows to the database,
+        # it's just supposed to modify existing rows. The default crud
+        # controller of PyJobs' admin already handles new row creations.
+    }
+
+
 class ModerationAdminConfig(BootstrapTGAdminConfig):
     """
     PyJobs' moderation related issues admin controller configuration. Every
@@ -226,6 +291,8 @@ class ModerationAdminConfig(BootstrapTGAdminConfig):
     documentation for more details:
     http://turbogears.readthedocs.io/en/latest/turbogears/wikier/admin.html?highlight=crud
     """
+    layout = ModerationAdminLayout
+
     def __init__(self, models, translations=None):
         super(ModerationAdminConfig, self).__init__(models, translations)
 
@@ -250,6 +317,31 @@ class AdminGeocodingController(AdminController):
         super(AdminGeocodingController, self).__init__(
             self.to_fix, DBSession, config_type=GeocodingAdminConfig)
 
+    @property
+    def geocoding_list(self):
+        models = [table.__name__ for table in self.config.models.values()]
+        models.sort()
+
+        geocoding_list = list()
+        for m in models:
+            geocoding_list.append(dict(link='%ss' % m.lower(), display=m))
+
+        return geocoding_list
+
+    @with_trailing_slash
+    @expose()
+    def index(self):
+        # We use a custom index template, therefore, we have to change the dict
+        # that's returned by the super.index() method, so that our template gets
+        # the values it needs to operate correctly.
+        super_res = super(AdminGeocodingController, self).index()
+
+        res = dict(config=super_res['config'],
+                   model_config=super_res['model_config'],
+                   geocoding_list=self.geocoding_list)
+
+        return res
+
 
 class AdminModerationController(AdminController):
     """
@@ -268,22 +360,47 @@ class AdminModerationController(AdminController):
         super(AdminModerationController, self).__init__(
             self.to_moderate, DBSession, config_type=ModerationAdminConfig)
 
+    @property
+    def moderation_list(self):
+        models = [table.__name__ for table in self.config.models.values()]
+        models.sort()
+
+        moderation_list = list()
+        for m in models:
+            moderation_list.append(dict(link='%ss' % m.lower(), display=m))
+
+        return moderation_list
+
+    @with_trailing_slash
+    @expose()
+    def index(self):
+        # We use a custom index template, therefore, we have to change the dict
+        # that's returned by the super.index() method, so that our template gets
+        # the values it needs to operate correctly.
+        super_res = super(AdminModerationController, self).index()
+
+        res = dict(config=super_res['config'],
+                   model_config=super_res['model_config'],
+                   moderation_list=self.moderation_list)
+
+        return res
+
 
 class PyJobsAdminLayout(BootstrapAdminLayout):
     """
     Pyjobs' custom admin interface layout. Redefines template_index and
     crud_templates from the ones used in the BootstrapAdminLayout.
     """
-    template_index = 'pyjobsweb.templates.admin.index'
+    template_index = 'pyjobsweb.templates.admin.default.index'
     crud_templates = {
         'get_all': [
-            'mako:pyjobsweb.templates.admin.get_all'
+            'mako:pyjobsweb.templates.admin.default.get_all'
         ],
         'edit': [
-            'mako:pyjobsweb.templates.admin.edit'
+            'mako:pyjobsweb.templates.admin.default.edit'
         ],
         'new': [
-            'mako:pyjobsweb.templates.admin.new'
+            'mako:pyjobsweb.templates.admin.default.new'
         ]
     }
 
@@ -389,7 +506,7 @@ class PyJobsAdminController(AdminController):
     # the end of the words, this is how it is in TG2 and this explains why there
     # are these 's' at the end of the link parameters.
     # TODO: find a way to remove the clunky 's'
-    geolocation_list = [
+    geocoding_list = [
         {'link': 'geocoding/jobs', 'display': 'Jobs'},
         {'link': 'geocoding/companys', 'display': 'Companies'}
     ]
@@ -424,7 +541,7 @@ class PyJobsAdminController(AdminController):
         res = dict(config=super_res['config'],
                    model_config=super_res['model_config'],
                    model_list=self.model_list,
-                   geolocation_list=self.geolocation_list,
+                   geocoding_list=self.geocoding_list,
                    moderation_list=self.moderation_list)
 
         return res

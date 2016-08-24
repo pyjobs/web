@@ -6,7 +6,7 @@
 
 <%def name="page_header()">
     <header class="page-header">
-        <h1 class="page-header">Interface d'administration de Pyjobs</h1>
+        <h1 class="page-header">Interface de modération de Pyjobs</h1>
     </header>
 </%def>
 
@@ -26,17 +26,11 @@
     </div>
 </%def>
 
-<h3>Administrer la base de données Postgresql:</h3>
-<hr>
-
-${admin_index_list(model_list)}
-
-<h3>Résoudre les problèmes de géolocalisation:</h3>
-<hr>
-
-${admin_index_list(geolocation_list)}
-
 <h3>Modérer des entreprises:</h3>
 <hr>
 
 ${admin_index_list(moderation_list)}
+
+<a href="/admin" title="Page d'acceuil de l'admin" class="btn btn-default">
+    Retour à la page d'acceuil
+</a>
