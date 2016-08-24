@@ -309,6 +309,11 @@ class JobCrudRestController(EasyCrudRestController):
         # should be recomputed too, so we mark the address as valid, so that
         # the geolocation program will try and recompute it later on.
         kw['dirty'] = True
+
+        # TODO: check if the address has been modified, if it's the case, the
+        # geolocation_is_valid field should be set to false
+        # kw['geolocation_is_valid'] = kw['geolocation_is_valid'] \
+        #       if current_address == old_address else False
         return EasyCrudRestController.put(self, *args, **kw)
 
 
@@ -328,6 +333,11 @@ class CompanyCrudRestController(EasyCrudRestController):
         # should be recomputed too, so we mark the address as valid, so that
         # the geolocation program will try and recompute it later on.
         kw['dirty'] = True
+
+        # TODO: check if the address has been modified, if it's the case, the
+        # geolocation_is_valid field should be set to false
+        # kw['geolocation_is_valid'] = kw['geolocation_is_valid'] \
+        #       if current_address == old_address else False
         return EasyCrudRestController.put(self, *args, **kw)
 
 
