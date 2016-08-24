@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sprox.widgets import TextField
+from sprox.widgets import TextField, TextArea
 from tg.decorators import expose, with_trailing_slash
 from tgext.admin import CrudRestControllerConfig
 from tgext.admin.controller import AdminController
@@ -90,19 +90,104 @@ class JobGeocodingController(EasyCrudRestController):
 
 
 class CompanyGeocodingController(EasyCrudRestController):
+    __table_options__ = {
+        '__limit_fields__': ['url', 'id', 'name', 'address',
+                             'address_is_valid'],
+        '__field_order__': ['url', 'id', 'name', 'address',
+                            'address_is_valid'],
+        '__xml_fields__': ['url'],
+        'url': lambda filler, row: '<a class="btn btn-default" '
+                                   'target="_blank" href="%(url)s">'
+                                   '<span class="glyphicon glyphicon-link">'
+                                   '</span>'
+                                   '</a>' % dict(url=row.url)
+    }
+
+    __form_options__ = {
+        '__hide_fields__': ['id', 'name', 'logo_url', 'description', 'url',
+                            'technologies', 'address_is_valid', 'email',
+                            'phone', 'latitude', 'longitude',
+                            'geolocation_is_valid', 'validated', 'dirty'],
+        '__field_widget_types__': {'address': TextField}
+    }
+
     def __init__(self, session, menu_items=None):
         super(CompanyGeocodingController, self).__init__(session,
                                                          menu_items)
 
-    # TODO: implement
+    @expose(inherit=True)
+    def get_all(self, *args, **kw):
+        # Since this controller is only meant to fix invalid addresses, we only
+        # request job offers with invalid addresses.
+        kw['address_is_valid'] = False
+        return super(CompanyGeocodingController, self).get_all(*args, **kw)
+
+    @expose(inherit=True)
+    def put(self, *args, **kw):
+        # The address has been modified, therefore this row is now dirty, and
+        # should be resynchronized with Elasticsearch. Also, the geolocation
+        # should be recomputed too, so we mark the address as valid, so that
+        # the geolocation program will try and recompute it later on.
+        kw['dirty'] = True
+        kw['address_is_valid'] = True
+
+        # We reset the geolocation related fields to their default values too.
+        # This bit isn't necessary, because the controller can only alter the
+        # content of rows with invalid addresses, and therefore rows which
+        # geolocation isn't valid by definition. But it doesn't hurt to put this
+        # additional code here. It just make the manipulation of the Companies
+        # table consistent across the geocoding issues controller and the
+        # general crud controller.
+        kw['geolocation_is_valid'] = False
+        kw['latitude'] = 0.0
+        kw['longitude'] = 0.0
+        return EasyCrudRestController.put(self, *args, **kw)
 
 
 class CompanyModerationController(EasyCrudRestController):
+    __table_options__ = {
+        '__limit_fields__': ['url', 'id', 'name', 'address'],
+        '__field_order__': ['url', 'id', 'name', 'address']
+    }
+
+    __form_options__ = {
+        '__hide_fields__': ['address_is_valid', 'latitude', 'longitude',
+                            'geolocation_is_valid', 'validated', 'dirty'],
+        '__field_widget_types__': {
+            'id': TextField,
+            'name': TextField,
+            'logo_url': TextField,
+            'description': TextArea,
+            'url': TextField,
+            'Technologies': TextArea,
+            'address': TextField,
+            'email': TextField,
+            'phone': TextField
+        }
+    }
+
     def __init__(self, session, menu_items=None):
+        # TODO: Change the edit form submit button text to 'Validate'
         super(CompanyModerationController, self).__init__(session,
                                                           menu_items)
 
-    # TODO: implement
+    @expose(inherit=True)
+    def get_all(self, *args, **kw):
+        # Since this controller is only meant to moderate unvalidated company
+        # submissions, we only query for companies that aren't yet validated.
+        kw['validated'] = False
+        return super(CompanyModerationController, self).get_all(*args, **kw)
+
+    @expose(inherit=True)
+    def put(self, *args, **kw):
+        # Someone just validated this company. Therefore, mark it as such.
+        kw['validated'] = True
+
+        # Even though these rows aren't yet indexed in the Elasticsearch
+        # database, we still mark the row as dirty (though the flag already is).
+        # It makes the code clearer amongst other controllers.
+        kw['dirty'] = True
+        return EasyCrudRestController.put(self, *args, **kw)
 
 
 class GeocodingAdminConfig(BootstrapTGAdminConfig):
