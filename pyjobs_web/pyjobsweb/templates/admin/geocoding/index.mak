@@ -26,7 +26,7 @@
     </div>
 </%def>
 
-<h3>Résoudre les problèmes de géocoding:</h3>
+<h3>Résoudre les problèmes de géocoding</h3>
 <hr>
 
 ${admin_index_list(geocoding_list)}
