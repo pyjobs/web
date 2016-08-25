@@ -154,6 +154,7 @@ class JobGeocodingController(EasyCrudRestController):
         kw['geolocation_is_valid'] = False
         kw['latitude'] = 0.0
         kw['longitude'] = 0.0
+
         return EasyCrudRestController.put(self, *args, **kw)
 
 
