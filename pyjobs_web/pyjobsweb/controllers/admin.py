@@ -6,6 +6,7 @@ from tg.exceptions import HTTPNotFound
 from tgext.admin import CrudRestControllerConfig
 from tgext.admin.controller import AdminController
 from tgext.admin.tgadminconfig import TGAdminConfig, BootstrapTGAdminConfig
+from tgext.admin.widgets import SubmitButton
 from tgext.admin.layouts import BootstrapAdminLayout
 from tgext.crud import EasyCrudRestController
 
@@ -274,9 +275,13 @@ class CompanyModerationController(EasyCrudRestController):
     }
 
     def __init__(self, session, menu_items=None):
-        # TODO: Change the edit form submit button text to 'Validate'
-        super(CompanyModerationController, self).__init__(session,
-                                                          menu_items)
+        super(CompanyModerationController, self).__init__(session, menu_items)
+
+        self.edit_form.__base_widget_args__['submit'] = SubmitButton(
+            id='submit',
+            value='Valider',
+            css_class='btn btn-primary'
+        )
 
     @expose(inherit=True)
     def get_all(self, *args, **kw):
