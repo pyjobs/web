@@ -89,20 +89,15 @@ class JobGeocodingController(EasyCrudRestController):
     def __actions__(cls, filler, row):
         primary_fields = filler.__provider__.get_primary_fields(filler
                                                                 .__entity__)
+
         pklist = '/'.join(map(lambda x: str(getattr(row, x)), primary_fields))
+
         value = '''
             <a href="%s/edit" class="btn btn-primary">
                 <span class="glyphicon glyphicon-pencil"></span>
             </a>
-            <div class="hidden-lg hidden-md">&nbsp;</div>
-            <form method="POST" action="%s" style="display: inline">
-            <input name="_method" value="DELETE" type="hidden">
-                <button type="submit" class="btn btn-danger"
-                    onclick="return confirm('Are you sure?')">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </button>
-            </form>
-        ''' % (pklist, pklist)
+        ''' % pklist
+
         return value
 
     @expose(inherit=True)
@@ -111,6 +106,10 @@ class JobGeocodingController(EasyCrudRestController):
         # request job offers with invalid addresses.
         kw['address_is_valid'] = False
         return super(JobGeocodingController, self).get_all(*args, **kw)
+
+    @expose(inherit=True)
+    def post_delete(self, *args, **kw):
+        raise HTTPNotFound()
 
     @expose(inherit=True)
     def post(self, *args, **kw):
@@ -169,7 +168,9 @@ class CompanyGeocodingController(EasyCrudRestController):
                                    'target="_blank" href="%(url)s">'
                                    '<span class="glyphicon glyphicon-link">'
                                    '</span>'
-                                   '</a>' % dict(url=row.url)
+                                   '</a>' % dict(url=row.url),
+        '__actions__': lambda filler, row:
+            CompanyGeocodingController.__actions__(filler, row)
     }
 
     __form_options__ = {
@@ -184,12 +185,31 @@ class CompanyGeocodingController(EasyCrudRestController):
         super(CompanyGeocodingController, self).__init__(session,
                                                          menu_items)
 
+    @classmethod
+    def __actions__(cls, filler, row):
+        primary_fields = filler.__provider__.get_primary_fields(filler
+                                                                .__entity__)
+
+        pklist = '/'.join(map(lambda x: str(getattr(row, x)), primary_fields))
+
+        value = '''
+            <a href="%s/edit" class="btn btn-primary">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </a>
+        ''' % pklist
+
+        return value
+
     @expose(inherit=True)
     def get_all(self, *args, **kw):
         # Since this controller is only meant to fix invalid addresses, we only
         # request job offers with invalid addresses.
         kw['address_is_valid'] = False
         return super(CompanyGeocodingController, self).get_all(*args, **kw)
+
+    @expose(inherit=True)
+    def post_delete(self, *args, **kw):
+        raise HTTPNotFound()
 
     @expose(inherit=True)
     def post(self, *args, **kw):
