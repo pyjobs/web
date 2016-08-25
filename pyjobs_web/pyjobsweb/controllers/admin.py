@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+import tg
 from sprox.widgets import TextField, TextArea
-from tg.decorators import expose, with_trailing_slash
+from tg.decorators import expose, with_trailing_slash, redirect
 from tg.exceptions import HTTPNotFound
 from tgext.admin import CrudRestControllerConfig
 from tgext.admin.controller import AdminController
@@ -10,6 +11,48 @@ from tgext.crud import EasyCrudRestController
 
 from pyjobsweb import model
 from pyjobsweb.model import DBSession
+
+
+def is_dirty(old_model, new_model):
+    for column in old_model.__table__.columns:
+        column = column.name
+        if getattr(old_model, column, None) != getattr(new_model, column, None):
+            return True
+
+    return False
+
+
+def find_type(cls, column_name):
+    if hasattr(cls, '__table__') and column_name in cls.__table__.c:
+        return cls.__table__.c[column_name].type
+    for base in cls.__bases__:
+        return find_type(base, column_name)
+    raise NameError(column_name)
+
+
+def kw_to_sqlalchemy(cls, kw):
+    sqlalchemy_table = cls()
+
+    for column, value in kw.iteritems():
+        try:
+            column_type = find_type(cls, column).python_type
+        except NameError:
+            continue
+
+        try:
+            if not issubclass(type(value), column_type):
+                if issubclass(column_type, bool):
+                    column_value = True if value.lower() == 'true' else False
+                else:
+                    column_value = column_type(value)
+            else:
+                column_value = value
+        except UnicodeEncodeError:
+            column_value = unicode(value)
+        finally:
+            setattr(sqlalchemy_table, column, column_value)
+
+    return sqlalchemy_table
 
 
 class JobGeocodingController(EasyCrudRestController):
@@ -84,6 +127,16 @@ class JobGeocodingController(EasyCrudRestController):
         if not kw['publication_datetime_is_fake']:
             kw['publication_datetime_is_fake'] = False
 
+        old_model = model.JobAlchemy.get_job_offer(kw['id'])
+        new_model = kw_to_sqlalchemy(model.JobAlchemy, kw)
+
+        if not is_dirty(old_model, new_model):
+            redirect_msg = u"Veuillez changer l'adresse de l'offre d'emploi " \
+                           u"s'il-vous-plaît."
+            redirect_status = 'error'
+            tg.flash(redirect_msg, redirect_status)
+            redirect('%sedit' % tg.request.url)
+
         # The address has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
         # should be recomputed too, so we mark the address as valid, so that
@@ -147,6 +200,16 @@ class CompanyGeocodingController(EasyCrudRestController):
 
     @expose(inherit=True)
     def put(self, *args, **kw):
+        old_model = model.CompanyAlchemy.get_company(kw['id'])
+        new_model = kw_to_sqlalchemy(model.CompanyAlchemy, kw)
+
+        if not is_dirty(old_model, new_model):
+            redirect_msg = u"Veuillez changer l'adresse de l'entreprise " \
+                           u"s'il-vous-plaît."
+            redirect_status = 'error'
+            tg.flash(redirect_msg, redirect_status)
+            redirect('%sedit' % tg.request.url)
+
         # The address has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
         # should be recomputed too, so we mark the address as valid, so that
@@ -421,16 +484,28 @@ class JobCrudRestController(EasyCrudRestController):
         if not kw['publication_datetime_is_fake']:
             kw['publication_datetime_is_fake'] = False
 
+        old_model = model.JobAlchemy.get_job_offer(kw['id'])
+        new_model = kw_to_sqlalchemy(model.JobAlchemy, kw)
+
+        if not is_dirty(old_model, new_model):
+            redirect_msg = u"Veuillez modifier l'offre d'emploi " \
+                           u"s'il-vous-plaît."
+            redirect_status = 'error'
+            tg.flash(redirect_msg, redirect_status)
+            redirect('%sedit' % tg.request.url)
+
         # The row has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
         # should be recomputed too, so we mark the address as valid, so that
         # the geolocation program will try and recompute it later on.
         kw['dirty'] = True
 
-        # TODO: check if the address has been modified, if it's the case, the
-        # geolocation_is_valid field should be set to false
-        # kw['geolocation_is_valid'] = kw['geolocation_is_valid'] \
-        #       if current_address == old_address else False
+        # Check if the address has been modified. If it's the case, then the
+        # 'geolocation_is_valid' field should be set to False, so that the
+        # geocoding command will compute the new corresponding geolocation.
+        if old_model.address != new_model.address:
+            kw['geolocation_is_valid'] = False
+
         return EasyCrudRestController.put(self, *args, **kw)
 
 
@@ -445,16 +520,27 @@ class CompanyCrudRestController(EasyCrudRestController):
 
     @expose(inherit=True)
     def put(self, *args, **kw):
+        old_model = model.CompanyAlchemy.get_company(kw['id'])
+        new_model = kw_to_sqlalchemy(model.CompanyAlchemy, kw)
+
+        if not is_dirty(old_model, new_model):
+            redirect_msg = u"Veuillez modifier l'entreprise s'il-vous-plaît."
+            redirect_status = 'error'
+            tg.flash(redirect_msg, redirect_status)
+            redirect('%sedit' % tg.request.url)
+
         # The row has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
         # should be recomputed too, so we mark the address as valid, so that
         # the geolocation program will try and recompute it later on.
         kw['dirty'] = True
 
-        # TODO: check if the address has been modified, if it's the case, the
-        # geolocation_is_valid field should be set to false
-        # kw['geolocation_is_valid'] = kw['geolocation_is_valid'] \
-        #       if current_address == old_address else False
+        # Check if the address has been modified. If it's the case, then the
+        # 'geolocation_is_valid' field should be set to False, so that the
+        # geocoding command will compute the new corresponding geolocation.
+        if old_model.address != new_model.address:
+            kw['geolocation_is_valid'] = False
+
         return EasyCrudRestController.put(self, *args, **kw)
 
 
