@@ -64,11 +64,15 @@ class Company(DeclarativeBase):
             .order_by(cls.name.asc())
 
     @classmethod
-    def get_company(cls, company_id):
+    def get_validated_company(cls, company_id):
         return DBSession.query(cls) \
             .filter(cls.id == company_id) \
             .filter_by(validated=True) \
             .one()
+
+    @classmethod
+    def get_company(cls, company_id):
+        return DBSession.query(cls).filter(cls.id == company_id).one()
 
     @classmethod
     def set_dirty(cls, company_id, dirty):

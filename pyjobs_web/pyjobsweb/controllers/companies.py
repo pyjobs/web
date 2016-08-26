@@ -135,7 +135,7 @@ class CompaniesController(BaseController):
     @expose('pyjobsweb.templates.companies.details')
     def details(self, company_id, *args, **kwargs):
         try:
-            company = CompanyAlchemy.get_company(company_id=company_id)
+            company = CompanyAlchemy.get_validated_company(company_id)
         except NoResultFound:
             raise HTTPNotFound()
         except Exception as exc:
