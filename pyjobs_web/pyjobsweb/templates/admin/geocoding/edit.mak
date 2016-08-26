@@ -4,6 +4,19 @@
     ${tmpl_context.title} - ${model}
 </%def>
 
+<%def name="end_body_scripts()">
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#address-validation").click(function () {
+                var address = $("#sx_address").val();
+                var nominatim = "https://www.openstreetmap.org/search?query=";
+                window.open(nominatim.concat(address), '_blank');
+            });
+        });
+    </script>
+</%def>
+
 <div class="row">
     <div class="col-md-2">
         % if hasattr(tmpl_context, 'menu_items'):
@@ -19,9 +32,17 @@
 
     <div class="col-md-10">
         <h1 class="page-header">Résoudre les problèmes de géocoding - ${model}</h1>
+
+        <div class="form-group">
+            <button id="address-validation" type="button" class="btn btn-info">
+                Vérifier la validité de l'adresse
+            </button>
+        </div>
+
         ${tmpl_context.widget(value=value, action='./') | n}
 
         <br/>
+
         <a href="/admin/geocoding/${model.lower()}s" title="Liste des ${model}" class="btn btn-default">
             Retour à la liste des ${model}
         </a>
