@@ -299,6 +299,15 @@ class CompanyModerationController(EasyCrudRestController):
         raise HTTPNotFound()
 
     @expose(inherit=True)
+    def edit(self, *args, **kw):
+        # This is a somewhat ugly solution. There might be a better way to add
+        # a delete button at the end of the edit form, but I haven't found one
+        # so far.
+        res = EasyCrudRestController.edit(self, *args, **kw)
+        res['delete_url'] = '/%s' % tg.request.controller_url
+        return res
+
+    @expose(inherit=True)
     def put(self, *args, **kw):
         # Someone just validated this company. Therefore, mark it as such.
         kw['validated'] = True

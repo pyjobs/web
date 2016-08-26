@@ -22,6 +22,16 @@
         ${tmpl_context.widget(value=value, action='./') | n}
 
         <br/>
+
+        <form method="POST" action="${delete_url}">
+            <input name="_method" value="DELETE" type="hidden">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr ? Cette opération est irréversible.')">
+                Rejeter
+            </button>
+        </form>
+
+        <br/>
+
         <a href="/admin/moderation/${model.lower()}s" title="Liste des ${model}" class="btn btn-default">
             Retour à la liste des ${model}
         </a>
