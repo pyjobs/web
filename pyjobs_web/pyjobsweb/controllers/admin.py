@@ -94,7 +94,7 @@ class JobGeocodingController(EasyCrudRestController):
                            u"s'il-vous-plaît."
             redirect_status = 'error'
             tg.flash(redirect_msg, redirect_status)
-            redirect('%sedit' % tg.request.url)
+            redirect('./edit')
 
         # The address has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
@@ -189,7 +189,7 @@ class CompanyGeocodingController(EasyCrudRestController):
                            u"s'il-vous-plaît."
             redirect_status = 'error'
             tg.flash(redirect_msg, redirect_status)
-            redirect('%sedit' % tg.request.url)
+            redirect('./edit')
 
         # The address has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
@@ -486,7 +486,7 @@ class JobCrudRestController(EasyCrudRestController):
                            u"s'il-vous-plaît."
             redirect_status = 'error'
             tg.flash(redirect_msg, redirect_status)
-            redirect('%sedit' % tg.request.url)
+            redirect('./edit')
 
         # The row has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
@@ -521,7 +521,7 @@ class CompanyCrudRestController(EasyCrudRestController):
             redirect_msg = u"Veuillez modifier l'entreprise s'il-vous-plaît."
             redirect_status = 'error'
             tg.flash(redirect_msg, redirect_status)
-            redirect('%sedit' % tg.request.url)
+            redirect('./edit')
 
         # The row has been modified, therefore this row is now dirty, and
         # should be resynchronized with Elasticsearch. Also, the geolocation
