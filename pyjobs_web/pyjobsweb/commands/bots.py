@@ -39,7 +39,7 @@ class BotsCommand(AppContextCommand):
                  % TwitterBot.MAX_TWEETS_TO_PUSH
         )
         twitter_parser.add_argument(
-            '-c', '--credentials-file', type=str,
+            '-cf', '--credentials-file', type=str,
             dest='twitter_credentials_file', required=True,
             help="This file must contain the your Twitter API "
                  "credentials in the following json format: "

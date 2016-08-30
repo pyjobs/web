@@ -15,5 +15,5 @@ cd pyjobs_web
 gearbox bots github -c "$CONFIG" &>> "$LOG_DIR"/github_bot.log
 echo ALGOO-MONITORABLE-CRON __ $(date +\"%Y-%m-%dT%H:%M:%S\") __  >> "$LOG_DIR"/elasticsearch_sync_jobs.log
 # Run the Twitter bot - Maximum 250 Tweets
-gearbox bots twitter -n 250 -c twitter_credentials.json -c "$CONFIG" 2>1& >> "$LOG_DIR"/twitter_bot.log
+gearbox bots twitter -n 250 -cf twitter_credentials.json -c "$CONFIG" 2>1& >> "$LOG_DIR"/twitter_bot.log
 echo ALGOO-MONITORABLE-CRON __ $(date +\"%Y-%m-%dT%H:%M:%S\") __  >> "$LOG_DIR"/elasticsearch_sync_companies.log
