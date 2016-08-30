@@ -63,3 +63,6 @@ target/
 
 # Project specific
 data/templates/*
+development.ini
+production.ini
+test.ini
