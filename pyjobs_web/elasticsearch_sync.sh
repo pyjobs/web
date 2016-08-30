@@ -10,6 +10,7 @@ CONFIG="$3"
 echo SOURCE_DIR: ${SOURCE_DIR}, LOG_DIR: ${LOG_DIR}, CONFIG: ${CONFIG}
 
 cd ${SOURCE_DIR} && . ./venv2.7/bin/activate
+cd pyjobs_web
 # Job offers synchronization
 gearbox -c "$CONFIG" populate-es -j >> "$LOG_DIR"/elasticsearch_sync_jobs.log
 echo ALGOO-MONITORABLE-CRON __ $(date +\"%Y-%m-%dT%H:%M:%S\") __  >> "$LOG_DIR"/elasticsearch_sync_jobs.log
