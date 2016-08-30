@@ -100,6 +100,9 @@ class SearchCompaniesController(BaseController):
             geoloc_query = json.loads(center)
             lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
 
+            if not radius:
+                radius = 5.0
+
             search_query = \
                 search_query.filter('geo_distance',
                                     geolocation=[lon, lat],
