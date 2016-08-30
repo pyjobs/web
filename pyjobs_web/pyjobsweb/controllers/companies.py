@@ -68,10 +68,13 @@ class NewCompanyController(BaseController):
 
 
 class SearchCompaniesController(BaseController):
-    items_per_page = 20
+    items_per_page = 10
+
+    def __init__(self, items_per_page=10):
+        self.items_per_page = items_per_page
 
     @expose('pyjobsweb.templates.companies.list')
-    @paginate('companies')
+    @paginate('companies', items_per_page=items_per_page)
     def index(self, query=None, radius=None, center=None, *args, **kwargs):
         if not query and not radius and not center:
             redirect('/companies')
@@ -119,11 +122,13 @@ class SearchCompaniesController(BaseController):
 
 
 class CompaniesController(BaseController):
+    items_per_page = 10
+
     new = NewCompanyController()
-    search = SearchCompaniesController()
+    search = SearchCompaniesController(items_per_page)
 
     @expose('pyjobsweb.templates.companies.list')
-    @paginate('companies')
+    @paginate('companies', items_per_page=items_per_page)
     def index(self, *args, **kwargs):
         try:
             companies = CompanyAlchemy.get_validated_companies()

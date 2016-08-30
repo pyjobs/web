@@ -15,10 +15,13 @@ from pyjobsweb.forms.research_form import ResearchForm
 
 
 class SearchJobsController(BaseController):
-    items_per_page = 20
+    items_per_page = 10
+
+    def __init__(self, items_per_page=10):
+        self.items_per_page = items_per_page
 
     @expose('pyjobsweb.templates.jobs.list')
-    @paginate('jobs')
+    @paginate('jobs', items_per_page=items_per_page)
     def index(self, query=None, radius=None, center=None, *args, **kwargs):
         if not query and not radius and not center:
             redirect('/jobs')
@@ -74,10 +77,11 @@ class SearchJobsController(BaseController):
 
 
 class JobsController(BaseController):
-    search = SearchJobsController()
+    items_per_page = 10
+    search = SearchJobsController(items_per_page)
 
     @expose('pyjobsweb.templates.jobs.list')
-    @paginate('jobs')
+    @paginate('jobs', items_per_page=items_per_page)
     def index(self, *args, **kwargs):
         try:
             job_offers = JobAlchemy.get_all_job_offers()
