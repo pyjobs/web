@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
+def _find_type(sqlalchemy_table_class, column_name):
+    if hasattr(sqlalchemy_table_class, '__table__') \
+            and column_name in sqlalchemy_table_class.__table__.c:
+        return sqlalchemy_table_class.__table__.c[column_name].type
+    for base in sqlalchemy_table_class.__bases__:
+        return _find_type(base, column_name)
+    raise NameError(column_name)
+
+
 def is_dirty(old_model, new_model):
     for column in old_model.__table__.columns:
         column = column.name
@@ -8,15 +17,6 @@ def is_dirty(old_model, new_model):
             return True
 
     return False
-
-
-def find_type(sqlalchemy_table_class, column_name):
-    if hasattr(sqlalchemy_table_class, '__table__') \
-            and column_name in sqlalchemy_table_class.__table__.c:
-        return sqlalchemy_table_class.__table__.c[column_name].type
-    for base in sqlalchemy_table_class.__bases__:
-        return find_type(base, column_name)
-    raise NameError(column_name)
 
 
 def kw_to_sqlalchemy(sqlalchemy_table_cls, kw):
