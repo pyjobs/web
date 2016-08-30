@@ -36,7 +36,7 @@ ${admin_index_list(model_list)}
 
 ${admin_index_list(geocoding_list)}
 
-<a href="moderation"><h3>Modérer des entreprises</h3></a>
+<a href="moderation"><h3>Interface de modération</h3></a>
 <hr>
 
 ${admin_index_list(moderation_list)}

@@ -26,7 +26,7 @@
     </div>
 </%def>
 
-<h3>Modérer des entreprises</h3>
+<h3>Modérer des entrées utilisateurs</h3>
 <hr>
 
 ${admin_index_list(moderation_list)}
