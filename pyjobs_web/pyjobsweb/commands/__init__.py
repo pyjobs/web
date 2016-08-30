@@ -43,7 +43,6 @@ class AppContextCommand(BaseCommand):
         return wsgi_app, test_app
 
     def take_action(self, parsed_args):
-        super(AppContextCommand, self).take_action(parsed_args)
         wsgi_app, test_app = self._get_initialized_app_context(parsed_args)
         self._wsgi_app = wsgi_app
         self._test_app = test_app
