@@ -12,8 +12,8 @@ echo SOURCE_DIR: ${SOURCE_DIR}, LOG_DIR: ${LOG_DIR}, CONFIG: ${CONFIG}
 cd ${SOURCE_DIR} && . ./venv2.7/bin/activate
 cd pyjobs_web
 # Job offers geocoding
-gearbox geocode -j -c "$CONFIG" >> "$LOG_DIR"/geocoding_jobs.log 2>1&
+gearbox geocode -j -c "$CONFIG" 2>1& >> "$LOG_DIR"/geocoding_jobs.log
 echo ALGOO-MONITORABLE-CRON __ $(date +\"%Y-%m-%dT%H:%M:%S\") __  >> "$LOG_DIR"/geocoding_jobs.log
 # Companies geocoding
-gearbox geocode -co -c "$CONFIG" >> "$LOG_DIR"/geocoding_companies.log 2>1&
+gearbox geocode -co -c "$CONFIG" 2>1& >> "$LOG_DIR"/geocoding_companies.log
 echo ALGOO-MONITORABLE-CRON __ $(date +\"%Y-%m-%dT%H:%M:%S\") __  >> "$LOG_DIR"/geocoding_companies.log
