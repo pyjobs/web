@@ -12,8 +12,8 @@ echo SOURCE_DIR: ${SOURCE_DIR}, LOG_DIR: ${LOG_DIR}, CONFIG: ${CONFIG}
 cd ${SOURCE_DIR} && . ./venv2.7/bin/activate
 cd pyjobs_web
 # Job offers synchronization
-gearbox populate-es -j -c "$CONFIG" >> "$LOG_DIR"/elasticsearch_sync_jobs.log
+gearbox populate-es -j -c "$CONFIG" >> "$LOG_DIR"/elasticsearch_sync_jobs.log 2>1&
 echo ALGOO-MONITORABLE-CRON __ $(date +\"%Y-%m-%dT%H:%M:%S\") __  >> "$LOG_DIR"/elasticsearch_sync_jobs.log
 # Companies synchronization
-gearbox populate-es -co -c "$CONFIG" >> "$LOG_DIR"/elasticsearch_sync_companies.log
+gearbox populate-es -co -c "$CONFIG" >> "$LOG_DIR"/elasticsearch_sync_companies.log 2>1&
 echo ALGOO-MONITORABLE-CRON __ $(date +\"%Y-%m-%dT%H:%M:%S\") __  >> "$LOG_DIR"/elasticsearch_sync_companies.log
