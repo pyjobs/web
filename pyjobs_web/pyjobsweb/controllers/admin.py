@@ -12,7 +12,8 @@ from tgext.crud import EasyCrudRestController
 
 from pyjobsweb import model
 from pyjobsweb.model import DBSession
-from pyjobsweb.lib.sqlalchemy_ import kw_to_sqlalchemy, is_dirty
+from pyjobsweb.lib.sqlalchemy_ import kw_to_sqlalchemy, is_dirty, \
+    mark_kw_as_dirty, prepare_kw_for_address_update, prepare_kw_for_validation
 
 
 class JobGeocodingController(EasyCrudRestController):
@@ -96,23 +97,7 @@ class JobGeocodingController(EasyCrudRestController):
             tg.flash(redirect_msg, redirect_status)
             redirect('./edit')
 
-        # The address has been modified, therefore this row is now dirty, and
-        # should be resynchronized with Elasticsearch. Also, the geolocation
-        # should be recomputed too, so we mark the address as valid, so that
-        # the geolocation program will try and recompute it later on.
-        kw['dirty'] = True
-        kw['address_is_valid'] = True
-
-        # We reset the geolocation related fields to their default values too.
-        # This bit isn't necessary, because the controller can only alter the
-        # content of rows with invalid addresses, and therefore rows which
-        # geolocation isn't valid by definition. But it doesn't hurt to put this
-        # additional code here. It just make the manipulation of the Jobs
-        # table consistent across the geocoding issues controller and the
-        # general crud controller.
-        kw['geolocation_is_valid'] = False
-        kw['latitude'] = 0.0
-        kw['longitude'] = 0.0
+        prepare_kw_for_address_update(kw)
 
         return EasyCrudRestController.put(self, *args, **kw)
 
@@ -191,23 +176,8 @@ class CompanyGeocodingController(EasyCrudRestController):
             tg.flash(redirect_msg, redirect_status)
             redirect('./edit')
 
-        # The address has been modified, therefore this row is now dirty, and
-        # should be resynchronized with Elasticsearch. Also, the geolocation
-        # should be recomputed too, so we mark the address as valid, so that
-        # the geolocation program will try and recompute it later on.
-        kw['dirty'] = True
-        kw['address_is_valid'] = True
+        prepare_kw_for_address_update(kw)
 
-        # We reset the geolocation related fields to their default values too.
-        # This bit isn't necessary, because the controller can only alter the
-        # content of rows with invalid addresses, and therefore rows which
-        # geolocation isn't valid by definition. But it doesn't hurt to put this
-        # additional code here. It just make the manipulation of the Companies
-        # table consistent across the geocoding issues controller and the
-        # general crud controller.
-        kw['geolocation_is_valid'] = False
-        kw['latitude'] = 0.0
-        kw['longitude'] = 0.0
         return EasyCrudRestController.put(self, *args, **kw)
 
 
@@ -268,13 +238,7 @@ class CompanyModerationController(EasyCrudRestController):
 
     @expose(inherit=True)
     def put(self, *args, **kw):
-        # Someone just validated this company. Therefore, mark it as such.
-        kw['validated'] = True
-
-        # Even though these rows aren't yet indexed in the Elasticsearch
-        # database, we still mark the row as dirty (though the flag already is).
-        # It makes the code clearer amongst other controllers.
-        kw['dirty'] = True
+        prepare_kw_for_validation(kw)
         return EasyCrudRestController.put(self, *args, **kw)
 
 
@@ -488,17 +452,14 @@ class JobCrudRestController(EasyCrudRestController):
             tg.flash(redirect_msg, redirect_status)
             redirect('./edit')
 
-        # The row has been modified, therefore this row is now dirty, and
-        # should be resynchronized with Elasticsearch. Also, the geolocation
-        # should be recomputed too, so we mark the address as valid, so that
-        # the geolocation program will try and recompute it later on.
-        kw['dirty'] = True
+        # The row has been modified, therefore mark it as such to make sure
+        # this row will be synced in Elasticsearch.
+        mark_kw_as_dirty(kw)
 
-        # Check if the address has been modified. If it's the case, then the
-        # 'geolocation_is_valid' field should be set to False, so that the
-        # geocoding command will compute the new corresponding geolocation.
+        # Check if the address has been modified. If it's the case, then
+        # prepare the kw dict before insertion.
         if old_model.address != new_model.address:
-            kw['geolocation_is_valid'] = False
+            prepare_kw_for_address_update(kw)
 
         return EasyCrudRestController.put(self, *args, **kw)
 
@@ -523,17 +484,14 @@ class CompanyCrudRestController(EasyCrudRestController):
             tg.flash(redirect_msg, redirect_status)
             redirect('./edit')
 
-        # The row has been modified, therefore this row is now dirty, and
-        # should be resynchronized with Elasticsearch. Also, the geolocation
-        # should be recomputed too, so we mark the address as valid, so that
-        # the geolocation program will try and recompute it later on.
-        kw['dirty'] = True
+        # The row has been modified, therefore mark it as such to make sure
+        # this row will be synced in Elasticsearch.
+        mark_kw_as_dirty(kw)
 
-        # Check if the address has been modified. If it's the case, then the
-        # 'geolocation_is_valid' field should be set to False, so that the
-        # geocoding command will compute the new corresponding geolocation.
+        # Check if the address has been modified. If it's the case, then
+        # prepare the kw dict before insertion.
         if old_model.address != new_model.address:
-            kw['geolocation_is_valid'] = False
+            prepare_kw_for_address_update(kw)
 
         return EasyCrudRestController.put(self, *args, **kw)
 
