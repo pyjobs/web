@@ -78,7 +78,7 @@ class GeocodeCommand(AppContextCommand):
         self._logging(logging.INFO, log_msg)
 
     def _geocode_job_offers(self):
-        self._geocode(model.JobAlchemy, self._company_id_logging)
+        self._geocode(model.JobAlchemy, self._job_id_logging)
 
     def _geocode_companies(self):
         self._geocode(model.CompanyAlchemy, self._company_id_logging)
