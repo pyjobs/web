@@ -103,7 +103,8 @@ class GitHubBot(object):
         with codecs.open(self._jobs_file_path, 'r', 'utf-8') as jobs_file:
             jobs_file_read = jobs_file.read()
             for job in jobs:
-                if job.url not in jobs_file_read:
+                pyjobs_url = get_job_url(job.id, job.title, absolute=True)
+                if pyjobs_url not in jobs_file_read:
                     cleaned_jobs.append(job)
         return cleaned_jobs
 
