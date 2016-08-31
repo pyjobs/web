@@ -57,6 +57,9 @@ class Company(DeclarativeBase):
 
         return result
 
+    def __repr__(self):
+        return "<Company: id='%d'>" % self.id
+
     @classmethod
     def get_validated_companies(cls):
         return DBSession.query(cls) \
