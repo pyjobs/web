@@ -1,50 +1,27 @@
 <%inherit file="local:templates.master"/>
+<%namespace name="admin_helpers" file="local:templates.admin.helpers"/>
 
 <%def name="title()">
     ${tmpl_context.title} - ${model}
 </%def>
 
 <%def name="end_body_scripts()">
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script>
-        $(document).ready(function () {
-            $("#address-validation").click(function () {
-                var address = $("#sx_address").val();
-                var nominatim = "https://www.openstreetmap.org/search?query=";
-                window.open(nominatim.concat(address), '_blank');
-            });
-        });
-    </script>
+    ${parent.end_body_scripts()}
+    ${admin_helpers.address_validation_scripts('sx_address')}
 </%def>
 
 <div class="row">
-    <div class="col-md-2">
-        % if hasattr(tmpl_context, 'menu_items'):
-            <ul class="nav crud-sidebar hidden-xs hidden-sm">
-                % for lower, item in sorted(tmpl_context.menu_items.items()):
-                    <li class="${item==model and 'active' or ''}">
-                        <a href="${tmpl_context.crud_helpers.make_link(lower, pk_count or 1)}">${item}</a>
-                    </li>
-                % endfor
-            </ul>
-        % endif
-    </div>
+    ${admin_helpers.side_list()}
 
     <div class="col-md-10">
         <h1 class="page-header">Résoudre les problèmes de géocoding - ${model}</h1>
 
-        <div class="form-group">
-            <button id="address-validation" type="button" class="btn btn-info">
-                Vérifier la validité de l'adresse
-            </button>
-        </div>
+        ${admin_helpers.address_validation_button() | n}
 
         ${tmpl_context.widget(value=value, action='./') | n}
 
         <br/>
 
-        <a href="/admin/geocoding/${model.lower()}s" title="Liste des ${model}" class="btn btn-default">
-            Retour à la liste des ${model}
-        </a>
+        ${admin_helpers.link_button(u'/admin/geocoding/%ss' % model.lower(), u'Liste des %ss' % model, u'Retour à la liste des %ss' % model)}
     </div>
 </div>

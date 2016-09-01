@@ -10,7 +10,8 @@
 </%def>
 
 <%def name="end_body_scripts()">
-    <script src="http://code.jquery.com/jquery.js"></script>
+    ${parent.end_body_scripts()}
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
     <script>
