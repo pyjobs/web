@@ -5,6 +5,9 @@ import tw2.jqplugins.select2 as twsel
 
 
 class GeocompleteField(twsel.Select2AjaxSingleSelectField):
+    def __init__(self, **kwargs):
+        super(GeocompleteField, self).__init__(**kwargs)
+
     attrs = dict(style='width: 100%;')
     options = []
     opts = dict(
@@ -70,36 +73,6 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
                 return location.value || location.text
             }
             """
-        ),
-        formatInputTooShort=twc.js_callback(
-            """
-            function(a, b) {
-                var c = b - a.length;
-                return 'Veuillez saisir ' + c + ' caract\\xE8re(s) '
-                    + 'suppl\\xE9mentaire(s).';
-            }
-            """
-        ),
-        formatInputTooLong=twc.js_callback(
-            """
-            function(a, b) {
-                return 'Saisie trop longue.';
-            }
-            """
-        ),
-        formatSearching=twc.js_callback(
-            """
-            function() {
-                return 'Recherche en cours...';
-            }
-            """
-        ),
-        formatNoMatches=twc.js_callback(
-            """
-            function() {
-                return 'Aucun r\\xE9sultat ne correpond \\xE0 votre recherche.';
-            }
-            """
         )
     )
 
@@ -138,6 +111,7 @@ class ResearchForm(twf.Form):
             '''
 
         query = twsel.Select2MultipleSelectField(
+            resources=[],
             name='query',
             label=u'Requête :',
             options=[],
@@ -149,19 +123,13 @@ class ResearchForm(twf.Form):
                     'Python', 'Django', 'Flask', 'Pyramid', 'Turbogears'
                 ],
                 maximumSelectionSize=10,
-                tokenSeparators=[','],
-                formatSelectionTooBig=twc.js_callback(
-                    """
-                    function(a) {
-                        return 'Nombre maximum de mots cl\\xE9s atteint.';
-                    }
-                    """
-                )
+                tokenSeparators=[',']
             ),
             ondemand=True
         )
 
-        center = GeocompleteField(name="center", label=u'Autour de :')
+        center = GeocompleteField(resources=[],
+                                  name="center", label=u'Autour de :')
 
         distances = [
             "5", "10", "25", "50", "100", "200", "200+"
@@ -177,22 +145,14 @@ class ResearchForm(twf.Form):
             tmp_options.append(option)
 
         radius = twsel.Select2SingleSelectField(
+            resources=[],
             name='radius',
             label=u'Dans un rayon de :',
             options=tmp_options,
             value='',
             attrs=dict(style='width: 100%'),
             placeholder=u'Distance maximale',
-            opts=dict(
-                allowClear=True,
-                formatNoMatches=twc.js_callback(
-                    """
-                    function() {
-                        return 'Aucun r\\xE9sultat ne correpond \\xE0 votre recherche.';
-                    }
-                    """
-                )
-            )
+            opts=dict(allowClear=True)
         )
 
         submit = twf.SubmitButton("submit")

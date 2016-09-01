@@ -4,6 +4,7 @@
     ${self.meta()}
     <title>${self.title()}</title>
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/select2.css')}"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/select2.bootstrap.css')}"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}"/>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -45,6 +46,9 @@
     <%def name="title()">  </%def>
 
     <%def name="end_body_scripts()">
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="${tg.url('/javascript/select2.min.js')}"></script>
+        <script src="${tg.url('/javascript/select2_locale_fr.js')}"></script>
         <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
     </%def>
 
