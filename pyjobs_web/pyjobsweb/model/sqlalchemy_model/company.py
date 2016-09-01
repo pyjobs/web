@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import transaction
+from datetime import datetime
 
 import sqlalchemy as sa
 
@@ -36,7 +37,12 @@ class Company(DeclarativeBase):
 
     validated = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    dirty = sa.Column(sa.Boolean, nullable=False, default=True)
+    last_modified = sa.Column(sa.DateTime(timezone=True), nullable=False,
+                              server_default=sa.func.now(),
+                              onupdate=sa.func.current_timestamp())
+
+    last_sync = sa.Column(sa.DateTime(timezone=True),
+                          nullable=False, default=datetime.min)
 
     def to_elasticsearch_document(self):
         result = CompanyElastic(
@@ -78,20 +84,6 @@ class Company(DeclarativeBase):
         return DBSession.query(cls).filter(cls.id == company_id).one()
 
     @classmethod
-    def set_dirty(cls, company_id, dirty):
-        transaction.begin()
-        DBSession.query(cls) \
-            .filter(cls.id == company_id) \
-            .update({'dirty': dirty})
-        transaction.commit()
-
-    @classmethod
-    def reset_dirty_flags(cls):
-        transaction.begin()
-        DBSession.query(cls).update({'dirty': True})
-        transaction.commit()
-
-    @classmethod
     def get_pending_geolocations(cls):
         return DBSession.query(cls) \
             .filter_by(address_is_valid=True) \
@@ -106,8 +98,7 @@ class Company(DeclarativeBase):
             .filter(cls.id == company_id) \
             .update({'latitude': lat,
                      'longitude': lon,
-                     'geolocation_is_valid': True,
-                     'dirty': True})
+                     'geolocation_is_valid': True})
         transaction.commit()
 
     @classmethod
@@ -115,7 +106,7 @@ class Company(DeclarativeBase):
         transaction.begin()
         DBSession.query(cls) \
             .filter(cls.id == company_id) \
-            .update({'geolocation_is_valid': is_valid, 'dirty': True})
+            .update({'geolocation_is_valid': is_valid})
         transaction.commit()
 
     @classmethod
@@ -129,6 +120,27 @@ class Company(DeclarativeBase):
     @classmethod
     def get_dirty_rows(cls):
         return DBSession.query(cls) \
-            .filter(cls.dirty) \
             .filter(cls.validated) \
+            .filter(cls.last_modified > cls.last_sync) \
             .order_by(cls.id.asc())
+
+    @classmethod
+    def update_last_sync(cls, job_id, timestamp):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == job_id) \
+            .update({'last_sync': timestamp,
+                     'last_modified': cls.last_modified})
+        DBSession.query(cls) \
+            .filter(cls.id == job_id) \
+            .filter(cls.last_modified < timestamp) \
+            .update({'last_modified': timestamp})
+        transaction.commit()
+
+    @classmethod
+    def reset_last_sync(cls):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.validated) \
+            .update({'last_sync': datetime.min})
+        transaction.commit()

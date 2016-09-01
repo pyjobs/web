@@ -12,8 +12,9 @@ from tgext.crud import EasyCrudRestController
 
 from pyjobsweb import model
 from pyjobsweb.model import DBSession
-from pyjobsweb.lib.sqlalchemy_ import kw_to_sqlalchemy, is_dirty, \
-    mark_kw_as_dirty, prepare_kw_for_address_update, prepare_kw_for_validation
+from pyjobsweb.lib.sqlalchemy_ import kw_to_sqlalchemy, sqlalchemy_to_kw, \
+    prepare_job_for_address_update, prepare_company_for_address_update, \
+    prepare_company_for_validation
 
 
 class JobGeocodingController(EasyCrudRestController):
@@ -36,7 +37,7 @@ class JobGeocodingController(EasyCrudRestController):
         '__hide_fields__': ['description', 'company', 'company_url', 'tags',
                             'publication_datetime',
                             'title', 'publication_datetime_is_fake',
-                            'crawl_datetime', 'dirty',
+                            'crawl_datetime', 'last_modified', 'last_sync',
                             'url', 'id', 'source', 'address_is_valid',
                             'geolocation_is_valid', 'latitude', 'longitude',
                             'pushed_on_twitter'],
@@ -87,17 +88,10 @@ class JobGeocodingController(EasyCrudRestController):
         if not kw['publication_datetime_is_fake']:
             kw['publication_datetime_is_fake'] = False
 
-        old_model = model.JobAlchemy.get_job_offer(kw['id'])
         new_model = kw_to_sqlalchemy(model.JobAlchemy, kw)
 
-        if not is_dirty(old_model, new_model):
-            redirect_msg = u"Veuillez changer l'adresse de l'offre d'emploi " \
-                           u"s'il-vous-plaît."
-            redirect_status = 'error'
-            tg.flash(redirect_msg, redirect_status)
-            redirect('./edit')
-
-        prepare_kw_for_address_update(kw)
+        prepare_job_for_address_update(new_model)
+        kw = sqlalchemy_to_kw(new_model)
 
         return EasyCrudRestController.put(self, *args, **kw)
 
@@ -122,7 +116,7 @@ class CompanyGeocodingController(EasyCrudRestController):
         '__hide_fields__': ['id', 'name', 'logo_url', 'description', 'url',
                             'technologies', 'address_is_valid', 'email',
                             'phone', 'latitude', 'longitude',
-                            'geolocation_is_valid', 'validated', 'dirty'],
+                            'geolocation_is_valid', 'validated', 'last_modified', 'last_sync'],
         '__field_widget_types__': {'address': TextField}
     }
 
@@ -166,17 +160,10 @@ class CompanyGeocodingController(EasyCrudRestController):
 
     @expose(inherit=True)
     def put(self, *args, **kw):
-        old_model = model.CompanyAlchemy.get_company(kw['id'])
         new_model = kw_to_sqlalchemy(model.CompanyAlchemy, kw)
 
-        if not is_dirty(old_model, new_model):
-            redirect_msg = u"Veuillez changer l'adresse de l'entreprise " \
-                           u"s'il-vous-plaît."
-            redirect_status = 'error'
-            tg.flash(redirect_msg, redirect_status)
-            redirect('./edit')
-
-        prepare_kw_for_address_update(kw)
+        prepare_company_for_address_update(new_model)
+        kw = sqlalchemy_to_kw(new_model)
 
         return EasyCrudRestController.put(self, *args, **kw)
 
@@ -189,7 +176,7 @@ class CompanyModerationController(EasyCrudRestController):
 
     __form_options__ = {
         '__hide_fields__': ['address_is_valid', 'latitude', 'longitude',
-                            'geolocation_is_valid', 'validated', 'dirty'],
+                            'geolocation_is_valid', 'validated', 'last_modified', 'last_sync'],
         '__field_widget_types__': {
             'id': TextField,
             'name': TextField,
@@ -238,7 +225,9 @@ class CompanyModerationController(EasyCrudRestController):
 
     @expose(inherit=True)
     def put(self, *args, **kw):
-        prepare_kw_for_validation(kw)
+        new_model = kw_to_sqlalchemy(model.CompanyAlchemy, kw)
+        prepare_company_for_validation(new_model)
+        kw = sqlalchemy_to_kw(new_model)
         return EasyCrudRestController.put(self, *args, **kw)
 
 
@@ -445,21 +434,12 @@ class JobCrudRestController(EasyCrudRestController):
         old_model = model.JobAlchemy.get_job_offer(kw['id'])
         new_model = kw_to_sqlalchemy(model.JobAlchemy, kw)
 
-        if not is_dirty(old_model, new_model):
-            redirect_msg = u"Veuillez modifier l'offre d'emploi " \
-                           u"s'il-vous-plaît."
-            redirect_status = 'error'
-            tg.flash(redirect_msg, redirect_status)
-            redirect('./edit')
-
-        # The row has been modified, therefore mark it as such to make sure
-        # this row will be synced in Elasticsearch.
-        mark_kw_as_dirty(kw)
-
         # Check if the address has been modified. If it's the case, then
         # prepare the kw dict before insertion.
         if old_model.address != new_model.address:
-            prepare_kw_for_address_update(kw)
+            prepare_job_for_address_update(kw)
+
+        kw = sqlalchemy_to_kw(new_model)
 
         return EasyCrudRestController.put(self, *args, **kw)
 
@@ -478,20 +458,12 @@ class CompanyCrudRestController(EasyCrudRestController):
         old_model = model.CompanyAlchemy.get_company(kw['id'])
         new_model = kw_to_sqlalchemy(model.CompanyAlchemy, kw)
 
-        if not is_dirty(old_model, new_model):
-            redirect_msg = u"Veuillez modifier l'entreprise s'il-vous-plaît."
-            redirect_status = 'error'
-            tg.flash(redirect_msg, redirect_status)
-            redirect('./edit')
-
-        # The row has been modified, therefore mark it as such to make sure
-        # this row will be synced in Elasticsearch.
-        mark_kw_as_dirty(kw)
-
         # Check if the address has been modified. If it's the case, then
         # prepare the kw dict before insertion.
         if old_model.address != new_model.address:
-            prepare_kw_for_address_update(kw)
+            prepare_company_for_address_update(kw)
+
+        kw = sqlalchemy_to_kw(new_model)
 
         return EasyCrudRestController.put(self, *args, **kw)
 
@@ -518,11 +490,8 @@ class PyJobsAdminController(AdminController):
     This controller handles the whole admin interface of PyJobs
     It consists of multiple CrudRestControllers that allows one to manipulate
     the database.
-    The of this controller index points to the default CrudRest
-    AdminController, with a few modifications to ensure some synchronization
-    issues between the Postgresql database and the Elasticsearch database,
-    (through the 'dirty' flag in the Postgresql tables which are to be
-    synchronized with their counterparts in Elasticsearch).
+    The index of this controller points to the default CrudRest AdminController,
+    with a few modifications to ensure some model integrity issues.
     """
 
     """
