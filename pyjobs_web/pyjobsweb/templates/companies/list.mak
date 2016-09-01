@@ -23,19 +23,7 @@
         <h1>
             Les entreprises qui recrutent !
             <span class="btn-group pull-right" role="group">
-                <a href="https://twitter.com/pyjobsfr" title="Annonces sur Twitter" target="_blank" class="btn btn-default">
-                    <i class="fa fa-3x fa-twitter" style="color: #55ACEE;"></i>
-                </a>
-
-                <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" target="_blank" class="btn btn-warning">
-                    <i class="fa fa-3x fa-rss"></i>
-                </a>
-
-                <a href="https://github.com/pyjobs/annonces" title="Annonces sur GitHub" target="_blank" class="btn btn-default">
-                    <i class="fa fa-3x fa-github"></i>
-                </a>
-
-                <a href="/companies/new" title="Ajouter une entreprise" class="btn btn-default">
+                <a href="/companies/new" title="Ajouter une entreprise" class="btn btn-success">
                     <i class="fa fa-3x fa-plus"></i>
                 </a>
             </span>
