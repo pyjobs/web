@@ -41,6 +41,7 @@ class JobGeocodingController(EasyCrudRestController):
                             'url', 'id', 'source', 'address_is_valid',
                             'geolocation_is_valid', 'latitude', 'longitude',
                             'pushed_on_twitter'],
+        '__omit_fields__': ['last_modified', 'last_sync'],
         '__field_widget_types__': {'address': TextField}
     }
 
@@ -117,6 +118,7 @@ class CompanyGeocodingController(EasyCrudRestController):
                             'technologies', 'address_is_valid', 'email',
                             'phone', 'latitude', 'longitude',
                             'geolocation_is_valid', 'validated', 'last_modified', 'last_sync'],
+        '__omit_fields__': ['last_modified', 'last_sync'],
         '__field_widget_types__': {'address': TextField}
     }
 
@@ -177,6 +179,7 @@ class CompanyModerationController(EasyCrudRestController):
     __form_options__ = {
         '__hide_fields__': ['address_is_valid', 'latitude', 'longitude',
                             'geolocation_is_valid', 'validated', 'last_modified', 'last_sync'],
+        '__omit_fields__': ['last_modified', 'last_sync'],
         '__field_widget_types__': {
             'id': TextField,
             'name': TextField,
@@ -226,8 +229,10 @@ class CompanyModerationController(EasyCrudRestController):
     @expose(inherit=True)
     def put(self, *args, **kw):
         new_model = kw_to_sqlalchemy(model.CompanyAlchemy, kw)
+
         prepare_company_for_validation(new_model)
         kw = sqlalchemy_to_kw(new_model)
+
         return EasyCrudRestController.put(self, *args, **kw)
 
 
@@ -421,6 +426,10 @@ class JobCrudRestController(EasyCrudRestController):
     adds some database synchronization code (to keep both Postgresql and
     Elasticsearch databases in sync.
     """
+    __form_options__ = {
+        '__omit_fields__': ['last_modified', 'last_sync']
+    }
+
     def __init__(self, session, menu_items=None):
         super(JobCrudRestController, self).__init__(session, menu_items)
 
@@ -450,6 +459,10 @@ class CompanyCrudRestController(EasyCrudRestController):
     adds some database synchronization code (to keep both Postgresql and
     Elasticsearch databases in sync.
     """
+    __form_options__ = {
+        '__omit_fields__': ['last_modified', 'last_sync']
+    }
+
     def __init__(self, session, menu_items=None):
         super(CompanyCrudRestController, self).__init__(session, menu_items)
 

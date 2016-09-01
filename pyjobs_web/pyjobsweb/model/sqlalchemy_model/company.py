@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import transaction
-from datetime import datetime
 
 import sqlalchemy as sa
 
+from pyjobsweb.lib.time import base_time
 from pyjobsweb.model import DeclarativeBase, DBSession
 from pyjobsweb.model.elasticsearch_model.company import Company \
     as CompanyElastic
@@ -42,7 +42,7 @@ class Company(DeclarativeBase):
                               onupdate=sa.func.current_timestamp())
 
     last_sync = sa.Column(sa.DateTime(timezone=True),
-                          nullable=False, default=datetime.min)
+                          nullable=False, default=base_time())
 
     def to_elasticsearch_document(self):
         result = CompanyElastic(
@@ -142,5 +142,5 @@ class Company(DeclarativeBase):
         transaction.begin()
         DBSession.query(cls) \
             .filter(cls.validated) \
-            .update({'last_sync': datetime.min})
+            .update({'last_sync': base_time()})
         transaction.commit()

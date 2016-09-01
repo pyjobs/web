@@ -7,6 +7,7 @@ import transaction
 from babel.dates import format_date, format_timedelta
 from pyjobs_crawlers.tools import condition_tags
 
+from pyjobsweb.lib.time import base_time
 from pyjobsweb.model import DeclarativeBase, DBSession
 from pyjobsweb.model.data import Tag2
 from pyjobsweb.model.elasticsearch_model.job import Job as JobElastic
@@ -44,11 +45,10 @@ class Job(DeclarativeBase):
 
     last_modified = sa.Column(sa.DateTime(timezone=True), nullable=False,
                               server_default=sa.func.now(),
-                              # onupdate=yolo)
                               onupdate=sa.func.current_timestamp())
 
     last_sync = sa.Column(sa.DateTime(timezone=True),
-                          nullable=False, default=datetime.min)
+                          nullable=False, default=base_time())
 
     def __repr__(self):
         return "<Job: id='%d'>" % self.id
@@ -203,5 +203,5 @@ class Job(DeclarativeBase):
     def reset_last_sync(cls):
         transaction.begin()
         DBSession.query(cls) \
-            .update({'last_sync': datetime.min})
+            .update({'last_sync': base_time()})
         transaction.commit()
