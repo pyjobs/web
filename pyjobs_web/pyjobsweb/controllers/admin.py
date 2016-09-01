@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import tg
 from sprox.widgets import TextField, TextArea
-from tg.decorators import expose, with_trailing_slash, redirect
+from tg.decorators import expose, with_trailing_slash
 from tg.exceptions import HTTPNotFound
 from tgext.admin import CrudRestControllerConfig
 from tgext.admin.controller import AdminController
