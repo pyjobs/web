@@ -70,9 +70,13 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="${tg.url('/')}">
-                        <img src="${tg.url('/img/pyjobs_logo_square.png')}" style="height: 32px;" alt="pyjobs"/>
-                        pyjobs &mdash;
-                        <small>opportunités professionnelles python</small>
+                        <div style="display: inline-block">
+                            <img src="${tg.url('/img/pyjobs_logo_square.png')}" style="height: 32px;" alt="pyjobs"/>
+                            pyjobs
+                        </div>
+                        <div class="hidden-xs" style="display: inline-block">
+                            &mdash;<small>opportunités professionnelles python</small>
+                        </div>
                     </a>
                 </div>
 
