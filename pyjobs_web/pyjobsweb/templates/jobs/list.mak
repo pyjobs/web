@@ -24,10 +24,10 @@
             Le job qu'il vous faut &mdash; en python
             <span class="btn-group pull-right" role="group">
                 <a href="https://twitter.com/pyjobsfr" title="Annonces sur Twitter" target="_blank" class="btn btn-default">
-                    <i class="fa fa-3x fa-twitter" style="color: #55ACEE;"></i>
+                    <i class="fa fa-3x fa-twitter"></i>
                 </a>
 
-                <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" target="_blank" class="btn btn-warning">
+                <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" target="_blank" class="btn btn-default">
                     <i class="fa fa-3x fa-rss"></i>
                 </a>
 
@@ -35,9 +35,9 @@
                     <i class="fa fa-3x fa-github"></i>
                 </a>
 
-                <a href="/companies/new" title="Ajouter une entreprise" class="btn btn-default">
-                    <i class="fa fa-3x fa-plus"></i>
-                </a>
+##                 <a href="/companies/new" title="Ajouter une entreprise" class="btn btn-success">
+##                     <i class="fa fa-3x fa-plus"></i>
+##                 </a>
             </span>
         </h1>
     ##    <h2>
