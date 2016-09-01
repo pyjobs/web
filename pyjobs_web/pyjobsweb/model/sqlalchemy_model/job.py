@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 
 import elasticsearch_dsl as es
@@ -64,7 +65,6 @@ class Job(DeclarativeBase):
 
     @property
     def alltags(self):
-        import json
         tags = []
         if self.tags:
             for tag in json.loads(self.tags):
@@ -74,7 +74,6 @@ class Job(DeclarativeBase):
 
     @property
     def condition_tags(self):
-        import json
         tags = []
         if self.tags:
             for tag in json.loads(self.tags):
