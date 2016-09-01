@@ -9,6 +9,7 @@ from elasticsearch_dsl.connections import connections
 from tg import config
 
 from pyjobsweb import model
+from pyjobsweb.lib.sqlalchemy_ import current_server_timestamp
 from pyjobsweb.commands import AppContextCommand
 
 
@@ -111,6 +112,8 @@ class PopulateESCommand(AppContextCommand):
                       'Computing out of sync %s documents.'
                       % es_doc.doc_type)
 
+        sync_timestamp = current_server_timestamp()
+
         pending_insertions = self._compute_dirty_documents(sql_table_cls)
 
         self._logging(logging.INFO,
@@ -130,14 +133,7 @@ class PopulateESCommand(AppContextCommand):
                               'Document %s has been synced successfully.'
                               % obj_id)
 
-                # TODO: FIX --> There is a synchronisation problem here !
-                #       Indeed, at this point the document as already been
-                #       indexed in elasticsearch, and if someone has changed
-                #       its content on the admin interface (or somewhere else)
-                #       the row has been set to dirty, and we are going to set
-                #       it as not dirty here, even if it's still dirty, since
-                #       someone made a change !
-                sql_table_cls.set_dirty(obj_id, False)
+                sql_table_cls.update_last_sync(obj_id, sync_timestamp)
             else:
                 id_logger(obj_id, logging.ERROR,
                           'Error while syncing document %s index.' % obj_id)

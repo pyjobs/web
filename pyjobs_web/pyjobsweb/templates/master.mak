@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html class="${self.html_class()}">
-<head>
-    ${self.meta()}
-    <title>${self.title()}</title>
-    <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/select2.bootstrap.css')}"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}"/>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss?limit=50"/>
-    ${self.head_content()}
-    ${h.head_js() | n}
-</head>
+    <head>
+        ${self.meta()}
+        <title>${self.title()}</title>
+        <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}"/>
+        <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/select2.css')}"/>
+        <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/select2.bootstrap.css')}"/>
+        <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}"/>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss?limit=50"/>
+        ${self.head_content()}
+        ${h.head_js() | n}
+    </head>
 
-<body class="${self.body_class()}">
-    ${self.main_menu()}
-    <div class="container full-height">
-        ${self.content_wrapper()}
-        ${self.footer()}
-    </div>
-    ${self.end_body_scripts()}
-</body>
+    <body class="${self.body_class()}">
+        ${self.main_menu()}
+        <div class="container full-height">
+            ${self.content_wrapper()}
+            ${self.footer()}
+        </div>
+        ${self.end_body_scripts()}
+    </body>
 
     <%def name="content_wrapper()">
         <%
@@ -45,6 +46,9 @@
     <%def name="title()">  </%def>
 
     <%def name="end_body_scripts()">
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="${tg.url('/javascript/select2.min.js')}"></script>
+        <script src="${tg.url('/javascript/select2_locale_fr.js')}"></script>
         <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
     </%def>
 
@@ -66,9 +70,13 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="${tg.url('/')}">
-                        <img src="${tg.url('/img/pyjobs_logo_square.png')}" style="height: 32px;" alt="pyjobs"/>
-                        pyjobs &mdash;
-                        <small>opportunités professionnelles python</small>
+                        <div style="display: inline-block">
+                            <img src="${tg.url('/img/pyjobs_logo_square.png')}" style="height: 32px;" alt="pyjobs"/>
+                            pyjobs
+                        </div>
+                        <div class="hidden-xs" style="display: inline-block">
+                            &mdash;<small>opportunités professionnelles python</small>
+                        </div>
                     </a>
                 </div>
 

@@ -7,6 +7,7 @@ import transaction
 from babel.dates import format_date, format_timedelta
 from pyjobs_crawlers.tools import condition_tags
 
+from pyjobsweb.lib.time import base_time
 from pyjobsweb.model import DeclarativeBase, DBSession
 from pyjobsweb.model.data import Tag2
 from pyjobsweb.model.elasticsearch_model.job import Job as JobElastic
@@ -40,12 +41,14 @@ class Job(DeclarativeBase):
     longitude = sa.Column(sa.Float, nullable=False, default=0.0)
     geolocation_is_valid = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    dirty = sa.Column(sa.Boolean, nullable=False, default=True)
-
     pushed_on_twitter = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    def __init__(self):
-        pass
+    last_modified = sa.Column(sa.DateTime(timezone=True), nullable=False,
+                              server_default=sa.func.now(),
+                              onupdate=sa.func.current_timestamp())
+
+    last_sync = sa.Column(sa.DateTime(timezone=True),
+                          nullable=False, default=base_time())
 
     def __repr__(self):
         return "<Job: id='%d'>" % self.id
@@ -113,20 +116,10 @@ class Job(DeclarativeBase):
         return DBSession.query(cls).filter(cls.url == url).count()
 
     @classmethod
-    def set_dirty(cls, offer_id, dirty):
-        transaction.begin()
-        DBSession.query(cls).filter(cls.id == offer_id).update({'dirty': dirty})
-        transaction.commit()
-
-    @classmethod
-    def reset_dirty_flags(cls):
-        transaction.begin()
-        DBSession.query(cls).update({'dirty': True})
-        transaction.commit()
-
-    @classmethod
     def get_dirty_rows(cls):
-        return DBSession.query(cls).filter(cls.dirty).order_by(cls.id.asc())
+        return DBSession.query(cls) \
+            .filter(cls.last_modified > cls.last_sync) \
+            .order_by(cls.id.asc())
 
     @classmethod
     def get_all_job_offers(cls):
@@ -162,8 +155,7 @@ class Job(DeclarativeBase):
             .filter(cls.id == offer_id) \
             .update({'latitude': lat,
                      'longitude': lon,
-                     'geolocation_is_valid': True,
-                     'dirty': True})
+                     'geolocation_is_valid': True})
         transaction.commit()
 
     @classmethod
@@ -171,7 +163,7 @@ class Job(DeclarativeBase):
         transaction.begin()
         DBSession.query(cls) \
             .filter(cls.id == offer_id) \
-            .update({'geolocation_is_valid': is_valid, 'dirty': True})
+            .update({'geolocation_is_valid': is_valid})
         transaction.commit()
 
     @classmethod
@@ -192,4 +184,24 @@ class Job(DeclarativeBase):
         DBSession.query(cls) \
             .filter(cls.id == offer_id) \
             .update({'pushed_on_twitter': pushed_on_twitter})
+        transaction.commit()
+
+    @classmethod
+    def update_last_sync(cls, job_id, timestamp):
+        transaction.begin()
+        DBSession.query(cls) \
+            .filter(cls.id == job_id) \
+            .update({'last_sync': timestamp,
+                     'last_modified': cls.last_modified})
+        DBSession.query(cls) \
+            .filter(cls.id == job_id) \
+            .filter(cls.last_modified < timestamp) \
+            .update({'last_modified': timestamp})
+        transaction.commit()
+
+    @classmethod
+    def reset_last_sync(cls):
+        transaction.begin()
+        DBSession.query(cls) \
+            .update({'last_sync': base_time()})
         transaction.commit()

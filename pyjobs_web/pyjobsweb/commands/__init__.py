@@ -8,7 +8,8 @@ from webtest import TestApp
 
 
 class BaseCommand(Command):
-    pass
+    def take_action(self, parsed_args):
+        raise NotImplementedError
 
 
 class AppContextCommand(BaseCommand):
@@ -51,6 +52,7 @@ class AppContextCommand(BaseCommand):
         parser = super(AppContextCommand, self).get_parser(prog_name)
 
         parser.add_argument("-c", "--config",
-                            help='application config file to read (default: development.ini)',
+                            help='application config file to read '
+                                 '(default: development.ini)',
                             dest='config_file', default="development.ini")
         return parser
