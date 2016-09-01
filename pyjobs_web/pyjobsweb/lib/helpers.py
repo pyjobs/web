@@ -55,7 +55,7 @@ def get_job_url(job_id, job_title=None, previous=None, absolute=False):
 
 
 def get_company_url(company_id, previous=None, absolute=False):
-    company_url = '/companies/details/%s' % company_id
+    company_url = '/societes-qui-recrutent/details/%s' % company_id
 
     if previous:
         company_url = '%s?previous=%s' % (company_url, quote_plus(previous))

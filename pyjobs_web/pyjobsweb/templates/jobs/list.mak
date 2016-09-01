@@ -35,7 +35,7 @@
                     <i class="fa fa-3x fa-github"></i>
                 </a>
 
-##                 <a href="/companies/new" title="Ajouter une entreprise" class="btn btn-success">
+##                 <a href="/societes-qui-recrutent/new" title="Ajouter une entreprise" class="btn btn-success">
 ##                     <i class="fa fa-3x fa-plus"></i>
 ##                 </a>
             </span>

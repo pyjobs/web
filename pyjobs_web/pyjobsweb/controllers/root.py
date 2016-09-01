@@ -54,7 +54,7 @@ class RootController(BaseController):
     admin = PyJobsAdminController()
 
     jobs = JobsController()
-    companies = CompaniesController()
+    societes_qui_recrutent = CompaniesController()
     geocomplete = GeocompleteController()
 
     error = ErrorController()

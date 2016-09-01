@@ -23,7 +23,7 @@
         <h1>
             Les entreprises qui recrutent !
             <span class="btn-group pull-right" role="group">
-                <a href="/companies/new" title="Ajouter une entreprise" class="btn btn-success">
+                <a href="/societes-qui-recrutent/new" title="Ajouter une entreprise" class="btn btn-success">
                     <i class="fa fa-3x fa-plus"></i>
                 </a>
             </span>
@@ -33,7 +33,7 @@
 
 <div id="company_search_form">
     <h2>Rechercher une entreprise</h2>
-     ${company_search_form.display(action='/companies/search', method='POST')}
+     ${company_search_form.display(action='/societes-qui-recrutent/search', method='POST')}
 </div>
 
 ${company_pagination()}

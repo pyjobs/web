@@ -52,7 +52,7 @@ class NewCompanyController(BaseController):
         company.email = kwargs['company_email']
         company.phone = kwargs['company_phone']
 
-        redirect_to = '/companies'
+        redirect_to = '/societes-qui-recrutent'
         redirect_msg = u"Votre demande d'ajout d'entreprise a bien été " \
                        u"soumise à modération. L'entreprise sera ajoutée à " \
                        u"cette liste sous peu si elle satisfait les critères " \
@@ -77,7 +77,7 @@ class SearchCompaniesController(BaseController):
     @paginate('companies', items_per_page=items_per_page)
     def index(self, query=None, radius=None, center=None, *args, **kwargs):
         if not query and not radius and not center:
-            redirect('/companies')
+            redirect('/societes-qui-recrutent')
 
         search_query = CompanyElastic.search()
 
