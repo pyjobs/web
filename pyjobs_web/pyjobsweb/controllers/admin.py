@@ -446,7 +446,7 @@ class JobCrudRestController(EasyCrudRestController):
         # Check if the address has been modified. If it's the case, then
         # prepare the kw dict before insertion.
         if old_model.address != new_model.address:
-            prepare_job_for_address_update(kw)
+            prepare_job_for_address_update(new_model)
 
         kw = sqlalchemy_to_kw(new_model)
 
@@ -474,7 +474,7 @@ class CompanyCrudRestController(EasyCrudRestController):
         # Check if the address has been modified. If it's the case, then
         # prepare the kw dict before insertion.
         if old_model.address != new_model.address:
-            prepare_company_for_address_update(kw)
+            prepare_company_for_address_update(new_model)
 
         kw = sqlalchemy_to_kw(new_model)
 
