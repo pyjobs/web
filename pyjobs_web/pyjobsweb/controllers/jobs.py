@@ -28,27 +28,35 @@ class SearchJobsController(BaseController):
 
         search_query = JobElastic.search()
 
-        search_on = ['description', 'title^10', 'company^20']
+        search_on = ['description', 'title^50', 'company^100']
 
         keyword_query = Q()
 
         if query:
             query = query.replace(',', ' ')
 
-            keyword_query = Q('multi_match',
-                              type='cross_fields',
-                              query=query,
-                              fields=search_on,
-                              minimum_should_match='2<50%')
+            keyword_query = Q(
+                'multi_match',
+                type='best_fields',
+                query=query,
+                fields=search_on,
+                minimum_should_match='1<50% 3<66% 4<75%'
+            )
 
-        decay_function = SF('gauss',
-                            publication_datetime=dict(origin='now',
-                                                      scale='120d',
-                                                      offset='7d',
-                                                      decay='0.1'))
-        search_query.query = Q('function_score',
-                               query=keyword_query,
-                               functions=[decay_function])
+        decay_function = SF(
+            'gauss',
+            publication_datetime=dict(
+                origin='now',
+                scale='15d',
+                offset='7d',
+                decay='0.5'
+            )
+        )
+        search_query.query = Q(
+            'function_score',
+            query=keyword_query,
+            functions=[decay_function]
+        )
 
         try:
             geoloc_query = json.loads(center)
