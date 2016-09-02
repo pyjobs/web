@@ -43,19 +43,34 @@ class GeocompleteController(BaseController):
         if postal_code:
             postal_code_query = Q('match', postal_code=postal_code)
 
-        weight_scoring_function = \
-            SF('field_value_factor', modifier='log1p', field='weight')
+        weight_scoring_function = SF(
+            'field_value_factor',
+            factor=5000,
+            modifier='log',
+            field='weight'
+        )
 
-        search.query = Q('function_score',
-                         query=address_query & postal_code_query,
-                         functions=[weight_scoring_function])
+        search.query = Q(
+            'function_score',
+            query=address_query & postal_code_query,
+            functions=[weight_scoring_function],
+            min_score=12
+        )
 
-        unique_agg = A('terms',
-                       field='name.raw',
-                       size=5,
-                       order={'avg_doc_score': 'desc'})
-        field_agg = A('top_hits', size=1)
-        score_agg = A('max', script=dict(lang='expression', script='_score'))
+        unique_agg = A(
+            'terms',
+            field='name.raw',
+            size=5,
+            order={'avg_doc_score': 'desc'}
+        )
+        field_agg = A(
+            'top_hits',
+            size=1
+        )
+        score_agg = A(
+            'max',
+            script=dict(lang='expression', script='_score')
+        )
 
         unique_agg.bucket('top_geo_matches', field_agg)
         unique_agg.bucket('avg_doc_score', score_agg)
