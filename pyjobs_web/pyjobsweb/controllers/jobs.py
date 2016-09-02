@@ -22,7 +22,8 @@ class SearchJobsController(BaseController):
 
     @expose('pyjobsweb.templates.jobs.list')
     @paginate('jobs', items_per_page=items_per_page)
-    def index(self, query=None, radius=None, center=None, *args, **kwargs):
+    def index(self, query=None, radius=None, center=None, sort_by=None,
+              *args, **kwargs):
         if not query and not radius and not center:
             redirect('/jobs')
 
@@ -82,6 +83,12 @@ class SearchJobsController(BaseController):
             # Since both these information are required to set a geolocation
             # filter are required, we ignore it.
             pass
+
+        if sort_by == 'dates':
+            search_query = search_query.sort(
+                '-publication_datetime',
+                '-_score'
+            )
 
         # TODO: result pagination
         job_offers = search_query[0:self.items_per_page * 50].execute()
