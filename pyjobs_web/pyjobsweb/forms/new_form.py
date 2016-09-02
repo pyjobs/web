@@ -258,7 +258,7 @@ class NewCompanyForm(twf.Form):
             label=u"Technologies utilisées par l'entreprise: (maximum 10)",
             placeholder=u"Technologie 1, Technologie 2, ..., Technologie 10",
             help_text=u"La liste de technologies utilisées par l'entreprise "
-                      u"(max. 10)",
+                      u"séparées par des virgules (max. 10)",
             maxlength=200,
             css_class='form-control',
             validator=TechnologiesValidator(required=True)
