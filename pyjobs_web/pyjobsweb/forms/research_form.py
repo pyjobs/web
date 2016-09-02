@@ -11,7 +11,7 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
     attrs = dict(style='width: 100%;')
     options = []
     opts = dict(
-        placeholder=u'Rechercher une localisation...',
+        placeholder=u'Autour de...',
         minimumInputLength=1,
         maximumInputLength=125,
         allowClear=True,
@@ -86,19 +86,29 @@ class ResearchForm(twf.Form):
                 ${c.display()}
             % endfor
 
-            <%def name="display_field(field, css_class)">
-                <div class="${css_class}">
-                    <label class="sr-only control-label" for="${field.compound_id}">
-                        ${field.label}
-                    </label>
-                    ${field.display()}
-                </div>
-                <div class="hidden-md hidden-lg col-xs-12" style="height:7px;"></div>
-            </%def>
+            <div class="col-xs-12 col-md-4 col-lg-4">
+                <label class="sr-only control-label" for="${w.children.query.compound_id}">
+                    ${w.children.query.label}
+                </label>
+                ${w.children.query.display()}
+            </div>
+            <div class="hidden-md hidden-lg col-xs-12" style="height:7px;"></div>
 
-            ${display_field(w.children.query, 'col-xs-12 col-md-4 col-lg-4')}
-            ${display_field(w.children.center, 'col-xs-12 col-md-3 col-lg-3')}
-            ${display_field(w.children.radius, 'col-xs-12 col-md-3 col-lg-3')}
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <label class="sr-only control-label" for="${w.children.center.compound_id}">
+                    ${w.children.center.label}
+                </label>
+                ${w.children.center.display()}
+            </div>
+            <div class="hidden-md hidden-lg col-xs-12" style="height:7px;"></div>
+
+            <div class="col-xs-12 col-md-3 col-lg-3">
+                <label class="sr-only control-label" for="${w.children.radius.compound_id}">
+                    ${w.children.radius.label}
+                </label>
+                ${w.children.radius.display()}
+            </div>
+            <div class="hidden-md hidden-lg col-xs-12" style="height:7px;"></div>
 
             <div class="col-xs-12 col-md-2 col-lg-2">
                 <button type="submit" class="form-control btn btn-default">
@@ -152,7 +162,7 @@ class ResearchForm(twf.Form):
             options=tmp_options,
             value='',
             attrs=dict(style='width: 100%;'),
-            placeholder=u'Distance maximale',
+            placeholder=u"Et jusqu'à...",
             opts=dict(
                 allowClear=True,
             )
