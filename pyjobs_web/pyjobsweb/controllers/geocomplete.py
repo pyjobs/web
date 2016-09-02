@@ -80,7 +80,6 @@ class GeocompleteController(BaseController):
 
         unique_agg.bucket('top_geo_matches', field_agg)
         unique_agg.bucket('avg_doc_score', score_agg)
-
         search.aggs.bucket('geo_matches', unique_agg)
 
         raw_res = search[0:0].execute()
