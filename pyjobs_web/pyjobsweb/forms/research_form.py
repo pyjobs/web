@@ -86,27 +86,25 @@ class ResearchForm(twf.Form):
                 ${c.display()}
             % endfor
 
-            <%def name="display_field(field)">
-                <div class="form-group">
-                    <label class="control-label col-sm-12" for="${field.compound_id}">
+            <%def name="display_field(field, css_class)">
+                <div class="${css_class}">
+                    <label class="sr-only control-label" for="${field.compound_id}">
                         ${field.label}
                     </label>
-                    <div class="col-xs-12 col-sm-12">
-                        ${field.display()}
-                    </div>
+                    ${field.display()}
                 </div>
-                <div class="col-xs-12" style="height:7px;"></div>
+                <div class="hidden-md hidden-lg col-xs-12" style="height:7px;"></div>
             </%def>
 
-            % for child in w.children_non_hidden:
-                ${display_field(child)}
-            % endfor
+            ${display_field(w.children.query, 'col-xs-12 col-md-4 col-lg-4')}
+            ${display_field(w.children.center, 'col-xs-12 col-md-3 col-lg-3')}
+            ${display_field(w.children.radius, 'col-xs-12 col-md-3 col-lg-3')}
 
-            <div class="form-group">
-                <label class="control-label col-sm-12" for="submit"> </label>
-                <div class="col-xs-12 col-md-12">
-                    ${w.submit.display()}
-                </div>
+            <div class="col-xs-12 col-md-2 col-lg-2">
+                <button type="submit" class="form-control btn btn-default">
+                    Filtrer
+                    <i class="fa fa-1x fa-search"></i>
+                </button>
             </div>
             '''
 
@@ -128,8 +126,11 @@ class ResearchForm(twf.Form):
             ondemand=True
         )
 
-        center = GeocompleteField(resources=[],
-                                  name="center", label=u'Autour de :')
+        center = GeocompleteField(
+            resources=[],
+            name="center",
+            label=u'Autour de :'
+        )
 
         distances = [
             "5", "10", "25", "50", "100", "200", "200+"
@@ -150,15 +151,14 @@ class ResearchForm(twf.Form):
             label=u'Dans un rayon de :',
             options=tmp_options,
             value='',
-            attrs=dict(style='width: 100%'),
+            attrs=dict(style='width: 100%;'),
             placeholder=u'Distance maximale',
-            opts=dict(allowClear=True)
+            opts=dict(
+                allowClear=True,
+            )
         )
-
-        submit = twf.SubmitButton("submit")
-        submit.value = "J'effectue ma recherche"
-        submit.css_class = "btn btn-default form-control"
 
     def __init__(self, **kwargs):
         super(ResearchForm, self).__init__(**kwargs)
         self.submit = None
+        self.css_class = 'row'
