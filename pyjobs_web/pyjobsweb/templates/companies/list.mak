@@ -29,12 +29,10 @@
             </span>
         </h1>
 
-        <h4>
-            <span class="pull-left">
-                <p>Retrouvez ici les entreprises qui recrutent des compétences python.</p>
-                <p>Si vous êtes vous-même collaborateur d'une entreprise qui recrute ou peut-être amenée à recruter des compétence python, n'hésitez pas à inscrire votre entreprise !</p>
-            </span>
-        </h4>
+        <br/>
+
+        <p>Retrouvez ici les entreprises qui recrutent des compétences python.</p>
+        <p>Si vous êtes vous-même collaborateur d'une entreprise qui recrute ou peut-être amenée à recruter des compétence python, n'hésitez pas à inscrire votre entreprise !</p>
     </header>
 </%def>
 
