@@ -93,10 +93,14 @@
                         <ul class="nav navbar-nav navbar-right">
                             ##         <li class="${('', 'active')[page=='index']}"><a href="${tg.url('/recruteurs')}">Recruteurs</a></li>
                             ##         <li class="${('', 'active')[page=='about']}"><a href="${tg.url('/candidats')}">Candidats</a></li>
-
                             <li class="${('', 'active')[page=='index']}">
-                                <a href="${tg.url('/sources')}">
-                                    Sources
+                                <a href="${tg.url('/societes-qui-recrutent')}">
+                                    Les entreprises qui recrutent
+                                </a>
+                            </li>
+                            <li class="${('', 'active')[page=='index']}">
+                                <a href="${tg.url('/origine-des-annonces-diffusees')}">
+                                    Origine des annonces
                                 </a>
                             </li>
                             <li class="${('', 'active')[page=='stats']}">

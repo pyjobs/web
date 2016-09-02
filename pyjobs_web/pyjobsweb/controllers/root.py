@@ -103,7 +103,7 @@ class RootController(BaseController):
         return feed.writeString('utf-8')
 
     @expose('pyjobsweb.templates.sources')
-    def sources(self, *args, **kwargs):
+    def origine_des_annonces_diffusees(self, *args, **kwargs):
         sources_last_crawl = {}
         sorted_sources = collections.OrderedDict(
             sorted(SOURCES.items(), key=lambda x: x[1].label))
