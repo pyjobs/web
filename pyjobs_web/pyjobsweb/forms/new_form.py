@@ -20,13 +20,19 @@ french_validation_messages = {
 
 
 class CompanyNameValidator(twc.Validator):
-    def __init__(self, **kwargs):
+    def __init__(self, max_length=100, **kwargs):
         super(CompanyNameValidator, self).__init__(**kwargs)
+        self.max_length = max_length
+
         self.msgs = dict(french_validation_messages)
         self.msgs['already_exists'] = u'Cette entreprise existe déjà dans '\
                                       u'notre base'
+        self.msgs['toolong'] = u"Nom d'entreprise trop long"
 
     def _validate_python(self, value, state=None):
+        if len(value) > self.max_length:
+            raise ValidationError('toolong', self)
+
         name_slug = slugify(value)
 
         # Check for duplicates in the database
