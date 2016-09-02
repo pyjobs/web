@@ -111,7 +111,7 @@ class ResearchForm(twf.Form):
         query = twsel.Select2MultipleSelectField(
             resources=[],
             name='query',
-            label=u'Requête :',
+            label=u'Mot clés :',
             options=[],
             value='',
             attrs=dict(style='width: 100%;'),
