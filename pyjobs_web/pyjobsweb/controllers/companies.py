@@ -81,18 +81,20 @@ class SearchCompaniesController(BaseController):
 
         search_query = CompanyElastic.search()
 
-        search_on = ['description', 'technologies^10', 'name^50']
+        search_on = ['description', 'technologies^50', 'name^100']
 
         keyword_query = Q()
 
         if query:
             query = query.replace(',', ' ')
 
-            keyword_query = Q('multi_match',
-                              type='cross_fields',
-                              query=query,
-                              fields=search_on,
-                              minimum_should_match='2<50%')
+            keyword_query = Q(
+                'multi_match',
+                type='best_fields',
+                query=query,
+                fields=search_on,
+                minimum_should_match='1<50% 3<66% 4<75%'
+            )
 
         search_query.query = keyword_query
 
