@@ -115,7 +115,7 @@ class ResearchForm(twf.Form):
             options=[],
             value='',
             attrs=dict(style='width: 100%;'),
-            placeholder=u"Mots clés recherchés...",
+            placeholder=u'Mots clés recherchés...',
             opts=dict(
                 tags=[
                     'Python', 'Django', 'Flask', 'Pyramid', 'Turbogears'
@@ -128,16 +128,16 @@ class ResearchForm(twf.Form):
 
         center = GeocompleteField(
             resources=[],
-            name="center",
+            name='center',
             label=u'Autour de :'
         )
 
         distances = [
-            "5", "10", "25", "50", "100", "200", "200+"
+            '5', '10', '25', '50', '100', '200', '200+'
         ]
         tmp_options = []
         for i, d in enumerate(distances):
-            distances_km = "{}{}".format(d, "km")
+            distances_km = '{}{}'.format(d, 'km')
             if i == len(distances) - 1:
                 option = ('infty', distances_km)
             else:
