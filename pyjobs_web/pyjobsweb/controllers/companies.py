@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import tg
 import json
 import logging
@@ -36,6 +37,15 @@ class NewCompanyController(BaseController):
 
         return dict(new_company_form=NewCompanyForm)
 
+    @staticmethod
+    def _parse_technologies(technologies):
+        technologies = re.sub(',+', ' ', technologies)
+        technologies = re.sub('(\s|\t)+', ' ', technologies)
+        technologies = technologies.strip()
+        technologies = technologies.replace(' ', ', ')
+
+        return technologies
+
     @expose()
     @validate(NewCompanyForm, error_handler=index)
     def submit(self, *args, **kwargs):
@@ -46,7 +56,10 @@ class NewCompanyController(BaseController):
         company.logo_url = kwargs['company_logo']
         company.url = kwargs['company_url']
         company.description = kwargs['company_description']
-        company.technologies = kwargs['company_technologies']
+
+        company.technologies = self._parse_technologies(
+            kwargs['company_technologies'])
+
         company.address = kwargs['company_address']
         company.address_is_valid = True
         company.email = kwargs['company_email']
