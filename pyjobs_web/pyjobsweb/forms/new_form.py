@@ -115,6 +115,14 @@ class RequiredValidator(twc.Validator):
         self.required = True
 
 
+class LengthValidator(twc.LengthValidator):
+    def __init__(self, **kwargs):
+        super(LengthValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.msgs['tooshort'] = u'Soumission trop courte'
+        self.msgs['toolong'] = u'Soumission trop longue'
+
+
 class UrlValidator(twc.UrlValidator):
     def __init__(self, **kwargs):
         super(UrlValidator, self).__init__(**kwargs)
@@ -250,12 +258,13 @@ class NewCompanyForm(twf.Form):
 
         company_description = twf.TextArea(
             id='company_description',
-            label=u"Description de l'entreprise:",
+            label=u"Description de l'entreprise: (de 100 à 5000 caractères)",
             placeholder=u"Description de l'entreprise...",
-            help_text=u"Une description succinte de l'entreprise",
+            help_text=u"Une description succinte de l'entreprise "
+                      u"(de 100 à 5000 caractères)",
             maxlength=5000,
             css_class='form-control',
-            validator=RequiredValidator
+            validator=LengthValidator(required=True, min=100, max=5000)
         )
 
         company_technologies = twf.TextArea(
