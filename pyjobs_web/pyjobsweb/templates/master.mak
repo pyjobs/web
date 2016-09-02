@@ -74,7 +74,7 @@
                             <img src="${tg.url('/img/pyjobs_logo_square.png')}" style="height: 32px;" alt="pyjobs"/>
                             pyjobs
                         </div>
-                        <div class="hidden-xs" style="display: inline-block">
+                        <div class="hidden-xs hidden-sm hidden-md" style="display: inline-block">
                             &mdash;<small>opportunités professionnelles python</small>
                         </div>
                     </a>
