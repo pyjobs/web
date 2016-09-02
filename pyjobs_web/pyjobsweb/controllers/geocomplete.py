@@ -11,12 +11,9 @@ from pyjobsweb.lib.base import BaseController
 
 
 class GeocompleteController(BaseController):
-    @expose('json')
-    def index(self, address=None, *args, **kwargs):
-        if not address:
-            return dict(results=[])
-
-        query_tokens = address.split(' ')
+    @staticmethod
+    def geocomplete_town_input_parser(address_input):
+        query_tokens = address_input.split(' ')
 
         postal_code = None
         address = None
@@ -32,10 +29,19 @@ class GeocompleteController(BaseController):
             except ValueError:
                 address = u'%s %s' % (address, token) if address else token
 
+        return address, postal_code
+
+    @expose('json')
+    def index(self, address=None, *args, **kwargs):
+        if not address:
+            return dict(results=[])
+
         search = model.Geocomplete.search()
 
         address_query = Q()
         postal_code_query = Q()
+
+        (address, postal_code) = self.geocomplete_town_input_parser(address)
 
         if address:
             address_query = Q('match', name=address)
