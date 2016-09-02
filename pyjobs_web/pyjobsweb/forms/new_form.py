@@ -228,7 +228,7 @@ class NewCompanyForm(twf.Form):
             help_text=u"Le numéro de téléphone de contact de l'entreprise pour "
                       u"les personnes souhaitant candidater au format "
                       u"0X.XX.XX.XX.XX",
-            maxlength=17,
+            maxlength=14,
             css_class='form-control',
             validator=PhoneNumberValidator(required=True)
         )
