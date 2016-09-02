@@ -11,10 +11,10 @@ from pyjobsweb.model import CompanyAlchemy
 from sqlalchemy.orm.exc import NoResultFound
 
 french_validation_messages = {
-    'required': (u'Veuillez saisir une valeur'),
-    'decode': (u'Mauvais jeu de caractère reçu; devrait être $encoding'),
-    'corrupt': (u"Données du formulaire reçues corrompues; veuillez réessayer "
-                u"s'il vous plaît."),
+    'required': u'Veuillez saisir une valeur',
+    'decode': u'Mauvais jeu de caractère reçu; devrait être $encoding',
+    'corrupt': u"Données du formulaire reçues corrompues; veuillez réessayer "
+                u"s'il vous plaît.",
     'childerror': '',  # Children of this widget have errors
 }
 
@@ -23,8 +23,8 @@ class CompanyNameValidator(twc.Validator):
     def __init__(self, **kwargs):
         super(CompanyNameValidator, self).__init__(**kwargs)
         self.msgs = dict(french_validation_messages)
-        self.msgs['already_exists'] = (u'Cette entreprise existe déjà dans '
-                                       u'notre base')
+        self.msgs['already_exists'] = u'Cette entreprise existe déjà dans '\
+                                      u'notre base'
 
     def _validate_python(self, value, state=None):
         name_slug = slugify(value)
@@ -45,7 +45,7 @@ class PhoneNumberValidator(twc.RegexValidator):
     def __init__(self, **kwargs):
         super(PhoneNumberValidator, self).__init__(**kwargs)
         self.msgs = dict(french_validation_messages)
-        self.msgs['badregex'] = (u'Numéro de téléphone invalide')
+        self.msgs['badregex'] = u'Numéro de téléphone invalide'
 
     regex = re.compile('^0([0-9](\.[0-9]{2}){4})$', re.IGNORECASE)
 
@@ -97,7 +97,7 @@ class TechnologiesValidator(twc.RegexValidator):
     def __init__(self, **kwargs):
         super(TechnologiesValidator, self).__init__(**kwargs)
         self.msgs = dict(french_validation_messages)
-        self.msgs['badregex'] = (u'Format du champ invalide')
+        self.msgs['badregex'] = u'Format du champ invalide'
 
     regex = re.compile('^(\w|\+|\-)+(\, (\w|\+|\-)+){0,9}$',
                        re.IGNORECASE | re.UNICODE)
