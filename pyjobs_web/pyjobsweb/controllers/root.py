@@ -64,7 +64,7 @@ class RootController(BaseController):
 
     @expose()
     def index(self, *args, **kwargs):
-        redirect('/jobs')
+        redirect(self.jobs.mount_point)
 
     @expose()
     def rss(self, limit=50, source=None, *args, **kwargs):
