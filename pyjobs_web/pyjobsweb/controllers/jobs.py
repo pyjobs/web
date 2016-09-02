@@ -11,7 +11,7 @@ from pyjobsweb.model import JobAlchemy
 from pyjobsweb.model import JobElastic
 from pyjobsweb.model.data import SOURCES
 from pyjobsweb.lib.base import BaseController
-from pyjobsweb.forms.research_form import ResearchForm
+from pyjobsweb.forms.research_forms import JobsResearchForm
 
 
 class SearchJobsController(BaseController):
@@ -94,7 +94,7 @@ class SearchJobsController(BaseController):
         job_offers = search_query[0:self.items_per_page * 50].execute()
 
         return dict(sources=SOURCES, jobs=job_offers,
-                    job_offer_search_form=ResearchForm)
+                    job_offer_search_form=JobsResearchForm)
 
 
 class JobsController(BaseController):
@@ -110,7 +110,7 @@ class JobsController(BaseController):
             job_offers = None
 
         return dict(sources=SOURCES, jobs=job_offers,
-                    job_offer_search_form=ResearchForm)
+                    job_offer_search_form=JobsResearchForm)
 
     @expose('pyjobsweb.templates.jobs.details')
     def details(self, offer_id, *args, **kwargs):

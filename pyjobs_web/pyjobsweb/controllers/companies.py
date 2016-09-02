@@ -15,7 +15,7 @@ from pyjobsweb.model import CompanyElastic
 from pyjobsweb.model import DBSession
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.forms.new_form import NewCompanyForm
-from pyjobsweb.forms.research_form import ResearchForm
+from pyjobsweb.forms.research_forms import CompaniesResearchForm
 
 
 class NewCompanyController(BaseController):
@@ -126,7 +126,8 @@ class SearchCompaniesController(BaseController):
         # TODO: result pagination
         companies = search_query[0:self.items_per_page * 50].execute()
 
-        return dict(companies=companies, company_search_form=ResearchForm)
+        return dict(companies=companies,
+                    company_search_form=CompaniesResearchForm)
 
 
 class CompaniesController(BaseController):
@@ -143,7 +144,8 @@ class CompaniesController(BaseController):
         except NoResultFound:
             companies = None
 
-        return dict(companies=companies, company_search_form=ResearchForm)
+        return dict(companies=companies,
+                    company_search_form=CompaniesResearchForm)
 
     @expose('pyjobsweb.templates.companies.details')
     def details(self, company_id, *args, **kwargs):
