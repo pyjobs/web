@@ -57,13 +57,16 @@ class SearchJobsController(BaseController):
             if not radius:
                 radius = 5.0
 
-            search_query = \
-                search_query.filter('geo_distance',
-                                    geolocation=[lon, lat],
-                                    distance='%skm' % float(radius))
+            search_query = search_query.filter(
+                'geo_distance',
+                geolocation=[lon, lat],
+                distance='%skm' % float(radius)
+            )
 
-            search_query = \
-                search_query.filter('term', geolocation_is_valid=True)
+            search_query = search_query.filter(
+                'term',
+                geolocation_is_valid=True
+            )
         except (ValueError, TypeError):
             # One of the following case has occurred:
             #     - Center wasn't a valid json string
