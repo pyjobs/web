@@ -32,7 +32,7 @@
         <br/>
 
         <p>Retrouvez ici les entreprises qui recrutent des compétences python.</p>
-        <p>Si vous êtes vous-même collaborateur d'une entreprise qui recrute ou peut-être amenée à recruter des compétence python, n'hésitez pas à inscrire votre entreprise !</p>
+        <p>Si vous êtes vous-même collaborateur d'une entreprise qui recrute ou peut-être amenée à recruter des compétences python, n'hésitez pas à inscrire votre entreprise !</p>
     </header>
 </%def>
 
