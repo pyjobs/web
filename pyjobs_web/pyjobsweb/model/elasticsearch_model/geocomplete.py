@@ -90,3 +90,14 @@ class Geocomplete(es.DocType):
     geolocation = es.GeoPoint()
 
     weight = es.Float()
+
+    def __init__(self, meta=None, **kwargs):
+        super(Geocomplete, self).__init__(meta, **kwargs)
+
+    @property
+    def index(self):
+        return self._doc_type.index
+
+    @property
+    def doc_type(self):
+        return self._doc_type.name

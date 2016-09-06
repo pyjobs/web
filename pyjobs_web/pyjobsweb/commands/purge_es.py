@@ -82,7 +82,7 @@ class PurgeESCommand(AppContextCommand):
         self._reset_sync(model.CompanyAlchemy)
 
     def purge_geocomplete_index(self):
-        index_name = model.Geocomplete.index
+        index_name = model.Geocomplete().index
         self._purge_index(index_name, dict(), model.Geocomplete)
 
     def take_action(self, parsed_args):
