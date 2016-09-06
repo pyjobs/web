@@ -43,38 +43,54 @@
 
 ${company_pagination()}
 
+<%def name="end_body_scripts()">
+    ${parent.end_body_scripts()}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".clickable-div").bind("click", function(e) {
+                if (e.ctrlKey) {
+                    window.open($(this).find("a:last").attr("href"), "_blank");
+                } else {
+                    window.location = $(this).find("a:last").attr("href");
+                    return false;
+                }
+            });
+
+            $(".clickable-div").hover(function () {
+                $(this).attr("title", $(this).find("a:last").attr("href"));
+                window.status = $(this).find("a:last").attr("href");
+            });
+
+            $(".clickable-div").css("cursor", "pointer");
+
+            $(".inside-link").click(function(event){
+                event.stopImmediatePropagation();
+            });
+        });
+    </script>
+</%def>
+
 % if not companies:
     <div class="no-company-found">
         <h3>Désolé, aucune entreprise n'a pu être trouvée.</h3>
     </div>
 % else:
     % for company in companies:
-        <div id="company-${company.id}" class="company-item ${loop.cycle('row-even', 'row-odd')}"
+        <div id="company-${company.id}" class="clickable-div company-item ${loop.cycle('row-even', 'row-odd')}"
              style="padding: 1em 1em 3em 1em;">
             <div class="row" id="company-post-head-${company.id}">
                 <div class="col-md-9">
                     <h3 style="margin-top: 0; padding-top: 0;">
                         <a style="color: #555; font-weight: bold;"
+                           class="inside-link"
                            href="${h.get_company_url(company.id, previous=request.url)}">
                             <i style="color: #555;" class="fa fa-fw fa-building-o"></i>
                             ${company.name}
                         </a>
                         <br/>
-                        <a href="mailto:${company.url}" style="color: #999;">
-                            <i class="fa fa-fw fa-envelope-o"></i>
-                            <span style="font-size: 0.9em;">
-                                ${company.email}
-                            </span>
-                        </a>
-                        <br/>
-                        <span style="color: #999;">
-                            <i class="fa fa-fw fa-phone"></i>
-                            <span style="font-size: 0.9em;">
-                                ${company.phone}
-                            </span>
-                        </span>
-                        <br/>
-                        <a href="http://nominatim.openstreetmap.org/search.php?q=${company.address}">
+                        <a class="inside-link"
+                           href="http://nominatim.openstreetmap.org/search.php?q=${company.address}" target="_blank">
                             <i class="fa fa-fw fa-map-marker"></i>
                             <span style="font-size: 0.9em;">
                                 ${company.address}
@@ -86,13 +102,12 @@ ${company_pagination()}
                 <div class="col-md-3">
                     <div class="text-right">
                         <h4>
-                            <a href="${company.url}" style="color: #555;">
-                                <i class="fa fa-fw fa-external-link"></i>
-                                Site de l'entreprise
+                            <a class="inside-link" href="${company.url}" style="color: #AAA; font-weight: bold;" target="_blank">
+                                <img style="max-height: 32px;" src="${company.logo_url}" alt="${company.name}"/>
                             </a>
                             <br/>
-                            <a href="${company.url}" style="color: #AAA; font-weight: bold;">
-                                <img style="max-height: 32px;" src="${company.logo_url}" alt="${company.name}"/>
+                            <a class="inside-link" href="${company.url}" style="color: #555;" target="_blank">
+                                ${company.url.replace('http://', '')}
                             </a>
                         </h4>
                     </div>
@@ -103,25 +118,8 @@ ${company_pagination()}
                         <span class="label label-default label-pyjob company-technology">${technology}</span>
                     % endfor
                 </div>
-
-                <div class="col-md-12">
-                    <h4 style="color: #555;">
-                        Présentation de l'entreprise:
-                    </h4>
-                    <div class="col-md-1"></div>
-                    <div class="col-md-10">
-                        <h4 style="color: #555; font-size: 1.1em;">
-                            ${company.description[0:139].rstrip()}
-                            % if len(company.description) > 140:
-                                ...
-                                <a href="${h.get_company_url(company.id, previous=request.url)}">
-                                    (cliquez ici pour lire la suite)
-                                </a>
-                            % endif
-                        </h4>
-                    </div>
-                </div>
             </div>
+            <a target="_blank" href="${h.get_company_url(company.id, previous=request.url, absolute=True)}"></a>
         </div>
     % endfor
 % endif
