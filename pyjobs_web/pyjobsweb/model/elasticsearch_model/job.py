@@ -6,6 +6,7 @@ from babel.dates import format_date, format_timedelta
 from pyjobs_crawlers.tools import condition_tags
 
 from pyjobsweb.model.data import Tag2
+from pyjobsweb.lib.elasticsearch_ import compute_index_name
 
 
 class Tag(es.InnerObjectWrapper):
@@ -91,6 +92,7 @@ class Job(es.DocType):
 
     def __init__(self, meta=None, **kwargs):
         super(Job, self).__init__(meta, **kwargs)
+        self._doc_type.index = compute_index_name(self.index)
 
     @property
     def index(self):

@@ -92,7 +92,7 @@ class SearchCompaniesController(BaseController):
         if not query and not radius and not center:
             redirect('/societes-qui-recrutent')
 
-        search_query = CompanyElastic.search()
+        search_query = CompanyElastic().search()
 
         search_on = ['description', 'technologies^50', 'name^100']
 

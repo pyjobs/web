@@ -152,16 +152,8 @@ class PopulateESCommand(AppContextCommand):
         self._synchronise_index(model.CompanyAlchemy,
                                 model.CompanyElastic, self._company_id_logging)
 
-    def _populate_geocomplete_index(self):
-        log_msg = 'Populating geocomplete index.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
-
-        elasticsearch_conn = connections.get_connection()
-
-        log_msg = 'Computing required geoloc-entry documents.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
-        to_index = [d.to_dict(True) for d in self._geocompletion_documents()]
-
+    @staticmethod
+    def _geocomplete_index_batch(elasticsearch_conn, to_index):
         log_msg = 'Indexing documents.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
 
@@ -176,6 +168,30 @@ class PopulateESCommand(AppContextCommand):
                           "under index: %s." % (doc_id, doc_type, doc_index)
 
                 logging.getLogger(__name__).log(logging_level, err_msg)
+
+    def _populate_geocomplete_index(self, max_doc=1000):
+        log_msg = 'Populating geocomplete index.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
+        elasticsearch_conn = connections.get_connection()
+
+        log_msg = 'Computing required geoloc-entry documents.'
+        logging.getLogger(__name__).log(logging.INFO, log_msg)
+
+        to_index = list()
+
+        for document in self._geocompletion_documents():
+            to_index.append(document.to_dict(True))
+
+            if len(to_index) < max_doc:
+                continue
+
+            self._geocomplete_index_batch(elasticsearch_conn, to_index)
+
+            to_index = list()
+
+        if len(to_index) != 0:
+            self._geocomplete_index_batch(elasticsearch_conn, to_index)
 
         elasticsearch_dsl.Index('geocomplete').refresh()
 

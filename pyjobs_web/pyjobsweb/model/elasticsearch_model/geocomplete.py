@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import elasticsearch_dsl as es
 
+from pyjobsweb.lib.elasticsearch_ import compute_index_name
+
 
 class Geocomplete(es.DocType):
     class Meta:
@@ -108,6 +110,9 @@ class Geocomplete(es.DocType):
 
     def __init__(self, meta=None, **kwargs):
         super(Geocomplete, self).__init__(meta, **kwargs)
+
+        if self.index in compute_index_name(self.index):
+            self._doc_type.index = compute_index_name(self.index)
 
     @property
     def index(self):

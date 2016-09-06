@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import elasticsearch_dsl as es
 
+from pyjobsweb.lib.elasticsearch_ import compute_index_name
+
 
 class Company(es.DocType):
     class Meta:
@@ -77,6 +79,7 @@ class Company(es.DocType):
 
     def __init__(self, meta=None, **kwargs):
         super(Company, self).__init__(meta, **kwargs)
+        self._doc_type.index = compute_index_name(self.index)
 
     @property
     def index(self):

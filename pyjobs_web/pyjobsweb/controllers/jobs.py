@@ -27,7 +27,7 @@ class SearchJobsController(BaseController):
         if not query and not radius and not center:
             redirect('/jobs')
 
-        search_query = JobElastic.search()
+        search_query = JobElastic().search()
 
         search_on = ['description', 'title^50', 'company^100']
 

@@ -36,7 +36,7 @@ class GeocompleteController(BaseController):
         if not address:
             return dict(results=[])
 
-        search = model.Geocomplete.search()
+        search = model.Geocomplete().search()
 
         address_query = Q()
         postal_code_query = Q()
