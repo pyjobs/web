@@ -47,7 +47,7 @@ class JobsResearchForm(twf.Form):
             <div class="hidden-md hidden-lg col-xs-12" style="height:7px;"></div>
 
             <div class="col-xs-12 col-md-2 col-lg-2">
-                <button type="submit" class="form-control btn btn-default">
+                <button type="submit" class="btn btn-default btn-sm" style="width: 100%;">
                     Filtrer
                     <i class="fa fa-1x fa-search"></i>
                 </button>
@@ -157,7 +157,7 @@ class CompaniesResearchForm(twf.Form):
             <div class="hidden-md hidden-lg col-xs-12" style="height:7px;"></div>
 
             <div class="col-xs-12 col-md-2 col-lg-2">
-                <button type="submit" class="form-control btn btn-default">
+                <button type="submit" class="btn btn-default btn-sm" style="width: 100%;">
                     Filtrer
                     <i class="fa fa-1x fa-search"></i>
                 </button>
