@@ -26,15 +26,28 @@ class Geocomplete(es.DocType):
         side='front'
     )
 
+    town_filter = es.token_filter(
+        'town_filter',
+        type='pattern_replace',
+        pattern=' ',
+        replacement='-'
+    )
+
+    geocompletion_index_tokenizer = es.tokenizer(
+        'geocompletion_index_tokenizer',
+        type='pattern',
+        pattern='@'
+    )
+
     geocompletion_index_analyzer = es.analyzer(
         'geocompletion_index_analyzer',
         type='custom',
-        tokenizer='standard',
+        tokenizer=geocompletion_index_tokenizer,
         filter=[
             'lowercase',
             'asciifolding',
-            'word_delimiter',
             french_elision,
+            town_filter,
             geocompletion_ngram_filter
         ]
     )
@@ -42,10 +55,12 @@ class Geocomplete(es.DocType):
     geocompletion_search_analyzer = es.analyzer(
         'geocompletion_search_analyzer',
         type='custom',
-        tokenizer='standard',
+        tokenizer=geocompletion_index_tokenizer,
         filter=[
             'lowercase',
-            'asciifolding'
+            'asciifolding',
+            town_filter,
+            french_elision
         ]
     )
 

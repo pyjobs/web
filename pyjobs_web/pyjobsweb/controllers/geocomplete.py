@@ -51,16 +51,15 @@ class GeocompleteController(BaseController):
 
         weight_scoring_function = SF(
             'field_value_factor',
-            factor=5000,
-            modifier='log',
+            factor=1,
+            modifier='none',
             field='weight'
         )
 
         search.query = Q(
             'function_score',
             query=address_query & postal_code_query,
-            functions=[weight_scoring_function],
-            min_score=12
+            functions=[weight_scoring_function]
         )
 
         unique_agg = A(
