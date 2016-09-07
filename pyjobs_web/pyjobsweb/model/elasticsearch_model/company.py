@@ -55,18 +55,28 @@ class Company(es.DocType):
         char_filter=['html_strip']
     )
 
-    technologies_tokenizer = es.tokenizer('comma_tokenizer',
-                                          type='pattern', pattern=',')
-    technologies_analyzer = es.analyzer('technologies_analyzer',
-                                        tokenizer=technologies_tokenizer)
+    technologies_tokenizer = es.tokenizer(
+        'comma_tokenizer',
+        type='pattern',
+        pattern=',|, '
+    )
+    technologies_analyzer = es.analyzer(
+        'technologies_analyzer',
+        tokenizer=technologies_tokenizer,
+        filter=[
+            'lowercase',
+            'asciifolding'
+        ]
+    )
 
     id = es.String(index='no')
 
-    name = es.String(index='analyzed')
+    name = es.String(index='not_analyzed')
     logo_url = es.String(index='no')
     description = es.String(analyzer=french_description_analyzer)
     url = es.String(index='no')
-    technologies = es.String(analyzer=technologies_analyzer)
+    technologies = es.String(analyzer=technologies_analyzer,
+                             search_analyzer=technologies_analyzer)
 
     address = es.String(index='no')
     address_is_valid = es.Boolean()
