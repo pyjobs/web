@@ -19,11 +19,12 @@
 </%def>
 
 <%def name="page_header()">
-    <header class="page-header">
+    <header class="page-header hidden-xs">
         <h1>
             Les entreprises qui recrutent !
             <span class="btn-group pull-right" role="group">
-                <a href="/societes-qui-recrutent/new" title="Ajouter une entreprise" class="btn btn-success">
+                <a href="/societes-qui-recrutent/new"
+                   title="Ajouter une entreprise" class="btn btn-success">
                     <i class="fa fa-3x fa-plus"></i>
                 </a>
             </span>
@@ -31,8 +32,31 @@
 
         <br/>
 
-        <p>Retrouvez ici les entreprises qui recrutent des compétences python.</p>
-        <p>Si vous êtes vous-même collaborateur d'une entreprise qui recrute ou peut-être amenée à recruter des compétences python, n'hésitez pas à inscrire votre entreprise !</p>
+        <p>Retrouvez ici les entreprises qui recrutent des compétences
+            python.</p>
+        <p>Si vous êtes vous-même collaborateur d'une entreprise qui recrute ou
+            peut-être amenée à recruter des compétences python, n'hésitez pas à
+            inscrire votre entreprise !</p>
+    </header>
+
+    <header class="page-header hidden-sm hidden-md hidden-lg">
+        <h1>
+            Les entreprises qui recrutent !
+        </h1>
+        <span class="btn-group" role="group">
+            <a href="/societes-qui-recrutent/new" title="Ajouter une entreprise"
+               class="btn btn-success">
+                <i class="fa fa-3x fa-plus"></i>
+            </a>
+        </span>
+
+        <br/>
+
+        <p>Retrouvez ici les entreprises qui recrutent des compétences
+            python.</p>
+        <p>Si vous êtes vous-même collaborateur d'une entreprise qui recrute ou
+            peut-être amenée à recruter des compétences python, n'hésitez pas à
+            inscrire votre entreprise !</p>
     </header>
 </%def>
 

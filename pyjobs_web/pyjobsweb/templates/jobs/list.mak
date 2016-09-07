@@ -19,7 +19,7 @@
 </%def>
 
 <%def name="page_header()">
-    <header class="page-header">
+    <header class="page-header hidden-xs">
         <h1>
             Le job qu'il vous faut &mdash; en python
             <span class="btn-group pull-right" role="group">
@@ -36,6 +36,23 @@
                 </a>
             </span>
         </h1>
+    </header>
+
+    <header class="page-header hidden-sm hidden-md hidden-lg">
+        <h1>
+            Offres emploi python
+        </h1>
+        <span class="btn-group" role="group">
+            <a href="https://twitter.com/pyjobsfr" title="Annonces sur Twitter" target="_blank" class="btn btn-default">
+                <i class="fa fa-3x fa-twitter"></i>
+            </a>
+            <a href="/rss?limit=50" title="Flux RSS des annonces de jobs python" target="_blank" class="btn btn-default">
+                <i class="fa fa-3x fa-rss"></i>
+            </a>
+            <a href="https://github.com/pyjobs/annonces" title="Annonces sur GitHub" target="_blank" class="btn btn-default">
+                <i class="fa fa-3x fa-github"></i>
+            </a>
+        </span>
     </header>
 </%def>
 
