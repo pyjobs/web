@@ -46,9 +46,7 @@ class NewCompanyController(BaseController):
 
         return technologies
 
-    @expose()
-    @validate(NewCompanyForm, error_handler=index)
-    def submit(self, *args, **kwargs):
+    def _build_company_obj(self, **kwargs):
         company = CompanyAlchemy()
 
         company.id = slugify(kwargs['company_name'])
@@ -65,6 +63,10 @@ class NewCompanyController(BaseController):
         company.email = kwargs['company_email']
         company.phone = kwargs['company_phone']
 
+        return company
+
+    @staticmethod
+    def _redirect():
         redirect_to = '/societes-qui-recrutent'
         redirect_msg = u"Votre demande d'ajout d'entreprise a bien été " \
                        u"soumise à modération. L'entreprise sera ajoutée à " \
@@ -72,12 +74,19 @@ class NewCompanyController(BaseController):
                        u"attendus."
         redirect_status = 'ok'
 
+        tg.flash(redirect_msg, redirect_status)
+        redirect(redirect_to)
+
+    @expose()
+    @validate(NewCompanyForm, error_handler=index)
+    def submit(self, *args, **kwargs):
+        company = self._build_company_obj(**kwargs)
+
         transaction.begin()
         DBSession.add(company)
         transaction.commit()
 
-        tg.flash(redirect_msg, redirect_status)
-        redirect(redirect_to)
+        self._redirect()
 
 
 class SearchCompaniesController(BaseController):
