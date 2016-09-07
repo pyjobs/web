@@ -86,7 +86,7 @@ class GeocodeCommand(AppContextCommand):
             if not acquired:
                 err_msg = 'Another process is already performing geocoding' \
                           'operations on the job offers, aborting now.'
-                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+                self._logging(logging.WARNING, err_msg)
             else:
                 self._geocode(model.JobAlchemy, self._job_id_logging)
 
@@ -98,7 +98,7 @@ class GeocodeCommand(AppContextCommand):
             if not acquired:
                 err_msg = 'Another process is already performing geocoding ' \
                           'operations on the companies, aborting now.'
-                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+                self._logging(logging.WARNING, err_msg)
             else:
                 self._geocode(model.CompanyAlchemy, self._company_id_logging)
 

@@ -8,6 +8,9 @@ from pyjobsweb.commands import AppContextCommand
 
 
 class BotsCommand(AppContextCommand):
+    def __init__(self, *args, **kwargs):
+        super(BotsCommand, self).__init__(args, kwargs)
+        self._logger = logging.getLogger(__name__)
 
     def get_parser(self, prog_name):
         parser = super(BotsCommand, self).get_parser(prog_name)
@@ -62,8 +65,10 @@ class BotsCommand(AppContextCommand):
 
         return parser
 
-    @staticmethod
-    def _get_twitter_credentials(credentials_path):
+    def _logging(self, logging_level, message):
+        self._logger.log(logging_level, message)
+
+    def _get_twitter_credentials(self, credentials_path):
         err_msg = ''
         exception = None
 
@@ -81,7 +86,7 @@ class BotsCommand(AppContextCommand):
             exception = exc
 
         if err_msg:
-            logging.getLogger(__name__).log(logging.ERROR, err_msg)
+            self._logging(logging.ERROR, err_msg)
             raise exception
 
         return credentials
@@ -95,7 +100,7 @@ class BotsCommand(AppContextCommand):
         except Exception:
             err_msg = 'A critical error occurred while ' \
                       'configuring/running the Twitter bot. Aborting now.'
-            logging.getLogger(__name__).log(logging.ERROR, err_msg)
+            self._logging(logging.ERROR, err_msg)
             return
 
     @staticmethod

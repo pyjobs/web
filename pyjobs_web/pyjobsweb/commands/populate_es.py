@@ -148,7 +148,7 @@ class PopulateESCommand(AppContextCommand):
                 es_doc = es_doc_cls()
                 err_msg = 'Another process is already synchronizing the %s ' \
                           'index, aborting now.' % es_doc.index
-                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+                self._logging(logging.WARNING, err_msg)
             else:
                 self._perform_index_sync(sql_table_cls, es_doc_cls, id_logger)
 
@@ -166,7 +166,7 @@ class PopulateESCommand(AppContextCommand):
     @staticmethod
     def _geocomplete_index_batch(elasticsearch_conn, to_index):
         log_msg = 'Indexing documents.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
+        self._logging(logging.INFO, log_msg)
 
         for ok, info in parallel_bulk(elasticsearch_conn, to_index):
             if not ok:
@@ -178,7 +178,7 @@ class PopulateESCommand(AppContextCommand):
                 err_msg = "Couldn't index document: '%s', of type: %s, " \
                           "under index: %s." % (doc_id, doc_type, doc_index)
 
-                logging.getLogger(__name__).log(logging_level, err_msg)
+                self._logging(logging_level, err_msg)
 
     def _perform_geocomplete_index_population(self, max_doc):
         elasticsearch_conn = connections.get_connection()
@@ -188,7 +188,7 @@ class PopulateESCommand(AppContextCommand):
         for i, document in enumerate(self._geocompletion_documents()):
             if i % max_doc == 0:
                 log_msg = 'Computing required geoloc-entry documents.'
-                logging.getLogger(__name__).log(logging.INFO, log_msg)
+                self._logging(logging.INFO, log_msg)
 
             to_index.append(document.to_dict(True))
 
@@ -206,18 +206,18 @@ class PopulateESCommand(AppContextCommand):
 
     def _populate_geocomplete_index(self, max_doc=1000):
         log_msg = 'Populating geocomplete index.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
+        self._logging(logging.INFO, log_msg)
 
         with acquire_inter_process_lock('populate_geocomplete') as acquired:
             if not acquired:
                 err_msg = 'Another process is already populating the ' \
                           'geocomplete index, aborting now.'
-                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+                self._logging(logging.WARNING, err_msg)
             else:
                 self._perform_geocomplete_index_population(max_doc)
 
                 log_msg = 'gecomplete index populated and refreshed.'
-                logging.getLogger(__name__).log(logging.INFO, log_msg)
+                self._logging(logging.INFO, log_msg)
 
     def take_action(self, parsed_args):
         super(PopulateESCommand, self).take_action(parsed_args)

@@ -40,6 +40,10 @@ class GitHubBot(object):
         model.init_model(engine)
 
         self._repo = None
+        self._logger = logging.getLogger(__name__)
+
+    def _logging(self, logging_level, message):
+        self._logger.log(logging_level, message)
 
     def _check_repository_directory(self):
         """
@@ -62,14 +66,19 @@ class GitHubBot(object):
         self._pull()
 
     def _prepare_local_repo(self):
+        self._logging(logging.INFO, 'Preparing the local git repository.')
         self._check_repository_directory()
         self._check_repository()
 
     def _compute_new_job_offers(self):
+        self._logging(logging.INFO, 'Computing the new job offers.')
         last_jobs = self._get_lasts_jobs()
         return self._get_new_jobs(last_jobs)
 
     def _commit_new_job_offers(self, new_job_offers):
+        self._logging(logging.INFO, 'Committing the new job offers on the '
+                                    'local git repository.')
+
         new_job_offers.reverse()
 
         for new_job_offer in new_job_offers:
@@ -77,6 +86,10 @@ class GitHubBot(object):
             self._write_jobs(new_job_offer, old_jobs)
             message = self._get_commit_message(new_job_offer)
             self._commit(message)
+
+    def _push_local_repo_offers(self):
+        self._logging(logging.INFO, 'Pushing changes to remote repository.')
+        self._push()
 
     def _push_new_job_offers_to_github(self):
         self._prepare_local_repo()
@@ -87,13 +100,15 @@ class GitHubBot(object):
             return
 
         self._commit_new_job_offers(new_job_offers)
-        self._push()
+        self._push_local_repo_offers()
 
     def run(self):
         """
         Update job file if new jobs. Then make a push.
         :return:
         """
+        self._logging(logging.INFO, 'Starting the Github bot.')
+
         with acquire_inter_process_lock('github_bot') as acquired:
             if not acquired:
                 err_msg = 'Another instance of the Github bot is already ' \

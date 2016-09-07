@@ -69,7 +69,7 @@ class PurgeESCommand(AppContextCommand):
             if not acquired:
                 err_msg = 'Another process is already purging the %s ' \
                           'index, aborting now.' % index_name
-                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+                self._logging(logging.WARNING, err_msg)
             else:
                 self._perform_index_purge(index_name,
                                           index_settings, doc_type_class)
@@ -89,14 +89,14 @@ class PurgeESCommand(AppContextCommand):
 
     def _reset_sync(self, index_name, sqlalchemy_table_class):
         err_msg = 'Resetting synchronization data for index %s.' % index_name
-        logging.getLogger(__name__).log(logging.WARNING, err_msg)
+        self._logging(logging.WARNING, err_msg)
 
         with acquire_inter_process_lock('purge_%s' % index_name) as acquired:
             if not acquired:
                 err_msg = 'Another process is already resetting the %s ' \
                           'index synchronization data, aborting now.' \
                           % index_name
-                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+                self._logging(logging.WARNING, err_msg)
             else:
                 self._perform_sync_reset(sqlalchemy_table_class)
 
