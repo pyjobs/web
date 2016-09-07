@@ -60,11 +60,11 @@
 }
 
 .row-even {
-    background-color: #FFF;
+    background-color: #E3E3E3;
 }
 
 .row-odd {
-    background-color: #E7E7E7;
+    background-color: #F7F7F7;
 }
 
 .label-pyjob {
@@ -207,4 +207,13 @@ html.full-height {
 .form-group.required .control-label:after {
   content:"*";
   color:red;
+}
+
+.clickable-div {
+    opacity: 0.75;
+}
+
+.clickable-div:hover {
+    opacity: 1;
+    box-shadow: 1px 0px #1a242f;
 }
