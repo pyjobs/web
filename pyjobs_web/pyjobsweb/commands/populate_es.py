@@ -163,8 +163,7 @@ class PopulateESCommand(AppContextCommand):
         self._synchronise_index(model.CompanyAlchemy,
                                 model.CompanyElastic, self._company_id_logging)
 
-    @staticmethod
-    def _geocomplete_index_batch(elasticsearch_conn, to_index):
+    def _geocomplete_index_batch(self, elasticsearch_conn, to_index):
         log_msg = 'Indexing documents.'
         self._logging(logging.INFO, log_msg)
 
