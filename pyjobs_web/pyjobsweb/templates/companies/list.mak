@@ -52,7 +52,7 @@ ${company_pagination()}
                 if (e.ctrlKey) {
                     window.open($(this).find("a:last").attr("href"), "_blank");
                 } else {
-                    window.location = $(this).find("a:last").attr("href");
+                    window.location.href = $(this).find("a:last").attr("href");
                     return false;
                 }
             });
@@ -119,7 +119,7 @@ ${company_pagination()}
                     % endfor
                 </div>
             </div>
-            <a target="_blank" href="${h.get_company_url(company.id, previous=request.url, absolute=True)}"></a>
+            <a target="_blank" href="${h.get_company_url(company.id, previous=request.url)}"></a>
         </div>
     % endfor
 % endif
