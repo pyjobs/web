@@ -27,7 +27,7 @@
 
 <div id="company-details-body" class="row">
     <div id="company-address" class="col-sm-8 col-xs-12">
-        <h3>Adresse de l'entreprise</h3>
+        <h3>Adresse</h3>
         <h4>
             <a class="inside-link"
                href="http://nominatim.openstreetmap.org/search.php?q=${company.address}"
@@ -88,7 +88,7 @@
 
     <div id="company-description" class="col-sm-8 col-xs-12">
         <h3>
-            Description de l'entreprise
+            Description
         </h3>
         ${company.description|n}
         <br/>
