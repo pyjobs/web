@@ -72,7 +72,7 @@ class Job(es.DocType):
 
     title = es.String(analyzer=french_analyzer)
     description = es.String(analyzer=french_description_analyzer)
-    company = es.String(index='analyzed')
+    company = es.String(index='not_analyzed')
     company_url = es.String(index='no')
 
     address = es.String(index='no')
