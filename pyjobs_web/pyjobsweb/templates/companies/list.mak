@@ -67,34 +67,6 @@
 
 ${company_pagination()}
 
-<%def name="end_body_scripts()">
-    ${parent.end_body_scripts()}
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $(".clickable-div").click(function(e) {
-                if (e.ctrlKey) {
-                    window.open($(this).find("a:last").attr("href"), "_blank");
-                } else {
-                    window.location.href = $(this).find("a:last").attr("href");
-                    return false;
-                }
-            });
-
-            $(".clickable-div").hover(function () {
-                $(this).attr("title", $(this).find("a:last").attr("href"));
-                window.status = $(this).find("a:last").attr("href");
-            });
-
-            $(".clickable-div").css("cursor", "pointer");
-
-            $(".inside-link").click(function(event){
-                event.stopImmediatePropagation();
-            });
-        });
-    </script>
-</%def>
-
 % if not companies:
     <div class="no-company-found">
         <h3>Désolé, aucune entreprise n'a pu être trouvée.</h3>

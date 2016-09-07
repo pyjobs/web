@@ -50,6 +50,7 @@
         <script src="${tg.url('/javascript/select2.min.js')}"></script>
         <script src="${tg.url('/javascript/select2_locale_fr.js')}"></script>
         <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
+        <script src="${tg.url('/javascript/clickable_divs.js')}"></script>
     </%def>
 
     <%def name="footer()">
