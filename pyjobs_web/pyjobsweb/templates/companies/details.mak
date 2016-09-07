@@ -86,30 +86,7 @@
         % endfor
     </div>
 
-    <div id="company-description" class="col-sm-8 hidden-xs">
-        <h3>
-            Description
-        </h3>
-        <%
-            company.description.rstrip()
-            limit = len(company.description) / 2
-
-            while limit < len(company.description) and company.description[limit] != ' ':
-                limit += 1
-
-            first_half = company.description[:limit]
-            second_half = company.description[limit:]
-        %>
-        <div style="float:left; width:45%;">
-            ${first_half|n}
-        </div>
-        <div style="width:45%; margin-left: 55%;">
-            ${second_half|n}
-        </div>
-        <br/>
-    </div>
-
-    <div id="company-description" class="col-xs-12 hidden-sm hidden-md hidden-lg">
+    <div id="company-description" class="col-sm-8 col-xs-12">
         <h3>
             Description
         </h3>
