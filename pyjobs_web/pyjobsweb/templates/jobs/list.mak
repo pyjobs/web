@@ -34,21 +34,8 @@
                 <a href="https://github.com/pyjobs/annonces" title="Annonces sur GitHub" target="_blank" class="btn btn-default">
                     <i class="fa fa-3x fa-github"></i>
                 </a>
-
-##                 <a href="/societes-qui-recrutent/new" title="Ajouter une entreprise" class="btn btn-success">
-##                     <i class="fa fa-3x fa-plus"></i>
-##                 </a>
             </span>
         </h1>
-    ##    <h2>
-    ##            <div class="col-md-6">
-    ##                <div class="btn-group" role="group" aria-label="...">
-    ##                    <button type="button" class="btn btn-small btn-default">Ma boîte recrute</button>
-    ##                    <button type="button" class="btn btn-small btn-default">Publier une annonce</button>
-    ##                </div>
-    ##            </div>
-    ##        </div>
-    ##    </h2>
     </header>
 </%def>
 
