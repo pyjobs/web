@@ -28,7 +28,7 @@ class NewCompanyController(BaseController):
 
         for _, err in errors.iteritems():
             if err:
-                error_msg = u'Il a eu des erreurs lors de la saisie du ' \
+                error_msg = u'Il y a eu des erreurs lors de la saisie du ' \
                             u'formulaire. Merci de bien vouloir les corriger.'
                 break
 
