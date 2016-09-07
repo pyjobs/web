@@ -72,7 +72,7 @@ ${company_pagination()}
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $(".clickable-div").bind("click", function(e) {
+            $(".clickable-div").click(function(e) {
                 if (e.ctrlKey) {
                     window.open($(this).find("a:last").attr("href"), "_blank");
                 } else {
