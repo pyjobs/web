@@ -58,7 +58,7 @@ class Company(es.DocType):
     technologies_tokenizer = es.tokenizer(
         'comma_tokenizer',
         type='pattern',
-        pattern=',|, '
+        pattern=', '
     )
     technologies_analyzer = es.analyzer(
         'technologies_analyzer',
