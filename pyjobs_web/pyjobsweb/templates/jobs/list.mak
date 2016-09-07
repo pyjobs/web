@@ -69,12 +69,12 @@ ${job_pagination()}
     </div>
 % else:
     % for job in jobs:
-        <div id="job-post-${job.id}" class="job-item ${loop.cycle('row-even', 'row-odd')}"
+        <div id="job-post-${job.id}" class="job-item clickable-div ${loop.cycle('row-even', 'row-odd')}"
              style="padding: 1em 1em 3em 1em;">
             <div class="row" id="job-post-head-${job.id}">
                 <div class="col-md-9">
                     <h2 style="margin-top: 0; padding-top: 0; font-size: 1.7em;">
-                        <a style="color: #555; font-weight: bold;"
+                        <a class="inside-link" style="color: #555; font-weight: bold;"
                            href="${h.get_job_url(job.id, job.title, previous=request.url)}">
                             ${job.title}
                         </a>
@@ -87,7 +87,7 @@ ${job_pagination()}
                             <span style="color: #999;">
                                 <i class="fa fa-fw fa-building-o"></i> ${job.company}
                                 <br/>
-                                <a href="http://nominatim.openstreetmap.org/search.php?q=${job.address}">
+                                <a class="inside-link" href="http://nominatim.openstreetmap.org/search.php?q=${job.address}">
                                     <i class="fa fa-fw fa-map-marker"></i>
                                     ${job.address}
                                 </a>
@@ -106,7 +106,7 @@ ${job_pagination()}
                                 % endif
                             </span>
                         <br/>
-                        <a href="${sources[job.source].url}" style="color: #AAA; font-weight: bold;">
+                        <a class="inside-link" href="${sources[job.source].url}" style="color: #AAA; font-weight: bold;">
                             ${sources[job.source].label}<br/>
                             <img style="max-height: 32px;" src="${sources[job.source].logo_url}"
                                  alt="${sources[job.source].label}"/>
@@ -115,7 +115,7 @@ ${job_pagination()}
                 </div>
             </div>
             <div class="row" id="job-post-detail-${job.id}-detail">
-                ##                        <a href="https://www.google.fr/maps/search/${urllib.quote_plus(encode_object(job.address))}">${job.address}</a>
+                ##                        <a class="inside-link" href="https://www.google.fr/maps/search/${urllib.quote_plus(encode_object(job.address))}">${job.address}</a>
                 ##                        <p class="label label-warning" style="font-weight: bold; font-size: 1.2em;">${job.address}</p>
                 ##                        <p class="label label-success" style="font-weight: bold; font-size: 1.2em;">${job.company}</p>
 
@@ -133,7 +133,8 @@ ${job_pagination()}
             ##                    <div class="row">
             ##                        ${job.description|n}
             ##                    </div>
-                        </div>
+            <a target="_blank" href="${h.get_job_url(job.id, previous=request.url)}"></a>
+        </div>
     % endfor
 % endif
 
