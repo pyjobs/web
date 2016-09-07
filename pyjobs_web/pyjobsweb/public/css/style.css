@@ -106,7 +106,7 @@
 }
 
 .company-source-link {
-    width: 425px;
+    max-width: 425px;
     margin-top: 25px;
     clear: both;
 }
