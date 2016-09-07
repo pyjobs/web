@@ -86,23 +86,30 @@ class BotsCommand(AppContextCommand):
 
         return credentials
 
+    def _run_twitter_bot(self, num_tweets, twitter_credentials_file):
+        try:
+            credentials_path = twitter_credentials_file
+            credentials = self._get_twitter_credentials(credentials_path)
+            twitter_bot = TwitterBot(credentials)
+            twitter_bot.run(num_tweets)
+        except Exception:
+            err_msg = 'A critical error occurred while ' \
+                      'configuring/running the Twitter bot. Aborting now.'
+            logging.getLogger(__name__).log(logging.ERROR, err_msg)
+            return
+
+    @staticmethod
+    def _run_github_bot():
+        github_bot = GitHubBot()
+        github_bot.run()
+
     def take_action(self, parsed_args):
         super(BotsCommand, self).take_action(parsed_args)
 
         if parsed_args.bot_command == 'twitter':
             num_tweets = parsed_args.number_of_tweets
-
-            try:
-                credentials_path = parsed_args.twitter_credentials_file
-                credentials = self._get_twitter_credentials(credentials_path)
-                twitter_bot = TwitterBot(credentials)
-                twitter_bot.run(num_tweets)
-            except Exception:
-                err_msg = 'A critical error occurred while ' \
-                          'configuring/running the Twitter bot. Aborting now.'
-                logging.getLogger(__name__).log(logging.ERROR, err_msg)
-                exit(-1)
+            credentials_path = parsed_args.twitter_credentials_file
+            self._run_twitter_bot(num_tweets, credentials_path)
 
         if parsed_args.bot_command == 'github':
-            github_bot = GitHubBot()
-            github_bot.run()
+            self._run_github_bot()

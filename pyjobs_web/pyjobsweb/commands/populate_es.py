@@ -10,6 +10,7 @@ from tg import config
 
 from pyjobsweb import model
 from pyjobsweb.lib.sqlalchemy_ import current_server_timestamp
+from pyjobsweb.lib.lock import acquire_inter_process_lock
 from pyjobsweb.commands import AppContextCommand
 
 
@@ -57,8 +58,10 @@ class PopulateESCommand(AppContextCommand):
         log_msg = u'[Company: %s] %s' % (company_id, message)
         self._logging(logging_level, log_msg)
 
-    @staticmethod
-    def _compute_dirty_documents(sql_table_cls):
+    def _compute_dirty_documents(self, sql_table_cls, doc_type):
+        self._logging(logging.INFO,
+                      'Computing out of sync %s documents.' % doc_type)
+
         dirty_rows = sql_table_cls.get_dirty_rows()
 
         for row in dirty_rows:
@@ -81,8 +84,10 @@ class PopulateESCommand(AppContextCommand):
                                         ),
                                         weight=place['weight'])
 
-    @staticmethod
-    def _synchronisation_op(elasticsearch_doctype, pending_insertions):
+    def _synchronisation_op(self, elasticsearch_doctype, pending_insertions):
+        self._logging(logging.INFO,
+                      'Computing required operations to synchronize documents.')
+
         for p in pending_insertions:
             doc_dict = p.to_dict(True)
 
@@ -100,28 +105,19 @@ class PopulateESCommand(AppContextCommand):
 
             yield sync_op
 
-    def _synchronise_index(self, sql_table_cls, es_doc_cls, id_logger):
+    def _perform_index_sync(self, sql_table_cls, es_doc_cls, id_logger):
         es_doc = es_doc_cls()
-
-        log_msg = 'Synchronizing %s index.' % es_doc.index
-        self._logging(logging.INFO, log_msg)
 
         elasticsearch_conn = connections.get_connection()
 
-        self._logging(logging.INFO,
-                      'Computing out of sync %s documents.'
-                      % es_doc.doc_type)
-
         sync_timestamp = current_server_timestamp()
 
-        pending_insertions = self._compute_dirty_documents(sql_table_cls)
-
-        self._logging(logging.INFO,
-                      'Computing required operations to synchronize documents.')
+        pending_insertions = self._compute_dirty_documents(
+            sql_table_cls, es_doc.doc_type)
 
         bulk_op = self._synchronisation_op(es_doc, pending_insertions)
 
-        self._logging(logging.INFO, 'Performing synchronisation.')
+        self._logging(logging.INFO, 'Performing synchronization.')
 
         for ok, info in parallel_bulk(elasticsearch_conn, bulk_op):
             obj_id = info['index']['_id'] \
@@ -141,8 +137,23 @@ class PopulateESCommand(AppContextCommand):
         # Refresh indices to increase research speed
         elasticsearch_dsl.Index(es_doc.index).refresh()
 
+    def _synchronise_index(self, sql_table_cls, es_doc_cls, id_logger):
+        es_doc = es_doc_cls()
+
         self._logging(logging.INFO,
-                      'Index %s is now synchronized.' % es_doc.index)
+                      'Synchronizing %s index.' % es_doc.index)
+
+        with acquire_inter_process_lock('sync_%s' % es_doc.index) as acquired:
+            if not acquired:
+                es_doc = es_doc_cls()
+                err_msg = 'Another process is already synchronizing the %s ' \
+                          'index, aborting now.' % es_doc.index
+                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+            else:
+                self._perform_index_sync(sql_table_cls, es_doc_cls, id_logger)
+
+                self._logging(logging.INFO,
+                              'Index %s is now synchronized.' % es_doc.index)
 
     def _synchronise_jobs_index(self):
         self._synchronise_index(model.JobAlchemy,
@@ -169,18 +180,16 @@ class PopulateESCommand(AppContextCommand):
 
                 logging.getLogger(__name__).log(logging_level, err_msg)
 
-    def _populate_geocomplete_index(self, max_doc=1000):
-        log_msg = 'Populating geocomplete index.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
-
+    def _perform_geocomplete_index_population(self, max_doc):
         elasticsearch_conn = connections.get_connection()
-
-        log_msg = 'Computing required geoloc-entry documents.'
-        logging.getLogger(__name__).log(logging.INFO, log_msg)
 
         to_index = list()
 
-        for document in self._geocompletion_documents():
+        for i, document in enumerate(self._geocompletion_documents()):
+            if i % max_doc == 0:
+                log_msg = 'Computing required geoloc-entry documents.'
+                logging.getLogger(__name__).log(logging.INFO, log_msg)
+
             to_index.append(document.to_dict(True))
 
             if len(to_index) < max_doc:
@@ -195,8 +204,20 @@ class PopulateESCommand(AppContextCommand):
 
         elasticsearch_dsl.Index('geocomplete').refresh()
 
-        log_msg = 'gecomplete index populated and refreshed.'
+    def _populate_geocomplete_index(self, max_doc=1000):
+        log_msg = 'Populating geocomplete index.'
         logging.getLogger(__name__).log(logging.INFO, log_msg)
+
+        with acquire_inter_process_lock('populate_geocomplete') as acquired:
+            if not acquired:
+                err_msg = 'Another process is already populating the ' \
+                          'geocomplete index, aborting now.'
+                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+            else:
+                self._perform_geocomplete_index_population(max_doc)
+
+                log_msg = 'gecomplete index populated and refreshed.'
+                logging.getLogger(__name__).log(logging.INFO, log_msg)
 
     def take_action(self, parsed_args):
         super(PopulateESCommand, self).take_action(parsed_args)

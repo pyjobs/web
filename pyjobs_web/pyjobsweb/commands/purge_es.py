@@ -6,6 +6,7 @@ import elasticsearch_dsl
 
 from pyjobsweb import model
 from pyjobsweb.commands import AppContextCommand
+from pyjobsweb.lib.lock import acquire_inter_process_lock
 
 
 class PurgeESCommand(AppContextCommand):
@@ -41,7 +42,7 @@ class PurgeESCommand(AppContextCommand):
     def _logging(self, logging_level, message):
         self._logger.log(logging_level, message)
 
-    def _purge_index(self, index_name, index_settings, doc_type_class):
+    def _perform_index_purge(self, index_name, index_settings, doc_type_class):
         log_msg = 'Dropping %s index.' % index_name
         self._logging(logging.INFO, log_msg)
 
@@ -60,26 +61,54 @@ class PurgeESCommand(AppContextCommand):
         log_msg = 'Index %s has been dropped successfully.' % index_name
         self._logging(logging.INFO, log_msg)
 
-    def _reset_sync(self, sqlalchemy_table_class):
+    def _purge_index(self, index_name, index_settings, doc_type_class):
+        log_msg = 'Purging index %s.' % index_name
+        self._logging(logging.INFO, log_msg)
+
+        with acquire_inter_process_lock('purge_%s' % index_name) as acquired:
+            if not acquired:
+                err_msg = 'Another process is already purging the %s ' \
+                          'index, aborting now.' % index_name
+                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+            else:
+                self._perform_index_purge(index_name,
+                                          index_settings, doc_type_class)
+
+    def _perform_sync_reset(self, sqlalchemy_table_class):
         # Update the Postgresql database
-        table_name = model.JobAlchemy.__tablename__
-        log_msg = 'Resetting %s table sync data in Postgresql.' % table_name
+        table_name = sqlalchemy_table_class.__tablename__
+
+        log_msg = 'Resetting Postgresql %s table sync data.' % table_name
         self._logging(logging.INFO, log_msg)
 
         sqlalchemy_table_class.reset_last_sync()
 
-        log_msg = 'Postgresql %s table sync data have been reset.' % table_name
+        log_msg = 'Postgresql %s table sync data successfully reset.' \
+                  % table_name
         self._logging(logging.INFO, log_msg)
+
+    def _reset_sync(self, index_name, sqlalchemy_table_class):
+        err_msg = 'Resetting synchronization data for index %s.' % index_name
+        logging.getLogger(__name__).log(logging.WARNING, err_msg)
+
+        with acquire_inter_process_lock('purge_%s' % index_name) as acquired:
+            if not acquired:
+                err_msg = 'Another process is already resetting the %s ' \
+                          'index synchronization data, aborting now.' \
+                          % index_name
+                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+            else:
+                self._perform_sync_reset(sqlalchemy_table_class)
 
     def purge_jobs_index(self):
         index_name = model.JobElastic().index
         self._purge_index(index_name, dict(), model.JobElastic)
-        self._reset_sync(model.JobAlchemy)
+        self._reset_sync(index_name, model.JobAlchemy)
 
     def purge_companies_index(self):
         index_name = model.CompanyElastic().index
         self._purge_index(index_name, dict(), model.CompanyElastic)
-        self._reset_sync(model.CompanyAlchemy)
+        self._reset_sync(index_name, model.CompanyAlchemy)
 
     def purge_geocomplete_index(self):
         index_name = model.Geocomplete().index

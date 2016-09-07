@@ -6,6 +6,7 @@ import logging
 
 from pyjobsweb.model import JobAlchemy
 from pyjobsweb.lib.helpers import get_job_url
+from pyjobsweb.lib.lock import acquire_inter_process_lock
 
 
 class TwitterBot(object):
@@ -94,4 +95,10 @@ class TwitterBot(object):
                 JobAlchemy.set_pushed_on_twitter(job_offer.id, True)
 
     def run(self, num_tweets_to_push):
-        self._push_job_offers_to_twitter(num_tweets_to_push)
+        with acquire_inter_process_lock('twitter_bot') as acquired:
+            if not acquired:
+                err_msg = 'Another instance of the Twitter bot is already ' \
+                          'running, aborting now.'
+                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+            else:
+                self._push_job_offers_to_twitter(num_tweets_to_push)

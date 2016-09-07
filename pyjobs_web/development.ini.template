@@ -109,6 +109,12 @@ elasticsearch.instance_name = dev
 # Geolocation raw data path
 fr.geolocation_data.path = %(here)s/static/geolocations/fr_locations.json
 
+# Pyjobs' processes configuration
+# The name of the project which will run pyjobs' processes
+processes.project_name = pyjobs
+# The name of the instance of the project which will run pyjobs' processes
+processes.instance_name = dev
+
 # This line ensures that Genshi will render xhtml when sending the
 # output. Change to html or xml, as desired.
 templating.genshi.method = xhtml

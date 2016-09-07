@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import logging
 import re
 import codecs
 import os
@@ -13,6 +14,7 @@ from tg import config
 
 from pyjobsweb import model
 from pyjobsweb.lib.helpers import get_job_url
+from pyjobsweb.lib.lock import acquire_inter_process_lock
 
 home = expanduser("~")
 
@@ -38,8 +40,6 @@ class GitHubBot(object):
         model.init_model(engine)
 
         self._repo = None
-        self._check_repository_directory()
-        self._check_repository()
 
     def _check_repository_directory(self):
         """
@@ -61,26 +61,46 @@ class GitHubBot(object):
         self._repo = Repo(self._repository_path)
         self._pull()
 
+    def _prepare_local_repo(self):
+        self._check_repository_directory()
+        self._check_repository()
+
+    def _compute_new_job_offers(self):
+        last_jobs = self._get_lasts_jobs()
+        return self._get_new_jobs(last_jobs)
+
+    def _commit_new_job_offers(self, new_job_offers):
+        new_job_offers.reverse()
+
+        for new_job_offer in new_job_offers:
+            old_jobs = self._get_old_jobs()[:-1]
+            self._write_jobs(new_job_offer, old_jobs)
+            message = self._get_commit_message(new_job_offer)
+            self._commit(message)
+
+    def _push_new_job_offers_to_github(self):
+        self._prepare_local_repo()
+
+        new_job_offers = self._compute_new_job_offers()
+
+        if not new_job_offers:
+            return
+
+        self._commit_new_job_offers(new_job_offers)
+        self._push()
+
     def run(self):
         """
         Update job file if new jobs. Then make a push.
         :return:
         """
-        last_jobs = self._get_lasts_jobs()
-        new_jobs = self._get_new_jobs(last_jobs)
-
-        if not new_jobs:
-            return
-
-        new_jobs.reverse()
-
-        for new_job in new_jobs:
-            old_jobs = self._get_old_jobs()[:-1]
-            self._write_jobs(new_job, old_jobs)
-            message = self._get_commit_message(new_job)
-            self._commit(message)
-
-        self._push()
+        with acquire_inter_process_lock('github_bot') as acquired:
+            if not acquired:
+                err_msg = 'Another instance of the Github bot is already ' \
+                          'running, aborting now.'
+                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+            else:
+                self._push_new_job_offers_to_github()
 
     def _get_lasts_jobs(self):
         """

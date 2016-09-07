@@ -4,6 +4,7 @@ import logging
 import pyjobsweb.lib.geolocation as geolocation
 from pyjobsweb import model
 from pyjobsweb.commands import AppContextCommand
+from pyjobsweb.lib.lock import acquire_inter_process_lock
 
 
 class GeocodeCommand(AppContextCommand):
@@ -78,10 +79,28 @@ class GeocodeCommand(AppContextCommand):
         self._logging(logging.INFO, log_msg)
 
     def _geocode_job_offers(self):
-        self._geocode(model.JobAlchemy, self._job_id_logging)
+        log_msg = 'Starting job offers geocoding operations...'
+        self._logging(logging.INFO, log_msg)
+
+        with acquire_inter_process_lock('geocode_job_offers') as acquired:
+            if not acquired:
+                err_msg = 'Another process is already performing geocoding' \
+                          'operations on the job offers, aborting now.'
+                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+            else:
+                self._geocode(model.JobAlchemy, self._job_id_logging)
 
     def _geocode_companies(self):
-        self._geocode(model.CompanyAlchemy, self._company_id_logging)
+        log_msg = 'Starting companies geocoding operations...'
+        self._logging(logging.INFO, log_msg)
+
+        with acquire_inter_process_lock('geocode_companies') as acquired:
+            if not acquired:
+                err_msg = 'Another process is already performing geocoding ' \
+                          'operations on the companies, aborting now.'
+                logging.getLogger(__name__).log(logging.WARNING, err_msg)
+            else:
+                self._geocode(model.CompanyAlchemy, self._company_id_logging)
 
     def take_action(self, parsed_args):
         super(GeocodeCommand, self).take_action(parsed_args)
@@ -89,14 +108,13 @@ class GeocodeCommand(AppContextCommand):
         log_msg = 'Starting geocoding operations.'
         self._logging(logging.INFO, log_msg)
 
+        # We do not run geocoding operation for the job offers and companies in
+        # different sub-processes to prevent overloading the geocoding API. This
+        # is why geocoding operations are run sequentially.
         if parsed_args.geocode_jobs:
-            log_msg = 'Starting job offers geocoding operations...'
-            self._logging(logging.INFO, log_msg)
             self._geocode_job_offers()
 
         if parsed_args.geocode_companies:
-            log_msg = 'Starting companies geocoding operations...'
-            self._logging(logging.INFO, log_msg)
             self._geocode_companies()
 
         log_msg = 'Geocoding operations done.'
