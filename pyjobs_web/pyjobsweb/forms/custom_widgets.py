@@ -14,6 +14,7 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
         minimumInputLength=1,
         maximumInputLength=125,
         allowClear=True,
+        dropdownAutoWidth=True,
         ajax=dict(
             url='/geocomplete',
             dataType='json',
