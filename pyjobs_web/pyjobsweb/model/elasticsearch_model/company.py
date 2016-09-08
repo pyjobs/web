@@ -71,7 +71,7 @@ class Company(es.DocType):
 
     id = es.String(index='no')
 
-    name = es.String(index='not_analyzed')
+    name = es.String(index='analyzed')
     logo_url = es.String(index='no')
     description = es.String(analyzer=french_description_analyzer)
     url = es.String(index='no')
