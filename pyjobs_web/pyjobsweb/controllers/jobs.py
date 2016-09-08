@@ -20,6 +20,68 @@ class SearchJobsController(BaseController):
     def __init__(self, items_per_page=10):
         self.items_per_page = items_per_page
 
+    @staticmethod
+    def _compute_keyword_queries(terms, search_on):
+        queries = list()
+        queries.append(Q())
+
+        for elem in terms:
+            keyword_query = Q(
+                'multi_match',
+                type='cross_fields',
+                query=elem,
+                fields=search_on,
+                analyzer='french_description_analyzer'
+            )
+            queries.append(keyword_query)
+
+        keyword_queries = Q(
+            'bool',
+            must=[],
+            should=queries,
+            minimum_should_match='1<50% 3<66% 4<75%'
+        )
+
+        return keyword_queries
+
+    @staticmethod
+    def _compute_decay_functions():
+        decay_function = SF(
+            'gauss',
+            publication_datetime=dict(
+                origin='now',
+                scale='15d',
+                offset='7d',
+                decay='0.5'
+            )
+        )
+
+        return [decay_function]
+
+    @staticmethod
+    def _apply_geolocation_filters(query, (lat, lon), radius):
+        query = query.filter(
+            'geo_distance',
+            geolocation=[lon, lat],
+            distance='%skm' % float(radius)
+        )
+
+        query = query.filter(
+            'term',
+            geolocation_is_valid=True
+        )
+
+        return query
+
+    @staticmethod
+    def _apply_date_sort(query):
+        query = query.sort(
+            '-publication_datetime',
+            '-_score'
+        )
+
+        return query
+
     @expose('pyjobsweb.templates.jobs.list')
     @paginate('jobs', items_per_page=items_per_page)
     def index(self, query=None, radius=None, center=None, sort_by=None,
@@ -31,58 +93,19 @@ class SearchJobsController(BaseController):
 
         search_on = ['description', 'title^50', 'company^100']
 
-        queries = list()
-
-        for elem in query.split(','):
-            keyword_query = Q(
-                'multi_match',
-                type='cross_fields',
-                query=elem,
-                fields=search_on,
-                analyzer='french_description_analyzer'
-            )
-            queries.append(keyword_query)
-
-        decay_function = SF(
-            'gauss',
-            publication_datetime=dict(
-                origin='now',
-                scale='15d',
-                offset='7d',
-                decay='0.5'
-            )
-        )
-
-        global_keywords_query = Q(
-            'bool',
-            must=[],
-            should=queries,
-            minimum_should_match='1<50% 3<66% 4<75%'
-        )
+        terms = query.split(',')
+        keyword_queries = self._compute_keyword_queries(terms, search_on)
+        decay_functions = self._compute_decay_functions()
 
         search_query.query = Q(
             'function_score',
-            query=global_keywords_query,
-            functions=[decay_function]
+            query=keyword_queries,
+            functions=decay_functions
         )
 
         try:
             geoloc_query = json.loads(center)
             lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
-
-            if not radius:
-                radius = 5.0
-
-            search_query = search_query.filter(
-                'geo_distance',
-                geolocation=[lon, lat],
-                distance='%skm' % float(radius)
-            )
-
-            search_query = search_query.filter(
-                'term',
-                geolocation_is_valid=True
-            )
         except (ValueError, TypeError):
             # One of the following case has occurred:
             #     - Center wasn't a valid json string
@@ -90,12 +113,12 @@ class SearchJobsController(BaseController):
             # Since both these information are required to set a geolocation
             # filter are required, we ignore it.
             pass
+        else:
+            search_query = self._apply_geolocation_filters(
+                search_query, (lat, lon), radius if radius else 5.0)
 
         if sort_by == 'dates':
-            search_query = search_query.sort(
-                '-publication_datetime',
-                '-_score'
-            )
+            search_query = self._apply_date_sort(search_query)
 
         # TODO: result pagination
         job_offers = search_query[0:self.items_per_page * 50].execute()
