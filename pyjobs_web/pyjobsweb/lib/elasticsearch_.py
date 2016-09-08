@@ -48,3 +48,14 @@ def compute_index_name(desired_name):
         return desired_name
 
     return '%s_%s' % (index_prefix, desired_name)
+
+
+class PaginatedSearch(object):
+    def __init__(self, search):
+        self._search = search
+
+    def __len__(self):
+        return self._search.count()
+
+    def __getitem__(self, item):
+        return list(self._search[item])

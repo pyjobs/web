@@ -15,6 +15,7 @@ from pyjobsweb.model import CompanyAlchemy
 from pyjobsweb.model import CompanyElastic
 from pyjobsweb.model import DBSession
 from pyjobsweb.lib.base import BaseController
+from pyjobsweb.lib.elasticsearch_ import PaginatedSearch
 from pyjobsweb.forms.new_form import NewCompanyForm
 from pyjobsweb.forms.research_forms import CompaniesResearchForm
 
@@ -145,10 +146,7 @@ class SearchCompaniesController(BaseController):
             # filter are required, we ignore it.
             pass
 
-        # TODO: result pagination
-        companies = search_query[0:self.items_per_page * 50].execute()
-
-        return dict(companies=companies,
+        return dict(companies=PaginatedSearch(search_query),
                     company_search_form=CompaniesResearchForm)
 
 

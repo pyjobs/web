@@ -11,6 +11,7 @@ from pyjobsweb.model import JobAlchemy
 from pyjobsweb.model import JobElastic
 from pyjobsweb.model.data import SOURCES
 from pyjobsweb.lib.base import BaseController
+from pyjobsweb.lib.elasticsearch_ import PaginatedSearch
 from pyjobsweb.forms.research_forms import JobsResearchForm
 
 
@@ -120,10 +121,7 @@ class SearchJobsController(BaseController):
         if sort_by == 'dates':
             search_query = self._apply_date_sort(search_query)
 
-        # TODO: result pagination
-        job_offers = search_query[0:self.items_per_page * 50].execute()
-
-        return dict(sources=SOURCES, jobs=job_offers,
+        return dict(sources=SOURCES, jobs=PaginatedSearch(search_query),
                     job_offer_search_form=JobsResearchForm)
 
 
