@@ -31,18 +31,17 @@ class SearchJobsController(BaseController):
 
         search_on = ['description', 'title^50', 'company^100']
 
-        keyword_query = Q()
+        queries = list()
 
-        if query:
-            query = query.replace(',', ' ')
-
+        for elem in query.split(','):
             keyword_query = Q(
                 'multi_match',
-                type='best_fields',
-                query=query,
+                type='cross_fields',
+                query=elem,
                 fields=search_on,
-                minimum_should_match='1<50% 3<66% 4<75%'
+                analyzer='french_description_analyzer'
             )
+            queries.append(keyword_query)
 
         decay_function = SF(
             'gauss',
@@ -53,9 +52,17 @@ class SearchJobsController(BaseController):
                 decay='0.5'
             )
         )
+
+        global_keywords_query = Q(
+            'bool',
+            must=[],
+            should=queries,
+            minimum_should_match='1<50% 3<66% 4<75%'
+        )
+
         search_query.query = Q(
             'function_score',
-            query=keyword_query,
+            query=global_keywords_query,
             functions=[decay_function]
         )
 
