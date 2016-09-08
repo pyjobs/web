@@ -62,40 +62,43 @@ class GeocompleteController(BaseController):
             functions=[weight_scoring_function]
         )
 
-        unique_agg = A(
-            'terms',
-            field='name.raw',
-            size=5,
-            order={'avg_doc_score': 'desc'}
-        )
-        field_agg = A(
+        dedup_docs = A(
             'top_hits',
             size=1
         )
-        score_agg = A(
+
+        dedup = A(
+            'terms',
+            field='name.raw',
+            size=5,
+            order={'score_sort': 'desc'}
+        )
+
+        score_sort = A(
             'max',
             script=dict(lang='expression', script='_score')
         )
 
-        unique_agg.bucket('top_geo_matches', field_agg)
-        unique_agg.bucket('avg_doc_score', score_agg)
-        search.aggs.bucket('geo_matches', unique_agg)
+        dedup.bucket('dedup_docs', dedup_docs)
+        dedup.bucket('score_sort', score_sort)
+        search.aggs.bucket('dedup', dedup)
 
+        # Do not compute the results, we are only interested by the aggregations
         raw_res = search[0:0].execute()
 
         res = list()
-        for bucket in raw_res.aggregations.geo_matches.buckets:
-            for source_doc in bucket['top_geo_matches']['hits']['hits']:
+        for bucket in raw_res.aggregations.dedup.buckets:
+            for source_doc in bucket['dedup_docs']['hits']['hits']:
                 fields = source_doc['_source']
                 geo_field = fields['geolocation']
                 geoloc = dict(lat=geo_field['lat'], lon=geo_field['lon'])
-                submit = json.dumps(geoloc)
+
                 display = u'%s %s - %s, France' % (fields['name'].upper(),
                                                    fields['complement'].upper(),
                                                    fields['postal_code']) \
                     if fields['complement'] else \
                     u'%s - %s, France' % (fields['name'].upper(),
                                           fields['postal_code'])
-                res.append(dict(to_submit=submit, to_display=display))
+                res.append(dict(to_submit=geoloc, to_display=display))
 
         return dict(results=res)
