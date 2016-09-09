@@ -81,9 +81,9 @@ class SearchJobsController(BaseController):
             'gauss',
             publication_datetime=dict(
                 origin='now',
-                scale='15d',
+                scale='30d',
                 offset='7d',
-                decay='0.5'
+                decay='0.1'
             )
         )
 
