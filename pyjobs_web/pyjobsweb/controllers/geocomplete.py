@@ -44,7 +44,12 @@ class GeocompleteController(BaseController):
         (address, postal_code) = self.geocomplete_town_input_parser(address)
 
         if address:
-            address_query = Q('match', name=address)
+            address_query = Q(
+                'multi_match',
+                fields=['name'],
+                query=address,
+                fuzziness='AUTO'
+            )
 
         if postal_code:
             postal_code_query = Q('match', postal_code=postal_code)
