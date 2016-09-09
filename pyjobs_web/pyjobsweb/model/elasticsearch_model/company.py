@@ -30,6 +30,19 @@ class Company(es.DocType):
     french_stemmer = es.token_filter('french_stemmer',
                                      type='stemmer', language='light_french')
 
+    technologies_synonyms_filter = es.token_filter(
+        'technologies_synonyms',
+        type='synonym',
+        synonyms=[
+            'c => c_language',
+            'c++, c ++, cpp => cpp_language',
+            'c/c++, c/c ++, c / c++, c / c ++, c/cpp, c / cpp => c_cpp_language',
+            'c#, c #, c♯, c ♯, csharp => csharp_language',
+            'f#, f #, f♯, f ♯, fsharp => fsharp_language',
+            '.net => dotnet'
+        ]
+    )
+
     french_analyzer = es.analyzer(
         'french_analyzer',
         tokenizer='standard',
@@ -37,19 +50,7 @@ class Company(es.DocType):
             'lowercase',
             'asciifolding',
             french_elision,
-            french_stopwords,
-            # french_keywords,
-            french_stemmer
-        ]
-    )
-
-    french_description_analyzer = es.analyzer(
-        'french_description_analyzer',
-        tokenizer='standard',
-        filter=[
-            'lowercase',
-            'asciifolding',
-            french_elision,
+            technologies_synonyms_filter,
             french_stopwords,
             # french_keywords,
             french_stemmer
@@ -67,20 +68,21 @@ class Company(es.DocType):
         tokenizer=technologies_tokenizer,
         filter=[
             'lowercase',
-            'asciifolding'
+            'asciifolding',
+            technologies_synonyms_filter
         ]
     )
 
     id = es.String(index='no')
 
-    name = es.String(index='analyzed')
-    logo_url = es.String(index='no')
-    description = es.String(analyzer=french_description_analyzer)
-    url = es.String(index='no')
-    technologies = es.String(analyzer=technologies_analyzer,
-                             search_analyzer=technologies_analyzer)
+    name = es.String(analyzer=french_analyzer)
+    description = es.String(analyzer=french_analyzer)
+    technologies = es.String(analyzer=technologies_analyzer)
 
-    address = es.String(index='no')
+    url = es.String(index='no')
+    logo_url = es.String(index='no')
+
+    address = es.String(analyzer=french_analyzer)
     address_is_valid = es.Boolean()
 
     email = es.String(index='no')

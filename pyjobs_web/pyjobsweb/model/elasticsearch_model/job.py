@@ -40,6 +40,19 @@ class Job(es.DocType):
     french_stemmer = es.token_filter('french_stemmer',
                                      type='stemmer', language='light_french')
 
+    technologies_synonyms_filter = es.token_filter(
+        'technologies_synonyms',
+        type='synonym',
+        synonyms=[
+            'c => c_language',
+            'c++, c ++, cpp => cpp_language',
+            'c/c++, c/c ++, c / c++, c / c ++, c/cpp, c / cpp => c_cpp_language',
+            'c#, c #, c♯, c ♯, csharp => csharp_language',
+            'f#, f #, f♯, f ♯, fsharp => fsharp_language',
+            '.net => dotnet'
+        ]
+    )
+
     french_analyzer = es.analyzer(
         'french_analyzer',
         tokenizer='standard',
@@ -47,19 +60,7 @@ class Job(es.DocType):
             'lowercase',
             'asciifolding',
             french_elision,
-            french_stopwords,
-            # french_keywords,
-            french_stemmer
-        ]
-    )
-
-    french_description_analyzer = es.analyzer(
-        'french_description_analyzer',
-        tokenizer='standard',
-        filter=[
-            'lowercase',
-            'asciifolding',
-            french_elision,
+            technologies_synonyms_filter,
             french_stopwords,
             # french_keywords,
             french_stemmer
@@ -73,12 +74,12 @@ class Job(es.DocType):
     source = es.String(index='not_analyzed')
 
     title = es.String(analyzer=french_analyzer)
-    description = es.String(analyzer=french_description_analyzer)
+    description = es.String(analyzer=french_analyzer)
     company = es.String(analyzer=french_analyzer)
 
     company_url = es.String(index='no')
 
-    address = es.String(index='no')
+    address = es.String(analyzer=french_analyzer)
     address_is_valid = es.Boolean()
 
     tags = es.Nested(doc_class=Tag,

@@ -33,7 +33,6 @@ class SearchJobsController(BaseController):
                 query=elem,
                 fields=search_on,
                 fuzziness='AUTO',
-                analyzer='french_description_analyzer',
                 operator='or',
                 tie_breaker=0.3
             )
@@ -60,7 +59,6 @@ class SearchJobsController(BaseController):
             query=terms,
             fields=search_on,
             fuzziness='AUTO',
-            analyzer='french_description_analyzer',
             operator='or',
             tie_breaker=0.3,
             minimum_should_match='1<2 2<3 3<3 4<3 5<4 6<4 7<4 8<4 9<5'
