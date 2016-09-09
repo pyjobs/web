@@ -96,6 +96,75 @@ class SearchCompaniesController(BaseController):
     def __init__(self, items_per_page=10):
         self.items_per_page = items_per_page
 
+    @staticmethod
+    def _compute_keyword_queries(terms, search_on):
+        queries = list()
+        queries.append(Q())
+
+        for elem in terms.split(','):
+            keyword_query = Q(
+                'multi_match',
+                type='best_fields',
+                query=elem,
+                fields=search_on,
+                fuzziness='AUTO',
+                analyzer='french_description_analyzer',
+                operator='or',
+                tie_breaker=0.3
+            )
+            queries.append(keyword_query)
+
+        # We could have used a cross_fields query to narrow the results given,
+        # by the previous queries, but it doesn't support fuzzy yet (and will
+        # probably never: https://github.com/elastic/elasticsearch/issues/6866).
+        # keyword_query = Q(
+        #     'multi_match',
+        #     type='cross_fields',
+        #     query=terms,
+        #     fields=search_on,
+        #     analyzer='french_description_analyzer',
+        #     minimum_should_match='1<2 2<3 3<3 4<3 5<4 6<4 7<4 8<4 9<5'
+        # )
+        # queries.append(keyword_query)
+
+        # Use another best_fields query with a minimum_should_match config. This
+        # will help us narrow the global keyword search query.
+        keyword_query = Q(
+            'multi_match',
+            type='best_fields',
+            query=terms,
+            fields=search_on,
+            fuzziness='AUTO',
+            analyzer='french_description_analyzer',
+            operator='or',
+            tie_breaker=0.3,
+            minimum_should_match='1<2 2<3 3<3 4<3 5<4 6<4 7<4 8<4 9<5'
+        )
+        queries.append(keyword_query)
+
+        keyword_queries = Q(
+            'bool',
+            should=queries,
+            minimum_should_match='1<2 2<3 3<4 4<4 5<5 6<5 7<5 8<5 9<6'
+        )
+
+        return keyword_queries
+
+    @staticmethod
+    def _apply_geolocation_filters(query, (lat, lon), radius):
+        query = query.filter(
+            'geo_distance',
+            geolocation=[lon, lat],
+            distance='%skm' % float(radius)
+        )
+
+        query = query.filter(
+            'term',
+            geolocation_is_valid=True
+        )
+
+        return query
+
     @expose('pyjobsweb.templates.companies.list')
     @paginate('companies', items_per_page=items_per_page)
     def index(self, query=None, radius=None, center=None, *args, **kwargs):
@@ -106,38 +175,12 @@ class SearchCompaniesController(BaseController):
 
         search_on = ['description', 'technologies^50', 'name^100']
 
-        keyword_query = Q()
-
-        if query:
-            query = query.replace(',', ' ')
-
-            keyword_query = Q(
-                'multi_match',
-                type='best_fields',
-                query=query,
-                fields=search_on,
-                minimum_should_match='1<50% 3<66% 4<75%'
-            )
-
-        search_query.query = keyword_query
+        terms = query
+        search_query.query = self._compute_keyword_queries(terms, search_on)
 
         try:
             geoloc_query = json.loads(center)
             lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
-
-            if not radius:
-                radius = 5.0
-
-            search_query = search_query.filter(
-                'geo_distance',
-                geolocation=[lon, lat],
-                distance='%skm' % float(radius)
-            )
-
-            search_query = search_query.filter(
-                'term',
-                geolocation_is_valid=True
-            )
         except (ValueError, TypeError):
             # One of the following case has occurred:
             #     - Center wasn't a valid json string
@@ -145,6 +188,9 @@ class SearchCompaniesController(BaseController):
             # Since both these information are required to set a geolocation
             # filter are required, we ignore it.
             pass
+        else:
+            search_query = self._apply_geolocation_filters(
+                search_query, (lat, lon), radius if radius else 5.0)
 
         return dict(companies=PaginatedSearch(search_query),
                     company_search_form=CompaniesResearchForm)

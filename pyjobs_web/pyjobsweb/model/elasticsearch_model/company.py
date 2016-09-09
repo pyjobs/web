@@ -35,6 +35,7 @@ class Company(es.DocType):
         tokenizer='standard',
         filter=[
             'lowercase',
+            'asciifolding',
             french_elision,
             french_stopwords,
             # french_keywords,
@@ -47,6 +48,7 @@ class Company(es.DocType):
         tokenizer='standard',
         filter=[
             'lowercase',
+            'asciifolding',
             french_elision,
             french_stopwords,
             # french_keywords,
