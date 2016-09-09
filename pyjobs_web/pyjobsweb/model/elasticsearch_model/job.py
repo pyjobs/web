@@ -35,7 +35,7 @@ class Job(es.DocType):
 
     # Do not include this filter if keywords is empty
     french_keywords = es.token_filter('french_keywords',
-                                      type='keyword_maker', keywords=[])
+                                      type='keyword_marker', keywords=[])
 
     french_stemmer = es.token_filter('french_stemmer',
                                      type='stemmer', language='light_french')
