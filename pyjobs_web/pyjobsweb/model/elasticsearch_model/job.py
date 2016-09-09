@@ -45,6 +45,7 @@ class Job(es.DocType):
         tokenizer='standard',
         filter=[
             'lowercase',
+            'asciifolding',
             french_elision,
             french_stopwords,
             # french_keywords,
@@ -57,6 +58,7 @@ class Job(es.DocType):
         tokenizer='standard',
         filter=[
             'lowercase',
+            'asciifolding',
             french_elision,
             french_stopwords,
             # french_keywords,
@@ -72,7 +74,8 @@ class Job(es.DocType):
 
     title = es.String(analyzer=french_analyzer)
     description = es.String(analyzer=french_description_analyzer)
-    company = es.String(index='analyzed')
+    company = es.String(analyzer=french_analyzer)
+
     company_url = es.String(index='no')
 
     address = es.String(index='no')
