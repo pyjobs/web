@@ -26,21 +26,33 @@ class SearchJobsController(BaseController):
         queries = list()
         queries.append(Q())
 
-        for elem in terms:
+        for elem in terms.split(','):
             keyword_query = Q(
                 'multi_match',
-                type='cross_fields',
+                type='best_fields',
                 query=elem,
                 fields=search_on,
-                analyzer='french_description_analyzer'
+                fuzziness='AUTO',
+                analyzer='french_description_analyzer',
+                operator='or',
+                tie_breaker=0.3
             )
             queries.append(keyword_query)
 
+        keyword_query = Q(
+            'multi_match',
+            type='cross_fields',
+            query=terms,
+            fields=search_on,
+            analyzer='french_description_analyzer',
+            minimum_should_match='1<2 2<3 3<3 4<3 5<4 6<4 7<4 8<4 9<5'
+        )
+        queries.append(keyword_query)
+
         keyword_queries = Q(
             'bool',
-            must=[],
             should=queries,
-            minimum_should_match='1<50% 3<66% 4<75%'
+            minimum_should_match='1<2 2<3 3<4 4<4 5<5 6<5 7<5 8<5 9<6'
         )
 
         return keyword_queries
@@ -94,7 +106,7 @@ class SearchJobsController(BaseController):
 
         search_on = ['description', 'title^50', 'company^100']
 
-        terms = query.split(',')
+        terms = query
         keyword_queries = self._compute_keyword_queries(terms, search_on)
         decay_functions = self._compute_decay_functions()
 
