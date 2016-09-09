@@ -92,6 +92,7 @@ class GeocompleteController(BaseController):
                 fields = source_doc['_source']
                 geo_field = fields['geolocation']
                 geoloc = dict(lat=geo_field['lat'], lon=geo_field['lon'])
+                to_submit = json.dumps(geoloc)
 
                 display = u'%s %s - %s, France' % (fields['name'].upper(),
                                                    fields['complement'].upper(),
@@ -99,6 +100,6 @@ class GeocompleteController(BaseController):
                     if fields['complement'] else \
                     u'%s - %s, France' % (fields['name'].upper(),
                                           fields['postal_code'])
-                res.append(dict(to_submit=geoloc, to_display=display))
+                res.append(dict(to_submit=to_submit, to_display=display))
 
         return dict(results=res)
