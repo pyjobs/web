@@ -39,12 +39,30 @@ class SearchJobsController(BaseController):
             )
             queries.append(keyword_query)
 
+        # We could have used a cross_fields query to narrow the results given,
+        # by the previous queries, but it doesn't support fuzzy yet (and will
+        # probably never: https://github.com/elastic/elasticsearch/issues/6866).
+        # keyword_query = Q(
+        #     'multi_match',
+        #     type='cross_fields',
+        #     query=terms,
+        #     fields=search_on,
+        #     analyzer='french_description_analyzer',
+        #     minimum_should_match='1<2 2<3 3<3 4<3 5<4 6<4 7<4 8<4 9<5'
+        # )
+        # queries.append(keyword_query)
+
+        # Use another best_fields query with a minimum_should_match config. This
+        # will help us narrow the global keyword search query.
         keyword_query = Q(
             'multi_match',
-            type='cross_fields',
+            type='best_fields',
             query=terms,
             fields=search_on,
+            fuzziness='AUTO',
             analyzer='french_description_analyzer',
+            operator='or',
+            tie_breaker=0.3,
             minimum_should_match='1<2 2<3 3<3 4<3 5<4 6<4 7<4 8<4 9<5'
         )
         queries.append(keyword_query)
