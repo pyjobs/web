@@ -127,7 +127,7 @@ class UrlValidator(twc.UrlValidator):
     def __init__(self, **kwargs):
         super(UrlValidator, self).__init__(**kwargs)
         self.msgs = dict(french_validation_messages)
-        self.msgs['badregex'] = u'URL invalide'
+        self.msgs['badurl'] = u'URL invalide'
 
 
 class EmailValidator(twc.EmailValidator):
