@@ -134,7 +134,7 @@ class EmailValidator(twc.EmailValidator):
     def __init__(self, **kwargs):
         super(EmailValidator, self).__init__(**kwargs)
         self.msgs = dict(french_validation_messages)
-        self.msgs['badregex'] = u'Adresse email invalide'
+        self.msgs['bademail'] = u'Adresse email invalide'
 
 
 class NewCompanyForm(twf.Form):
