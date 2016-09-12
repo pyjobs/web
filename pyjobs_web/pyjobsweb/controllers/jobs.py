@@ -123,14 +123,16 @@ class SearchJobsController(BaseController):
         search_on = ['description', 'title^50', 'company^100']
 
         terms = query
-        keyword_queries = self._compute_keyword_queries(terms, search_on)
-        decay_functions = self._compute_decay_functions()
 
-        search_query.query = Q(
-            'function_score',
-            query=keyword_queries,
-            functions=decay_functions
-        )
+        if terms:
+            keyword_queries = self._compute_keyword_queries(terms, search_on)
+            decay_functions = self._compute_decay_functions()
+
+            search_query.query = Q(
+                'function_score',
+                query=keyword_queries,
+                functions=decay_functions
+            )
 
         try:
             geoloc_query = json.loads(center)
