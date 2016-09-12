@@ -174,7 +174,8 @@ class SearchCompaniesController(BaseController):
         search_on = ['description', 'technologies^50', 'name^100']
 
         terms = query
-        search_query.query = self._compute_keyword_queries(terms, search_on)
+        if terms:
+            search_query.query = self._compute_keyword_queries(terms, search_on)
 
         try:
             geoloc_query = json.loads(center)
