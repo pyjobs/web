@@ -22,54 +22,51 @@ class SearchJobsController(BaseController):
         self.items_per_page = items_per_page
 
     @staticmethod
-    def _compute_keyword_queries(terms, search_on):
+    def _compute_keyword_queries(terms):
         queries = list()
 
-        for elem in terms.split(','):
-            keyword_query = Q(
-                'multi_match',
-                type='best_fields',
-                query=elem,
-                fields=search_on,
-                fuzziness='AUTO',
-                operator='or',
-                tie_breaker=0.3
-            )
-            queries.append(keyword_query)
+        search_on = ['description', 'title', 'company']
 
-        # We could have used a cross_fields query to narrow the results given,
-        # by the previous queries, but it doesn't support fuzzy yet (and will
-        # probably never: https://github.com/elastic/elasticsearch/issues/6866).
-        # keyword_query = Q(
-        #     'multi_match',
-        #     type='cross_fields',
-        #     query=terms,
-        #     fields=search_on,
-        #     analyzer='french_description_analyzer',
-        #     minimum_should_match='1<2 2<3 3<3 4<3 5<4 6<4 7<4 8<4 9<5'
-        # )
-        # queries.append(keyword_query)
-
-        # Use another best_fields query with a minimum_should_match config. This
-        # will help us narrow the global keyword search query.
-        keyword_query = Q(
+        description_query = Q(
             'multi_match',
-            type='best_fields',
             query=terms,
-            fields=search_on,
+            fields=[search_on[0]],
             fuzziness='AUTO',
             operator='or',
-            tie_breaker=0.3,
-            minimum_should_match='1<2 2<3 3<3 4<3 5<4 6<4 7<4 8<4 9<5'
+            minimum_should_match='1<2 2<3 3<3 4<4 5<4 6<5 7<5 8<5 9<5',
+            boost=len(terms)
         )
-        queries.append(keyword_query)
+        queries.append(description_query)
+
+        title_query = Q(
+            'multi_match',
+            query=terms,
+            fields=[search_on[1]],
+            fuzziness='AUTO',
+            operator='or',
+            minimum_should_match='1<1',
+            boost=10 - len(terms) + 1
+        )
+        queries.append(title_query)
+
+        company_name_query = Q(
+            'multi_match',
+            query=terms,
+            fields=[search_on[2]],
+            fuzziness='AUTO',
+            operator='or',
+            minimum_should_match='1<1',
+            boost=50
+        )
+        queries.append(company_name_query)
+
+        minimum_should_match = '66%'
 
         keyword_queries = Q(
             'bool',
             should=queries,
-            minimum_should_match='1<2 2<3 3<4 4<4 5<5 6<5 7<5 8<5 9<6'
+            minimum_should_match=minimum_should_match
         )
-
         return keyword_queries
 
     @staticmethod
@@ -119,12 +116,8 @@ class SearchJobsController(BaseController):
 
         search_query = JobElastic().search()
 
-        search_on = ['description', 'title^50', 'company^100']
-
-        terms = query
-
-        if terms:
-            keyword_queries = self._compute_keyword_queries(terms, search_on)
+        if query:
+            keyword_queries = self._compute_keyword_queries(query)
             decay_functions = self._compute_decay_functions()
 
             search_query.query = Q(
