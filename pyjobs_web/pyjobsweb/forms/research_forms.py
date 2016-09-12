@@ -64,7 +64,21 @@ class JobsResearchForm(twf.Form):
             placeholder=u'Mots clés recherchés...',
             opts=dict(
                 tags=[
-                    'Python', 'Django', 'Flask', 'Pyramid', 'Turbogears'
+                    'Python',
+                    'Django',
+                    'Flask',
+                    'Pyramid',
+                    'Turbogears',
+                    'Ansible',
+                    'Plone',
+                    'Docker',
+                    'PostgreSQL',
+                    'MySQL',
+                    'Oracle',
+                    'Startup',
+                    'CTO',
+                    'Devops'
+
                 ],
                 maximumSelectionSize=10,
                 tokenSeparators=[',']
@@ -174,7 +188,21 @@ class CompaniesResearchForm(twf.Form):
             placeholder=u'Mots clés recherchés...',
             opts=dict(
                 tags=[
-                    'Python', 'Django', 'Flask', 'Pyramid', 'Turbogears'
+                    'Python',
+                    'Django',
+                    'Flask',
+                    'Pyramid',
+                    'Turbogears',
+                    'Ansible',
+                    'Plone',
+                    'Docker',
+                    'PostgreSQL',
+                    'MySQL',
+                    'Oracle',
+                    'Startup',
+                    'CTO',
+                    'Devops'
+
                 ],
                 maximumSelectionSize=10,
                 tokenSeparators=[',']
