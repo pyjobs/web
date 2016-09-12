@@ -99,7 +99,6 @@ class SearchCompaniesController(BaseController):
     @staticmethod
     def _compute_keyword_queries(terms, search_on):
         queries = list()
-        queries.append(Q())
 
         for elem in terms.split(','):
             keyword_query = Q(
