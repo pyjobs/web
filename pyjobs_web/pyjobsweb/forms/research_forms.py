@@ -1,6 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*
+import tw2.core as twc
 import tw2.forms as twf
 import tw2.jqplugins.select2 as twsel
+from tw2.core.validation import Validator
 
 from pyjobsweb.forms.custom_widgets import GeocompleteField
 
@@ -81,9 +83,30 @@ class JobsResearchForm(twf.Form):
 
                 ],
                 maximumSelectionSize=10,
-                tokenSeparators=[',']
+                tokenSeparators=[','],
+                initSelection=twc.js_callback(
+                    '''
+                    function (element, callback) {
+                        var init_data = [];
+
+                        query = params['query'];
+
+                        if(typeof query !== "undefined" && query) {
+                            $.each(query.split(','), function(i, v) {
+                                var elem = {};
+                                elem.id = v;
+                                elem.text = v;
+                                init_data.push(elem);
+                            });
+                        }
+
+                        callback(init_data);
+                    }
+                    '''
+                )
             ),
-            ondemand=True
+            ondemand=True,
+            validator=Validator()
         )
 
         center = GeocompleteField(
@@ -93,17 +116,9 @@ class JobsResearchForm(twf.Form):
         )
 
         distances = [
-            '5', '10', '25', '50', '100', '200', '200+'
+            '5', '10', '25', '50', '100', '200'
         ]
-        tmp_options = []
-        for i, d in enumerate(distances):
-            distances_km = '{}{}'.format(d, 'km')
-            if i == len(distances) - 1:
-                option = ('infty', distances_km)
-            else:
-                option = (d, distances_km)
-
-            tmp_options.append(option)
+        tmp_options = [(d, '{}{}'.format(d, 'km')) for d in distances]
 
         radius = twsel.Select2SingleSelectField(
             resources=[],
@@ -114,8 +129,28 @@ class JobsResearchForm(twf.Form):
             attrs=dict(style='width: 100%;'),
             placeholder=u"Et jusqu'à...",
             opts=dict(
-                allowClear=True
-            )
+                allowClear=True,
+                initSelection=twc.js_callback(
+                    '''
+                    function (element, callback) {
+                        var init_data;
+
+                        radius = params['radius'];
+
+                        if(typeof radius !== "undefined" && radius) {
+                            var elem = {};
+                            elem.id = radius;
+                            elem.text = radius.concat('km');
+                            init_data = elem;
+                        }
+
+                        callback(init_data);
+                    }
+                    '''
+                )
+            ),
+            ondemand=True,
+            validator=Validator()
         )
 
         sort_by = twsel.Select2SingleSelectField(
@@ -127,13 +162,41 @@ class JobsResearchForm(twf.Form):
             attrs=dict(style='width: 100%;'),
             placeholder=u"Trier par...",
             opts=dict(
-                allowClear=True
-            )
+                allowClear=True,
+                initSelection=twc.js_callback(
+                    '''
+                    function (element, callback) {
+                        var init_data;
+
+                        sort_by = params['sort_by'];
+
+                        if(typeof sort_by !== "undefined" && sort_by) {
+                            var elem = {};
+                            elem.id = sort_by;
+
+                            if(sort_by === 'dates') {
+                                elem.text = 'Dates';
+                            } else {
+                                elem.text = 'Pertinence';
+                            }
+
+                            init_data = elem;
+                        }
+
+                        callback(init_data);
+                    }
+                    '''
+                )
+            ),
+            ondemand=True,
+            validator=Validator()
         )
 
     def __init__(self, **kwargs):
         super(JobsResearchForm, self).__init__(**kwargs)
         self.submit = None
+        self.method = 'GET'
+        self.attrs = {'enctype': 'application/x-www-form-urlencoded'}
         self.css_class = 'row'
 
 
@@ -205,9 +268,30 @@ class CompaniesResearchForm(twf.Form):
 
                 ],
                 maximumSelectionSize=10,
-                tokenSeparators=[',']
+                tokenSeparators=[','],
+                initSelection=twc.js_callback(
+                    '''
+                    function (element, callback) {
+                        var init_data = [];
+
+                        query = params['query'];
+
+                        if(typeof query !== "undefined" && query) {
+                            $.each(query.split(','), function(i, v) {
+                                var elem = {};
+                                elem.id = v;
+                                elem.text = v;
+                                init_data.push(elem);
+                            });
+                        }
+
+                        callback(init_data);
+                    }
+                    '''
+                )
             ),
-            ondemand=True
+            ondemand=True,
+            validator=Validator()
         )
 
         center = GeocompleteField(
@@ -217,17 +301,9 @@ class CompaniesResearchForm(twf.Form):
         )
 
         distances = [
-            '5', '10', '25', '50', '100', '200', '200+'
+            '5', '10', '25', '50', '100', '200'
         ]
-        tmp_options = []
-        for i, d in enumerate(distances):
-            distances_km = '{}{}'.format(d, 'km')
-            if i == len(distances) - 1:
-                option = ('infty', distances_km)
-            else:
-                option = (d, distances_km)
-
-            tmp_options.append(option)
+        tmp_options = [(d, '{}{}'.format(d, 'km')) for d in distances]
 
         radius = twsel.Select2SingleSelectField(
             resources=[],
@@ -238,11 +314,33 @@ class CompaniesResearchForm(twf.Form):
             attrs=dict(style='width: 100%;'),
             placeholder=u"Et jusqu'à...",
             opts=dict(
-                allowClear=True
-            )
+                allowClear=True,
+                initSelection=twc.js_callback(
+                    '''
+                    function (element, callback) {
+                        var init_data;
+
+                        radius = params['radius'];
+
+                        if(typeof radius !== "undefined" && radius) {
+                            var elem = {};
+                            elem.id = radius;
+                            elem.text = radius.concat('km');
+                            init_data = elem;
+                        }
+
+                        callback(init_data);
+                    }
+                    '''
+                )
+            ),
+            ondemand=True,
+            validator=Validator()
         )
 
     def __init__(self, **kwargs):
         super(CompaniesResearchForm, self).__init__(**kwargs)
         self.submit = None
+        self.method = 'GET'
+        self.attrs = {'enctype': 'application/x-www-form-urlencoded'}
         self.css_class = 'row'

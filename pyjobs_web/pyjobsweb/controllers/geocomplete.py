@@ -90,16 +90,21 @@ class GeocompleteController(BaseController):
         for bucket in raw_res.aggregations.dedup.buckets:
             for source_doc in bucket['dedup_docs']['hits']['hits']:
                 fields = source_doc['_source']
-                geo_field = fields['geolocation']
-                geoloc = dict(lat=geo_field['lat'], lon=geo_field['lon'])
-                to_submit = json.dumps(geoloc)
 
-                display = u'%s %s - %s, France' % (fields['name'].upper(),
-                                                   fields['complement'].upper(),
-                                                   fields['postal_code']) \
-                    if fields['complement'] else \
-                    u'%s - %s, France' % (fields['name'].upper(),
-                                          fields['postal_code'])
-                res.append(dict(to_submit=to_submit, to_display=display))
+                name = fields['name']
+                complement = fields['complement']
+                postal_code = fields['postal_code']
+                country = 'France'
+
+                geoloc = fields['geolocation']
+                coordinates = dict(lat=geoloc['lat'], lon=geoloc['lon'])
+
+                res.append(dict(
+                    name=name,
+                    complement=complement,
+                    postal_code=postal_code,
+                    country=country,
+                    coordinates=coordinates
+                ))
 
         return dict(results=res)

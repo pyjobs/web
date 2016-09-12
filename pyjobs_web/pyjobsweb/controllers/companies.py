@@ -178,7 +178,8 @@ class SearchCompaniesController(BaseController):
 
         try:
             geoloc_query = json.loads(center)
-            lat, lon = (geoloc_query['lat'], geoloc_query['lon'])
+            coordinates = geoloc_query['coordinates']
+            lat, lon = (coordinates['lat'], coordinates['lon'])
         except (ValueError, TypeError):
             # One of the following case has occurred:
             #     - Center wasn't a valid json string

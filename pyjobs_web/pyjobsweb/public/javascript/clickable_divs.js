@@ -1,6 +1,4 @@
-/**
- * Created by echernib on 9/7/16.
- */
+"use strict";
 
 $(document).ready(function () {
     $(".clickable-div").click(function(e) {
