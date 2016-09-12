@@ -46,7 +46,8 @@ class Job(es.DocType):
         synonyms=[
             'c => c_language',
             'c++, c ++, cpp => cpp_language',
-            'c/c++, c/c ++, c / c++, c / c ++, c/cpp, c / cpp => c_cpp_language',
+            'c/c++, c/c ++, c / c++, c / c ++, c/cpp, c / cpp => c_language',
+            'c/c++, c/c ++, c / c++, c / c ++, c/cpp, c / cpp => cpp_language',
             'c#, c #, c♯, c ♯, csharp => csharp_language',
             'f#, f #, f♯, f ♯, fsharp => fsharp_language',
             '.net => dotnet'
