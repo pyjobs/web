@@ -1,10 +1,33 @@
 # -*- coding: utf-8 -*
-import tw2.core as twc
 import tw2.forms as twf
-import tw2.jqplugins.select2 as twsel
-from tw2.core.validation import Validator
 
+from pyjobsweb.forms.custom_widgets import PersistentSelect2SingleSelect
+from pyjobsweb.forms.custom_widgets import PersistentSelect2MultipleSelect
 from pyjobsweb.forms.custom_widgets import GeocompleteField
+
+
+def _get_distances():
+    distances = ['5', '10', '25', '50', '100', '200']
+    return [(d, '{}{}'.format(d, 'km')) for d in distances]
+
+
+def _get_keyword_list():
+    return [
+        'Python',
+        'Django',
+        'Flask',
+        'Pyramid',
+        'Turbogears',
+        'Ansible',
+        'Plone',
+        'Docker',
+        'PostgreSQL',
+        'MySQL',
+        'Oracle',
+        'Startup',
+        'CTO',
+        'Devops'
+    ]
 
 
 class JobsResearchForm(twf.Form):
@@ -56,140 +79,39 @@ class JobsResearchForm(twf.Form):
             </div>
             '''
 
-        query = twsel.Select2MultipleSelectField(
-            resources=[],
+        query = PersistentSelect2MultipleSelect(
             name='query',
             label=u'Mot clés :',
-            options=[],
+            options=_get_keyword_list(),
             value='',
-            attrs=dict(style='width: 100%;'),
             placeholder=u'Mots clés recherchés...',
-            opts=dict(
-                tags=[
-                    'Python',
-                    'Django',
-                    'Flask',
-                    'Pyramid',
-                    'Turbogears',
-                    'Ansible',
-                    'Plone',
-                    'Docker',
-                    'PostgreSQL',
-                    'MySQL',
-                    'Oracle',
-                    'Startup',
-                    'CTO',
-                    'Devops'
-
-                ],
-                maximumSelectionSize=10,
-                tokenSeparators=[','],
-                initSelection=twc.js_callback(
-                    '''
-                    function (element, callback) {
-                        var init_data = [];
-
-                        query = params['query'];
-
-                        if(typeof query !== "undefined" && query) {
-                            $.each(query.split(','), function(i, v) {
-                                var elem = {};
-                                elem.id = v;
-                                elem.text = v;
-                                init_data.push(elem);
-                            });
-                        }
-
-                        callback(init_data);
-                    }
-                    '''
-                )
-            ),
-            ondemand=True,
-            validator=Validator()
+            attrs=dict(style='width: 100%;')
         )
 
         center = GeocompleteField(
-            resources=[],
             name='center',
-            label=u'Autour de :'
+            label=u'Autour de :',
+            value='',
+            placeholder=u'Autour de...',
+            attrs=dict(style='width: 100%;')
         )
 
-        distances = [
-            '5', '10', '25', '50', '100', '200'
-        ]
-        tmp_options = [(d, '{}{}'.format(d, 'km')) for d in distances]
-
-        radius = twsel.Select2SingleSelectField(
-            resources=[],
+        radius = PersistentSelect2SingleSelect(
             name='radius',
             label=u'Dans un rayon de :',
-            options=tmp_options,
+            options=_get_distances(),
             value='',
-            attrs=dict(style='width: 100%;'),
             placeholder=u"Et jusqu'à...",
-            opts=dict(
-                allowClear=True,
-                initSelection=twc.js_callback(
-                    '''
-                    function (element, callback) {
-                        var init_data;
-
-                        radius = params['radius'];
-
-                        if(typeof radius !== "undefined" && radius) {
-                            var elem = {};
-                            elem.id = radius;
-                            elem.text = radius.concat('km');
-                            init_data = elem;
-                        }
-
-                        callback(init_data);
-                    }
-                    '''
-                )
-            ),
-            ondemand=True,
-            validator=Validator()
+            attrs=dict(style='width: 100%;')
         )
 
-        sort_by = twsel.Select2SingleSelectField(
-            resources=[],
+        sort_by = PersistentSelect2SingleSelect(
             name='sort_by',
             label=u'Trier par :',
             options=[('dates', 'Dates'), ('scores', 'Pertinence')],
             value='',
             attrs=dict(style='width: 100%;'),
-            placeholder=u"Trier par...",
-            opts=dict(
-                allowClear=True,
-                initSelection=twc.js_callback(
-                    '''
-                    function (element, callback) {
-                        var init_data;
-
-                        sort_by = params['sort_by'];
-
-                        if(typeof sort_by !== "undefined" && sort_by) {
-                            var elem = {};
-                            elem.id = sort_by;
-
-                            if(sort_by === 'dates') {
-                                elem.text = 'Dates';
-                            } else {
-                                elem.text = 'Pertinence';
-                            }
-
-                            init_data = elem;
-                        }
-
-                        callback(init_data);
-                    }
-                    '''
-                )
-            ),
-            ondemand=True,
-            validator=Validator()
+            placeholder=u"Trier par..."
         )
 
     def __init__(self, **kwargs):
@@ -241,101 +163,30 @@ class CompaniesResearchForm(twf.Form):
             </div>
             '''
 
-        query = twsel.Select2MultipleSelectField(
-            resources=[],
+        query = PersistentSelect2MultipleSelect(
             name='query',
             label=u'Mot clés :',
-            options=[],
+            options=_get_keyword_list(),
             value='',
-            attrs=dict(style='width: 100%;'),
             placeholder=u'Mots clés recherchés...',
-            opts=dict(
-                tags=[
-                    'Python',
-                    'Django',
-                    'Flask',
-                    'Pyramid',
-                    'Turbogears',
-                    'Ansible',
-                    'Plone',
-                    'Docker',
-                    'PostgreSQL',
-                    'MySQL',
-                    'Oracle',
-                    'Startup',
-                    'CTO',
-                    'Devops'
-
-                ],
-                maximumSelectionSize=10,
-                tokenSeparators=[','],
-                initSelection=twc.js_callback(
-                    '''
-                    function (element, callback) {
-                        var init_data = [];
-
-                        query = params['query'];
-
-                        if(typeof query !== "undefined" && query) {
-                            $.each(query.split(','), function(i, v) {
-                                var elem = {};
-                                elem.id = v;
-                                elem.text = v;
-                                init_data.push(elem);
-                            });
-                        }
-
-                        callback(init_data);
-                    }
-                    '''
-                )
-            ),
-            ondemand=True,
-            validator=Validator()
+            attrs=dict(style='width: 100%;')
         )
 
         center = GeocompleteField(
-            resources=[],
             name='center',
-            label=u'Autour de :'
+            label=u'Autour de :',
+            value='',
+            placeholder=u'Autour de...',
+            attrs=dict(style='width: 100%;')
         )
 
-        distances = [
-            '5', '10', '25', '50', '100', '200'
-        ]
-        tmp_options = [(d, '{}{}'.format(d, 'km')) for d in distances]
-
-        radius = twsel.Select2SingleSelectField(
-            resources=[],
+        radius = PersistentSelect2SingleSelect(
             name='radius',
             label=u'Dans un rayon de :',
-            options=tmp_options,
+            options=_get_distances(),
             value='',
-            attrs=dict(style='width: 100%;'),
             placeholder=u"Et jusqu'à...",
-            opts=dict(
-                allowClear=True,
-                initSelection=twc.js_callback(
-                    '''
-                    function (element, callback) {
-                        var init_data;
-
-                        radius = params['radius'];
-
-                        if(typeof radius !== "undefined" && radius) {
-                            var elem = {};
-                            elem.id = radius;
-                            elem.text = radius.concat('km');
-                            init_data = elem;
-                        }
-
-                        callback(init_data);
-                    }
-                    '''
-                )
-            ),
-            ondemand=True,
-            validator=Validator()
+            attrs=dict(style='width: 100%;')
         )
 
     def __init__(self, **kwargs):
