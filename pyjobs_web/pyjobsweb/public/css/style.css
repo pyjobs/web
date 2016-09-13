@@ -217,3 +217,8 @@ html.full-height {
     opacity: 1;
     box-shadow: 1px 0px #1a242f;
 }
+
+.honey-field {
+    display: none !important;
+    visibility: hidden;
+}

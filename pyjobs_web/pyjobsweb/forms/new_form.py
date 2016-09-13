@@ -137,6 +137,17 @@ class EmailValidator(twc.EmailValidator):
         self.msgs['bademail'] = u'Adresse email invalide'
 
 
+class EmptyHoneyPotValidator(twc.Validator):
+    def __init__(self, **kwargs):
+        super(EmptyHoneyPotValidator, self).__init__(**kwargs)
+
+    def to_python(self, value, state=None):
+        if not self._is_empty(value):
+            raise ValidationError('', self)
+
+        return value
+
+
 class NewCompanyForm(twf.Form):
     def __init__(self, **kwargs):
         super(NewCompanyForm, self).__init__(**kwargs)
@@ -168,8 +179,27 @@ class NewCompanyForm(twf.Form):
                 <div class="col-xs-12" style="height:7px;"></div>
             </%def>
 
+            <%def name="display_honeypot(field)">
+                <div class="form-group required honey-field
+                ${'has-success' if field.value else ''}"
+                title="${field.help_text if field.help_text else ''}">
+                    <label class="control-label col-sm-12 honey-field" for="${field.compound_id}">
+                        ${field.label}
+                        ${field.error_msg if field.error_msg else ''}
+                    </label>
+                    <div class="col-xs-12 col-sm-12 honey-field">
+                        ${field.display()}
+                    </div>
+                </div>
+                <div class="col-xs-12 honey-field" style="height:7px;"></div>
+            </%def>
+
             % for child in w.children_non_hidden:
-                ${display_field(child)}
+                % if 'honey-field' in child.css_class:
+                    ${display_honeypot(child)}
+                % else:
+                    ${display_field(child)}
+                % endif
             % endfor
 
             <div class="form-group">
@@ -276,6 +306,16 @@ class NewCompanyForm(twf.Form):
             maxlength=200,
             css_class='form-control',
             validator=TechnologiesValidator(required=True)
+        )
+
+        company_required_field = twf.TextField(
+            name='company_required_field',
+            label=u'Company label',
+            placeholder=u"Label de l'entreprise",
+            help_text=u"Message d'aide",
+            maxlength=5,
+            css_class='form-control honey-field',
+            validator=EmptyHoneyPotValidator
         )
 
         submit = twf.SubmitButton('submit')
