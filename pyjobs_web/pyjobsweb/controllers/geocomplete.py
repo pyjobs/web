@@ -64,7 +64,8 @@ class GeocompleteController(BaseController):
 
         dedup_docs = A(
             'top_hits',
-            size=1
+            size=1,
+            sort={'postal_code.raw': 'asc'}
         )
 
         dedup = A(

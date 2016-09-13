@@ -101,7 +101,8 @@ class Geocomplete(es.DocType):
     postal_code = es.String(
         index='analyzed',
         analyzer=postal_code_index_analyzer,
-        search_analyzer=postal_code_search_analyzer
+        search_analyzer=postal_code_search_analyzer,
+        fields=dict(raw=es.String(index='not_analyzed'))
     )
 
     geolocation = es.GeoPoint()
