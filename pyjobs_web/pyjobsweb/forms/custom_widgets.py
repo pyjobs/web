@@ -34,21 +34,12 @@ class PersistentSelect2MultipleSelect(twsel.Select2MultipleSelectField):
     def __init__(self, **kwargs):
         super(PersistentSelect2MultipleSelect, self).__init__(**kwargs)
         self.resources = [select2_persistence_js]
-        self.ondemand = self.ondemand or True
+        self.ondemand = True
         self.validator = self.validator or Validator()
 
-        options = self.options
         self.options = []
 
-        default_opts = dict(
-            tags=options,
-            maximumSelectionSize=10,
-            tokenSeparators=[',']
-        )
-
-        for key, val in default_opts.iteritems():
-            self.opts[key] = self.opts[key] if key in self.opts else val
-
+        self.opts = self.opts.copy()
         self.opts['initSelection'] = twc.js_callback(
             '''
             function(element, callback) {
@@ -76,15 +67,14 @@ class PersistentSelect2SingleSelect(twsel.Select2SingleSelectField):
         super(PersistentSelect2SingleSelect, self).__init__(**kwargs)
         self.resources = [select2_persistence_js]
 
-        self.ondemand = True,
-        self.validator = Validator()
+        self.ondemand = True
+        self.validator = self.validator or Validator()
 
         self.js_dict_entries = ['%s: "%s"' % (key, value)
                                 for key, value in self.options]
         self.js_opts_dict = '{%s}' % ', '.join(self.js_dict_entries)
 
-        self.opts = dict()
-        self.opts['allowClear'] = True
+        self.opts = self.opts.copy()
         self.opts['initSelection'] = twc.js_callback(
             '''
             function (element, callback) {
@@ -136,14 +126,71 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
         ]
         self.options = []
         self.ondemand = True
-        self.validator = Validator()
+        self.validator = self.validator or Validator()
 
-    opts = dict(
-        minimumInputLength=1,
-        maximumInputLength=125,
-        allowClear=True,
-        dropdownAutoWidth=True,
-        ajax=dict(
+        self.opts.copy()
+        self.opts['minimumInputLength'] = 1
+        self.opts['maximumInputLength'] = 125
+        self.opts['allowClear'] = True
+        self.opts['dropdownAutoWidth'] = True
+
+        self.opts['initSelection'] = twc.js_callback(
+            """
+            function (element, callback) {
+                var init_data;
+
+                param = params['%(name)s'];
+
+                if(typeof param !== "undefined" && param) {
+                    var elem = {};
+                    param_dict = JSON.parse(param);
+                    elem.id = param;
+
+                    name = format_name(
+                        param_dict['name'],
+                        param_dict['complement'],
+                        param_dict['postal_code'],
+                        param_dict['country']
+                    );
+
+                    elem.name = name;
+                    elem.value = name;
+
+                    init_data = elem;
+                }
+
+                callback(init_data);
+            }
+            """ % dict(name=self.name)
+        )
+        self.opts['escapeMarkup'] = twc.js_callback(
+            """
+            function(markup) {
+                return markup;
+            }
+            """
+        )
+        self.opts['formatResult'] = twc.js_callback(
+            """
+            function(location) {
+                var markup = '<option value="' + location.value + '">'
+                    + location.name
+                    + '</option>';
+                return markup;
+            }
+            """
+        )
+        self.opts['formatSelection'] = twc.js_callback(
+            """
+            function(location) {
+                if(typeof location !== "undefined") {
+                    return location.value || location.text;
+                }
+            }
+            """
+        )
+
+        self.opts['ajax'] = dict(
             url='/geocomplete',
             dataType='json',
             type='POST',
@@ -165,63 +212,20 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
                         $.each(data['results'], function(i, v) {
                             var o = {};
                             o.id = JSON.stringify(v);
-                            o.name = format_name(v['name'], v['complement'], v['postal_code'], v['country']);
-                            o.value = format_name(v['name'], v['complement'], v['postal_code'], v['country']);
+                            name = format_name(
+                                v['name'],
+                                v['complement'],
+                                v['postal_code'],
+                                v['country']
+                            );
+                            o.name = name;
+                            o.value = name;
                             results.push(o);
                         });
                     }
 
-                    return {
-                        results: results
-                    };
+                    return {results: results};
                 }
                 """
             )
-        ),
-        initSelection=twc.js_callback(
-            """
-            function (element, callback) {
-                var init_data;
-
-                center = params['center'];
-
-                if(typeof center !== "undefined" && center) {
-                    var elem = {};
-                    center_dict = JSON.parse(center);
-                    elem.id = center;
-                    elem.name = format_name(center_dict['name'], center_dict['complement'], center_dict['postal_code'], center_dict['country']);
-                    elem.value = format_name(center_dict['name'], center_dict['complement'], center_dict['postal_code'], center_dict['country']);
-                    init_data = elem;
-                }
-
-                callback(init_data);
-            }
-            """
-        ),
-        escapeMarkup=twc.js_callback(
-            """
-            function(markup) {
-                return markup;
-            }
-            """
-        ),
-        formatResult=twc.js_callback(
-            """
-            function(location) {
-                var markup = '<option value="' + location.value + '">'
-                    + location.name
-                    + '</option>';
-                return markup;
-            }
-            """
-        ),
-        formatSelection=twc.js_callback(
-            """
-            function(location) {
-                if(typeof location !== "undefined") {
-                    return location.value || location.text;
-                }
-            }
-            """
         )
-    )

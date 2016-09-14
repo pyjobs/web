@@ -337,12 +337,15 @@ class NewCompanyForm(twf.Form):
         company_technologies = PersistentSelect2MultipleSelect(
             name='company_technologies',
             label=u"Technologies utilisées par l'entreprise: (maximum 10)",
-            options=_get_technology_list(),
             placeholder=u"Technologie 1, Technologie 2, ..., Technologie 10",
             help_text=u"La liste de technologies utilisées par l'entreprise "
                       u"(max. 10)",
             attrs=dict(style='width: 100%;'),
-            maximumSelectionSize=10,
+            opts=dict(
+                tags=_get_technology_list(),
+                maximumSelectionSize=10,
+                tokenSeparators=[',']
+            ),
             validator=Select2MultipleSelectValidator(
                 required=True, min=1, max=10)
         )

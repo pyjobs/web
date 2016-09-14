@@ -82,10 +82,14 @@ class JobsResearchForm(twf.Form):
         query = PersistentSelect2MultipleSelect(
             name='query',
             label=u'Mot clés :',
-            options=_get_keyword_list(),
             value='',
             placeholder=u'Mots clés recherchés...',
-            attrs=dict(style='width: 100%;')
+            attrs=dict(style='width: 100%;'),
+            opts=dict(
+                tags=_get_keyword_list(),
+                maximumSelectionSize=10,
+                tokenSeparators=[',']
+            )
         )
 
         center = GeocompleteField(
@@ -102,7 +106,8 @@ class JobsResearchForm(twf.Form):
             options=_get_distances(),
             value='',
             placeholder=u"Et jusqu'à...",
-            attrs=dict(style='width: 100%;')
+            attrs=dict(style='width: 100%;'),
+            opts=dict(allowClear=True)
         )
 
         sort_by = PersistentSelect2SingleSelect(
@@ -110,8 +115,9 @@ class JobsResearchForm(twf.Form):
             label=u'Trier par :',
             options=[('dates', 'Dates'), ('scores', 'Pertinence')],
             value='',
+            placeholder=u"Trier par...",
             attrs=dict(style='width: 100%;'),
-            placeholder=u"Trier par..."
+            opts=dict(allowClear=True)
         )
 
     def __init__(self, **kwargs):
@@ -167,10 +173,14 @@ class CompaniesResearchForm(twf.Form):
         query = PersistentSelect2MultipleSelect(
             name='query',
             label=u'Mot clés :',
-            options=_get_keyword_list(),
             value='',
             placeholder=u'Mots clés recherchés...',
-            attrs=dict(style='width: 100%;')
+            attrs=dict(style='width: 100%;'),
+            opts=dict(
+                tags=_get_keyword_list(),
+                maximumSelectionSize=10,
+                tokenSeparators=[',']
+            )
         )
 
         center = GeocompleteField(
@@ -187,7 +197,8 @@ class CompaniesResearchForm(twf.Form):
             options=_get_distances(),
             value='',
             placeholder=u"Et jusqu'à...",
-            attrs=dict(style='width: 100%;')
+            attrs=dict(style='width: 100%;'),
+            opts=dict(allowClear=True)
         )
 
     def __init__(self, **kwargs):
