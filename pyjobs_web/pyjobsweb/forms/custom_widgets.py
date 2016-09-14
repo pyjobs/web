@@ -4,10 +4,36 @@ import tw2.jqplugins.select2 as twsel
 from tw2.core.validation import Validator
 
 
+select2_persistence_js = twc.JSSource(src='''
+    // This function returns the value of the specified GET parameter.
+    // The code has been found at the following url:
+    // http://stackoverflow.com/questions/5448545/how-to-retrieve-get-parameters-from-javascript
+    // Big Kudos to you mister Jonah.
+    var params = function() {
+        function urldecode(str) {
+            return decodeURIComponent((str+'').replace(/\+/g, '%20'));
+        }
+
+        function transformToAssocArray( prmstr ) {
+            var params = {};
+            var prmarr = prmstr.split("&");
+            for ( var i = 0; i < prmarr.length; i++) {
+                var tmparr = prmarr[i].split("=");
+                params[tmparr[0]] = urldecode(tmparr[1]);
+            }
+            return params;
+        }
+
+        var prmstr = window.location.search.substr(1);
+        return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
+    }();
+''')
+
+
 class PersistentSelect2MultipleSelect(twsel.Select2MultipleSelectField):
     def __init__(self, **kwargs):
         super(PersistentSelect2MultipleSelect, self).__init__(**kwargs)
-        self.resources = []
+        self.resources = [select2_persistence_js]
         self.ondemand = True
         self.validator = Validator()
 
@@ -43,7 +69,7 @@ class PersistentSelect2MultipleSelect(twsel.Select2MultipleSelectField):
 class PersistentSelect2SingleSelect(twsel.Select2SingleSelectField):
     def __init__(self, **kwargs):
         super(PersistentSelect2SingleSelect, self).__init__(**kwargs)
-        self.resources = []
+        self.resources = [select2_persistence_js]
 
         self.ondemand = True,
         self.validator = Validator()
@@ -82,6 +108,7 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
     def __init__(self, **kwargs):
         super(GeocompleteField, self).__init__(**kwargs)
         self.resources = [
+            select2_persistence_js,
             twc.JSSource(
                 src='''
                 function format_name(name, complement, postal_code, country) {
