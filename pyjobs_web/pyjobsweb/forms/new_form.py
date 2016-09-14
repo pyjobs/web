@@ -6,9 +6,10 @@ import tw2.core as twc
 import tw2.forms as twf
 import tw2.forms.widgets as tww
 from tw2.core.validation import ValidationError
+from sqlalchemy.orm.exc import NoResultFound
 
 from pyjobsweb.model import CompanyAlchemy
-from sqlalchemy.orm.exc import NoResultFound
+from pyjobsweb.forms.custom_widgets import PersistentSelect2MultipleSelect
 
 french_validation_messages = {
     'required': u'Veuillez saisir une valeur',
@@ -17,6 +18,22 @@ french_validation_messages = {
                 u"s'il vous plaît.",
     'childerror': '',  # Children of this widget have errors
 }
+
+
+def _get_technology_list():
+    return [
+        'Python',
+        'Django',
+        'Flask',
+        'Pyramid',
+        'Turbogears',
+        'Ansible',
+        'Plone',
+        'Docker',
+        'PostgreSQL',
+        'MySQL',
+        'Oracle'
+    ]
 
 
 class CompanyNameValidator(twc.Validator):
@@ -99,13 +116,21 @@ class SirenValidator(twc.Validator):
             raise ValidationError('duplicate_siren', self)
 
 
-class TechnologiesValidator(twc.RegexValidator):
-    def __init__(self, **kwargs):
-        super(TechnologiesValidator, self).__init__(**kwargs)
-        self.msgs = dict(french_validation_messages)
-        self.msgs['badregex'] = u'Format du champ invalide'
+class Select2MultipleSelectValidator(twc.Validator):
+    min = 0
+    max = 10
 
-    regex = re.compile('^[^,]*(,*[^,]+){0,10},*$', re.IGNORECASE | re.UNICODE)
+    def __init__(self, **kwargs):
+        super(Select2MultipleSelectValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.msgs['tooshort'] = u'Soumission trop courte'
+        self.msgs['toolong'] = u'Soumission trop longue'
+
+    def _validate_python(self, value, state=None):
+        if len(value) > self.max:
+            raise ValidationError('toolong', self)
+        elif len(value) < self.min:
+            raise ValidationError('tooshort', self)
 
 
 class RequiredValidator(twc.Validator):
@@ -152,6 +177,8 @@ class NewCompanyForm(twf.Form):
     def __init__(self, **kwargs):
         super(NewCompanyForm, self).__init__(**kwargs)
         self.submit = None
+        self.method = 'GET'
+        self.attrs = {'enctype': 'application/x-www-form-urlencoded'}
 
     class child(tww.BaseLayout):
         hover_help = True
@@ -164,9 +191,18 @@ class NewCompanyForm(twf.Form):
             % endfor
 
             <%def name="display_field(field)">
-                <div class="form-group required
-                ${'has-success' if field.value and not field.error_msg else ''}
-                ${'has-error' if field.error_msg else ''}"
+                <%
+                    css_success = ''
+                    if field.error_msg:
+                        css_success = 'has-error'
+                    elif isinstance(field.value, list):
+                        if field.value[0]['text']:
+                            css_success = 'has-success'
+                    elif field.value:
+                        css_success = 'has-success'
+                %>
+
+                <div class="form-group required ${css_success}"
                 title="${field.help_text if field.help_text else ''}">
                     <label class="control-label col-sm-12" for="${field.compound_id}">
                         ${field.label}
@@ -297,15 +333,17 @@ class NewCompanyForm(twf.Form):
             validator=LengthValidator(required=True, min=100, max=5000)
         )
 
-        company_technologies = twf.TextArea(
+        company_technologies = PersistentSelect2MultipleSelect(
             name='company_technologies',
             label=u"Technologies utilisées par l'entreprise: (maximum 10)",
+            options=_get_technology_list(),
             placeholder=u"Technologie 1, Technologie 2, ..., Technologie 10",
             help_text=u"La liste de technologies utilisées par l'entreprise "
-                      u"séparées par des virgules (max. 10)",
-            maxlength=200,
-            css_class='form-control',
-            validator=TechnologiesValidator(required=True)
+                      u"(max. 10)",
+            attrs=dict(style='width: 100%;'),
+            maximumSelectionSize=10,
+            validator=Select2MultipleSelectValidator(
+                required=True, min=1, max=10)
         )
 
         company_required_field = twf.TextField(
@@ -315,7 +353,7 @@ class NewCompanyForm(twf.Form):
             help_text=u"Message d'aide",
             maxlength=5,
             css_class='form-control honey-field',
-            validator=EmptyHoneyPotValidator
+            validator=EmptyHoneyPotValidator(required=True)
         )
 
         submit = twf.SubmitButton('submit')

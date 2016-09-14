@@ -40,12 +40,7 @@ class NewCompanyController(BaseController):
 
     @staticmethod
     def _parse_technologies(technologies):
-        technologies = re.sub(',+', ' ', technologies)
-        technologies = re.sub('(\s|\t)+', ' ', technologies)
-        technologies = technologies.strip()
-        technologies = technologies.replace(' ', ', ')
-
-        return technologies
+        return technologies[0].replace(',', ', ')
 
     def _build_company_obj(self, **kwargs):
         company = CompanyAlchemy()

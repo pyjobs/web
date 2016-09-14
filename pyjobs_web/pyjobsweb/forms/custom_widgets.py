@@ -34,16 +34,21 @@ class PersistentSelect2MultipleSelect(twsel.Select2MultipleSelectField):
     def __init__(self, **kwargs):
         super(PersistentSelect2MultipleSelect, self).__init__(**kwargs)
         self.resources = [select2_persistence_js]
-        self.ondemand = True
-        self.validator = Validator()
+        self.ondemand = self.ondemand or True
+        self.validator = self.validator or Validator()
 
         options = self.options
         self.options = []
 
-        self.opts = dict()
-        self.opts['tags'] = options
-        self.opts['maximumSelectionSize'] = 10
-        self.opts['tokenSeparators'] = [',']
+        default_opts = dict(
+            tags=options,
+            maximumSelectionSize=10,
+            tokenSeparators=[',']
+        )
+
+        for key, val in default_opts.iteritems():
+            self.opts[key] = self.opts[key] if key in self.opts else val
+
         self.opts['initSelection'] = twc.js_callback(
             '''
             function(element, callback) {
