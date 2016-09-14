@@ -120,6 +120,7 @@ class JobsResearchForm(twf.Form):
         self.method = 'GET'
         self.attrs = {'enctype': 'application/x-www-form-urlencoded'}
         self.css_class = 'row'
+        self.action = '/jobs/search'
 
 
 class CompaniesResearchForm(twf.Form):
@@ -195,3 +196,4 @@ class CompaniesResearchForm(twf.Form):
         self.method = 'GET'
         self.attrs = {'enctype': 'application/x-www-form-urlencoded'}
         self.css_class = 'row'
+        self.action = '/societes-qui-recrutent/search'

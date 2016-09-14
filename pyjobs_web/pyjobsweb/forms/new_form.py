@@ -179,6 +179,7 @@ class NewCompanyForm(twf.Form):
         self.submit = None
         self.method = 'GET'
         self.attrs = {'enctype': 'application/x-www-form-urlencoded'}
+        self.action = '/societes-qui-recrutent/new/submit'
 
     class child(tww.BaseLayout):
         hover_help = True

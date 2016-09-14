@@ -62,7 +62,7 @@
 
 <div id="company_search_form">
     <h2>Rechercher une entreprise</h2>
-     ${company_search_form.display(action='/societes-qui-recrutent/search', method='POST')}
+     ${company_search_form.display()}
 </div>
 
 ${company_pagination()}

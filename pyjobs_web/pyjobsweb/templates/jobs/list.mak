@@ -58,7 +58,7 @@
 
 <div id="job_offer_search_form">
     <h2>Rechercher une offre d'emploi</h2>
-    ${job_offer_search_form.display(action='/jobs/search', method='POST')}
+    ${job_offer_search_form.display()}
 </div>
 
 ${job_pagination()}
