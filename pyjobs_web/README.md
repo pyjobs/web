@@ -62,3 +62,16 @@ Then you are ready to go.
 ## Update job database with crawls
 
 Run ``gearbox crawl`` command. It will be run [PyJobs Crawlers](https://github.com/pyjobs/crawlers) and feed PyJobs Web database.
+
+## Populate the Elasticsearch database with populate-es
+
+Run ``gearbox populate-es [-j|--jobs] [-g|--geocomplete]`` command. This command allows you to index the job offers present in the Postgresql database (through the
+``-j`` or ``--jobs`` argument) under the ``jobs`` index. These documents are required if you want the research form to work. It also allows you to index the required
+geocomplete documents present in the ``static/geolocations/fr_locations.json`` file, under the ``geocomplete`` index (through the ``-g`` or ``--geocomplete`` argument).
+These documents are required for the geocompletion in the research form to work.
+
+## Purge the Elasticsearch database with purge-es
+
+Run ``gearbox purge-es [-j|--jobs] [-g|--geocomplete]`` command. The command will delete both the ``jobs`` and/or ``geocomplete`` Elasticsearch indices depending on
+the specified arguments. After deleting them it will recreate them along with their mappings. Also, after purging the ``jobs`` index, the command will also set back
+the ``dirty`` column to ``True`` for every entry in the Postgresql ``jobs`` table.

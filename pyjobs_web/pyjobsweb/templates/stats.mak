@@ -10,37 +10,37 @@
 </%def>
 
 <%def name="end_body_scripts()">
+    ${parent.end_body_scripts()}
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
     <script>
-    $(document).ready(function () {
+        $(document).ready(function () {
+            Morris.Line({
+                element: 'month_chart',
+                data: ${h.to_json(flat_month, indent=4) | n},
+                xkey: ${h.to_json(flat_x_field) | n},
+                ykeys: ${h.to_json(flat_y_fields) | n},
+                labels: ${h.to_json(sources_labels) | n}
+            });
 
-        Morris.Line({
-          element: 'month_chart',
-          data: ${h.to_json(flat_month, indent=4) | n},
-          xkey: ${h.to_json(flat_x_field) | n},
-          ykeys: ${h.to_json(flat_y_fields) | n},
-          labels: ${h.to_json(sources_labels) | n}
+            Morris.Line({
+                element: 'weeks_chart',
+                data: ${h.to_json(flat_week, indent=4) | n},
+                xkey: ${h.to_json(flat_x_field) | n},
+                ykeys: ${h.to_json(flat_y_fields) | n},
+                labels: ${h.to_json(sources_labels) | n}
+            });
         });
-
-        Morris.Line({
-          element: 'weeks_chart',
-          data: ${h.to_json(flat_week, indent=4) | n},
-          xkey: ${h.to_json(flat_x_field) | n},
-          ykeys: ${h.to_json(flat_y_fields) | n},
-          labels: ${h.to_json(sources_labels) | n}
-        });
-
-    });
-</script>
+    </script>
 </%def>
 
 <%def name="stats_table(stats, periods, period_format)">
     <table class="stats table table-striped table-hover">
         <thead>
-                <th>
-                    Source
-                </th>
+        <th>
+            Source
+        </th>
             % for period in periods:
                 <th>
                     ${period.strftime(period_format)}
@@ -64,7 +64,11 @@
     </table>
 </%def>
 
-<h1>Statistiques</h1>
+<%def name="page_header()">
+    <header class="page-header">
+        <h1>Statistiques</h1>
+    </header>
+</%def>
 
 <h2>Publication d'offres par mois</h2>
 

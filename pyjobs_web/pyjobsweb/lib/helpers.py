@@ -2,10 +2,10 @@
 """Template Helpers used in pyjobsweb."""
 import json
 import logging
+from datetime import datetime
 from urllib import quote_plus
 
 from markupsafe import Markup
-from datetime import datetime
 from slugify import slugify as base_slugify
 from tg import config
 
@@ -44,7 +44,7 @@ def head_js():
 
 
 def get_job_url(job_id, job_title=None, previous=None, absolute=False):
-    job_url = "/job/%s" % job_id
+    job_url = "/jobs/details/%s" % job_id
     if job_title:
         job_url += "/%s" % slugify(job_title)
     if previous:
@@ -53,10 +53,21 @@ def get_job_url(job_id, job_title=None, previous=None, absolute=False):
         job_url = "%s%s" % (config.get('site.domain_base_url'), job_url)
     return job_url
 
+
+def get_company_url(company_id, previous=None, absolute=False):
+    company_url = '/societes-qui-recrutent/details/%s' % company_id
+
+    if previous:
+        company_url = '%s?previous=%s' % (company_url, quote_plus(previous))
+    if absolute:
+        company_url = '%s%s' % (config.get('site.domain_base_url'), company_url)
+
+    return company_url
+
 # Import commonly used helpers from WebHelpers2 and TG
-from tg.util.html import script_json_encode
 
 try:
     from webhelpers2 import date, html, number, misc, text
 except SyntaxError:
     log.error("WebHelpers2 helpers not available with this Python Version")
+

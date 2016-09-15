@@ -5,7 +5,12 @@
     pyjobs — à propos
 </%def>
 
-<h1>pyjobs est développé par la société <a href="http://algoo.fr">algoo</a></h1>
+<%def name="page_header()">
+    <header class="page-header">
+        <h1>pyjobs est développé par la société <a href="http://algoo.fr">algoo</a></h1>
+    </header>
+</%def>
+
 <h2>algoo &mdash; spécialiste du développement d'applications web et SAAS</h2>
 <p>
     Nous sommes une jeune startup grenobloise spécialisée dans le développement d'applications web en python.
@@ -16,7 +21,8 @@
     et livrons des solutions opérationnelles «&nbsp;clé-en-main&nbsp;».
 </p>
 <p>
-    <a href="http://algoo.fr">Nous vous invitons à découvrir nos compétences et à nous contacter si vous voulez en savoir plus</a>
+    <a href="http://algoo.fr">Nous vous invitons à découvrir nos compétences et à nous contacter si vous voulez en
+        savoir plus</a>
 </p>
 <h2>pyjobs &mdash; mise en relation de candidats et recruteurs «&nbsp;python&nbsp;»</h2>
 <p>
@@ -35,18 +41,26 @@
     voire à parler de nous :)
 </p>
 
-<script type="text/javascript">
-    decodeBase64 = function(s) {
-        var e={},i,b=0,c,x,l=0,a,r='',w=String.fromCharCode,L=s.length;
-        var A="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        for(i=0;i<64;i++){e[A.charAt(i)]=i;}
-        for(x=0;x<L;x++){
-            c=e[s.charAt(x)];b=(b<<6)+c;l+=6;
-            while(l>=8){((a=(b>>>(l-=8))&0xff)||(x<(L-2)))&&(r+=w(a));}
-        }
-        return r;
-    };
+<%def name="end_body_scripts()">
+    <script type="text/javascript">
+        decodeBase64 = function (s) {
+            var e = {}, i, b = 0, c, x, l = 0, a, r = '', w = String.fromCharCode, L = s.length;
+            var A = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+            for (i = 0; i < 64; i++) {
+                e[A.charAt(i)] = i;
+            }
+            for (x = 0; x < L; x++) {
+                c = e[s.charAt(x)];
+                b = (b << 6) + c;
+                l += 6;
+                while (l >= 8) {
+                    ((a = (b >>> (l -= 8)) & 0xff) || (x < (L - 2))) && (r += w(a));
+                }
+            }
+            return r;
+        };
 
-    // Set email on link (email base64 encoded for robots)
-    document.getElementById('mailto').href = 'mailto:' +  decodeBase64('Y29udGFjdEBhbGdvby5mcg==') + '?subject=pyjobs';
-</script>
+        // Set email on link (email base64 encoded for robots)
+        document.getElementById('mailto').href = 'mailto:' + decodeBase64('Y29udGFjdEBhbGdvby5mcg==') + '?subject=pyjobs';
+    </script>
+</%def>

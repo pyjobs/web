@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 import datetime
+import json
 
-import sqlalchemy
 import transaction
 from pyjobs_crawlers.run import Connector
 from sqlalchemy.orm.exc import NoResultFound
-from tg import config
 
 from pyjobsweb import model
 from pyjobsweb.model import DBSession, Log
-from pyjobsweb.model.data import Job
 
 __all__ = ('helpers', 'app_globals')
 
 
 class PyJobsWebConnector(Connector):
-    def __init__(self):
-        engine = sqlalchemy.engine.create_engine(config.get('sqlalchemy.url'))
-        engine.connect()
-        model.init_model(engine)
-
     def add_job(self, job_item):
         """
 
@@ -34,9 +27,13 @@ class PyJobsWebConnector(Connector):
             print 'Skip existing item'
             return
 
-        job = Job()
-        attributes = ['title', 'description', 'company', 'address', 'company_url',
-                      'publication_datetime', 'publication_datetime_is_fake']
+        job = model.JobAlchemy()
+
+        # Populate attributes which do not require special treatments before
+        # population
+        attributes = ['title', 'description', 'company', 'address',
+                      'company_url', 'publication_datetime',
+                      'publication_datetime_is_fake']
 
         # Populate job attributes if item contain it
         for attribute in attributes:
@@ -47,11 +44,13 @@ class PyJobsWebConnector(Connector):
         job.source = job_item['source']
         job.crawl_datetime = job_item['initial_crawl_datetime']
 
+        # Populate attributes which require special treatments before population
         if 'tags' in job_item:
-            import json
-            tags = [{'tag': t.tag, 'weight': t.weight} for t in job_item['tags']]
+            tags = [{'tag': t.tag, 'weight': t.weight}
+                    for t in job_item['tags']]
             job.tags = json.dumps(tags)
 
+        # Insert the job offer in the Postgresql database
         DBSession.add(job)
         transaction.commit()
 
@@ -63,10 +62,7 @@ class PyJobsWebConnector(Connector):
         :param job_url: External identifier of job (url)
         :return:
         """
-        return model.DBSession \
-            .query(model.data.Job) \
-            .filter(model.data.Job.url == job_url) \
-            .count()
+        return model.JobAlchemy.job_offer_exists(job_url)
 
     def log(self, source, action, more=None):
         if more is not None:
@@ -84,10 +80,11 @@ class PyJobsWebConnector(Connector):
 
     def get_most_recent_job_date(self, source):
         try:
-            return model.DBSession.query(model.data.Job.publication_datetime)\
-                .filter(model.data.Job.source == source)\
-                .order_by(model.data.Job.publication_datetime.desc())\
+            return \
+                model.DBSession.query(model.JobAlchemy.publication_datetime)\
+                .filter(model.JobAlchemy.source == source)\
+                .order_by(model.JobAlchemy.publication_datetime.desc())\
                 .limit(1)\
-                .one()[0]  # First element is publication_datetime datetime value
+                .one()[0]  # First element is publication_datetime value
         except NoResultFound:
             return datetime.datetime(1970, 1, 1, 0, 0, 0)

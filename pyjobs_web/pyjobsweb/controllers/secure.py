@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """Sample controller with all its actions protected."""
-from tg import expose, flash
-from tg.i18n import ugettext as _, lazy_ugettext as l_
-from tg.predicates import has_permission
 
 from pyjobsweb.lib.base import BaseController
 

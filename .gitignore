@@ -63,4 +63,8 @@ target/
 
 # Project specific
 data/templates/*
+development.ini
+production.ini
+test.ini
+
 venv2.7

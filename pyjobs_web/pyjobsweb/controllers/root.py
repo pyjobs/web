@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
-import datetime
 import collections
+import datetime
+
 import webhelpers.feedgenerator as feedgenerator
 from sqlalchemy.orm.exc import NoResultFound
 from tg import expose, flash, require, lurl, config
 from tg import predicates
 from tg import request, redirect, tmpl_context
-from tg.decorators import paginate
 from tg.exceptions import HTTPFound
 from tg.i18n import ugettext as _, lazy_ugettext as l_
-from tgext.admin.controller import AdminController
-from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 
 from pyjobsweb import model
+from pyjobsweb.controllers.admin import PyJobsAdminController
 from pyjobsweb.controllers.error import ErrorController
+from pyjobsweb.controllers.geocomplete import GeocompleteController
 from pyjobsweb.controllers.secure import SecureController
+from pyjobsweb.controllers.companies import CompaniesController
+from pyjobsweb.controllers.jobs import JobsController
 from pyjobsweb.lib.base import BaseController
 from pyjobsweb.lib.helpers import slugify, get_job_url
 from pyjobsweb.lib.stats import StatsQuestioner
 from pyjobsweb.model import DBSession, Log
-from pyjobsweb.model.data import Job, SOURCES
+from pyjobsweb.model.data import SOURCES
 
 __all__ = ['RootController']
 existing_fields = (
@@ -49,30 +51,23 @@ class RootController(BaseController):
 
     """
     secc = SecureController()
-    admin = AdminController(model, DBSession, config_type=TGAdminConfig)
+    admin = PyJobsAdminController()
+
+    jobs = JobsController()
+    societes_qui_recrutent = CompaniesController()
+    geocomplete = GeocompleteController()
 
     error = ErrorController()
 
-    def _before(self, *args, **kw):
+    def _before(self, *args, **kwargs):
         tmpl_context.project_name = "Algoo"
 
-    @expose('pyjobsweb.templates.jobs')
-    @paginate('jobs', items_per_page=20)
-    def index(self, source=None):
-
-        jobs = DBSession.query(Job) \
-            .order_by(Job.publication_datetime.desc())
-
-        if source is not None:
-            jobs = jobs.filter(Job.source == source)
-
-        return dict(
-            sources=SOURCES,
-            jobs=jobs
-        )
+    @expose()
+    def index(self, *args, **kwargs):
+        redirect(self.jobs.mount_point)
 
     @expose()
-    def rss(self, limit=50, source=None):
+    def rss(self, limit=50, source=None, *args, **kwargs):
         """
         RSS feed of jobs
         :param source: source name
@@ -88,64 +83,48 @@ class RootController(BaseController):
             feed_url=u"http://www.pyjobs.fr/rss?limit=%s" % limit
         )
 
-        jobs = DBSession.query(Job) \
-            .order_by(Job.publication_datetime.desc()) \
+        jobs = DBSession.query(model.JobAlchemy) \
+            .order_by(model.JobAlchemy.publication_datetime.desc()) \
             .limit(limit)
 
         if source is not None:
-            jobs = jobs.filter(Job.source == source)
+            jobs = jobs.filter(model.JobAlchemy.source == source)
 
         for job in jobs:
             job_slug = slugify(job.title)
             feed.add_item(
-                    title=job.title,
-                    link=get_job_url(job.id, job_title=job.title, absolute=True),
-                    description=job.description,
-                    pubdate=job.publication_datetime,
-                    unique_id="%s/job/%d/%s" % (site_url, job.id, job_slug)
+                title=job.title,
+                link=get_job_url(job.id, job_title=job.title, absolute=True),
+                description=job.description,
+                pubdate=job.publication_datetime,
+                unique_id="%s/job/%d/%s" % (site_url, job.id, job_slug)
             )
 
         return feed.writeString('utf-8')
 
-    @expose('pyjobsweb.templates.job')
-    def job(self, job_id, job_title=None, previous=None):
-        """
-        Job detail page
-        :param job_id: Job identifier
-        :param job_title: Job title (optional) for pretty url
-        :return: dict
-        """
-        try:
-            job = DBSession.query(Job).filter_by(id=job_id).one()
-        except NoResultFound:
-            pass  # TODO: TubroGears 404 ?
-        return dict(
-                job=job,
-                sources=SOURCES
-        )
-
     @expose('pyjobsweb.templates.sources')
-    def sources(self):
+    def origine_des_annonces_diffusees(self, *args, **kwargs):
         sources_last_crawl = {}
-        sorted_sources = collections.OrderedDict(sorted(SOURCES.items(), key=lambda x: x[1].label))
+        sorted_sources = collections.OrderedDict(
+            sorted(SOURCES.items(), key=lambda x: x[1].label))
         for source_name in sorted_sources:
             try:
                 sources_last_crawl[source_name] = DBSession.query(Log.datetime) \
                     .filter(Log.source == source_name) \
                     .order_by(Log.datetime.desc()) \
-                    .limit(1)\
+                    .limit(1) \
                     .one()[0]
             except NoResultFound:
                 sources_last_crawl[source_name] = None
 
         return dict(
-                sources=sorted_sources,
-                existing_fields=existing_fields,
-                sources_last_crawl=sources_last_crawl
+            sources=sorted_sources,
+            existing_fields=existing_fields,
+            sources_last_crawl=sources_last_crawl
         )
 
     @expose('pyjobsweb.templates.stats')
-    def stats(self, since_months=4):
+    def stats(self, since_months=4, *args, **kwargs):
         stats = StatsQuestioner
         stats_questioner = stats(DBSession)
         date_from, date_to = stats.get_month_period(int(since_months))
@@ -156,7 +135,8 @@ class RootController(BaseController):
             date_to=date_to,
         ).all()
         months = stats.extract(by_months, stats.FIELD_DATE)
-        stats_month = stats.extract_stats(query_result=by_months, sources=SOURCES.keys())
+        stats_month = stats.extract_stats(query_result=by_months,
+                                          sources=SOURCES.keys())
         flat_month = stats.flat_query_by_y(
             query_result=by_months,
             sources=SOURCES.keys(),
@@ -169,7 +149,8 @@ class RootController(BaseController):
             date_to=date_to,
         ).all()
         weeks = stats.extract(by_weeks, stats.FIELD_DATE)
-        stats_week = stats.extract_stats(query_result=by_weeks, sources=SOURCES.keys())
+        stats_week = stats.extract_stats(query_result=by_weeks,
+                                         sources=SOURCES.keys())
         flat_week = stats.flat_query_by_y(
             query_result=by_weeks,
             sources=SOURCES.keys(),
@@ -190,15 +171,17 @@ class RootController(BaseController):
         )
 
     @expose('pyjobsweb.templates.logs')
-    def logs(self, source=None, last_days=1):
+    def logs(self, source=None, last_days=1, *args, **kwargs):
 
-        logs_query = DBSession.query(Log)\
-            .order_by(Log.datetime.desc())\
-            .filter(Log.datetime >= datetime.datetime.now() + datetime.timedelta(days=-int(last_days)))\
+        logs_query = DBSession.query(Log) \
+            .order_by(Log.datetime.desc()) \
+            .filter(
+            Log.datetime >= datetime.datetime.now() + datetime.timedelta(
+                days=-int(last_days))) \
             .filter(Log.message.in_(('CRAWL_LIST_START',
-                                    'CRAWL_LIST_FINISHED',
-                                    'ERROR_UNEXPECTED_END',
-                                    'ERROR_CRAWNLING')))
+                                     'CRAWL_LIST_FINISHED',
+                                     'ERROR_UNEXPECTED_END',
+                                     'ERROR_CRAWNLING')))
 
         if source is not None:
             logs_query = logs_query.filter(Log.source == source)
@@ -210,23 +193,24 @@ class RootController(BaseController):
         )
 
     @expose('pyjobsweb.templates.about')
-    def about(self):
+    def about(self, *args, **kwargs):
         return dict()
 
     @expose('pyjobsweb.templates.index')
     @require(predicates.has_permission('manage', msg=l_('Only for managers')))
-    def manage_permission_only(self, **kw):
+    def manage_permission_only(self, *args, **kwargs):
         """Illustrate how a page for managers only works."""
         return dict(page='managers stuff')
 
     @expose('pyjobsweb.templates.index')
     @require(predicates.is_user('editor', msg=l_('Only for the editor')))
-    def editor_user_only(self, **kw):
+    def editor_user_only(self, *args, **kwargs):
         """Illustrate how a page exclusive for the editor works."""
         return dict(page='editor stuff')
 
     @expose('pyjobsweb.templates.login')
-    def login(self, came_from=lurl('/'), failure=None, login=''):
+    def login(self, came_from=lurl('/'), failure=None, login='',
+              *args, **kwargs):
         """Start the user login."""
         if failure is not None:
             if failure == 'user-not-found':
@@ -242,7 +226,7 @@ class RootController(BaseController):
                     came_from=came_from, login=login)
 
     @expose()
-    def post_login(self, came_from=lurl('/')):
+    def post_login(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.
@@ -260,7 +244,7 @@ class RootController(BaseController):
         return HTTPFound(location=came_from)
 
     @expose()
-    def post_logout(self, came_from=lurl('/')):
+    def post_logout(self, came_from=lurl('/'), *args, **kwargs):
         """
         Redirect the user to the initially requested page on logout and say
         goodbye as well.

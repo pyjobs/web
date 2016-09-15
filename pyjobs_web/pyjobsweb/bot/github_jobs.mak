@@ -3,6 +3,9 @@
 
 Offres d'emploi python pour le marché français
 
-% for job in jobs:
-* ${job.publication_datetime.strftime('%Y/%m/%d')} - [${job.title}](${get_job_url(job.id, job.title, absolute=True)} "${job.title}")
+% if new_job:
+* ${new_job.publication_datetime.strftime('%Y/%m/%d')} - [${new_job.title}](${get_job_url(new_job.id, new_job.title, absolute=True)} "${new_job.title}")
+% endif
+% for old_job in old_jobs:
+${old_job}
 % endfor

@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
-from pyjobs_crawlers.tools import get_sources, condition_tags
-from sqlalchemy import Column, Text, String, Integer, DateTime, Boolean
-
-from pyjobsweb.model import DeclarativeBase
-from datetime import datetime
-from babel.dates import format_date, format_timedelta
+from pyjobs_crawlers.tools import get_sources
 
 
 class Status(object):
@@ -37,62 +32,3 @@ class Tag2(object):
             u'télé-travail': 'job-remote',
         }
         return css[tagname]
-
-
-class Job(DeclarativeBase):
-
-    __tablename__ = 'jobs'
-
-    id = Column(Integer, primary_key=True)
-
-    url = Column(String(1024))
-    source = Column(String(64))
-
-    title = Column(String(1024), nullable=False, default='')
-    description = Column(Text(), nullable=False, default='')
-    company = Column(String(1024), nullable=False, default='')
-    company_url = Column(String(1024), nullable=True, default='')
-
-    address = Column(String(2048), nullable=False, default='')
-    tags = Column(Text(), nullable=False, default='')  # JSON
-
-    publication_datetime = Column(DateTime)
-    publication_datetime_is_fake = Column(Boolean)
-
-    crawl_datetime = Column(DateTime)
-
-    def __init__(self):
-        pass
-
-    def __repr__(self):
-        return "<Job: id='%d'>" % (self.id)
-
-    @property
-    def published(self):
-        return format_date(self.publication_datetime, locale='FR_fr')
-
-    @property
-    def published_in_days(self):
-        delta = datetime.now() - self.publication_datetime
-        return format_timedelta(delta, granularity='day', locale='en_US')
-
-    @property
-    def alltags(self):
-        import json
-        tags = []
-        if self.tags:
-            for tag in json.loads(self.tags):
-                if tag['tag'] not in condition_tags:
-                    tags.append(Tag2(tag['tag'], tag['weight']))
-        return tags
-
-    @property
-    def condition_tags(self):
-        import json
-        tags = []
-        if self.tags:
-            for tag in json.loads(self.tags):
-                if tag['tag'] in condition_tags:
-                    tag = Tag2(tag['tag'], tag['weight'], Tag2.get_css(tag['tag']))
-                    tags.append(tag)
-        return tags
