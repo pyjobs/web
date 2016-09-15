@@ -229,3 +229,19 @@ class GeocompleteField(twsel.Select2AjaxSingleSelectField):
                 """
             )
         )
+
+    def prepare(self):
+        # Temporary workaround a bug in Toscawidget2 Select2 widget prepare,
+        # which would make the persistence persistence bug (due to bugous values
+        # introduced in $().select2("val", ...)).
+        value = None
+        try:
+            value = self.value
+            delattr(self, 'value')
+        except AttributeError:
+            pass
+
+        super(GeocompleteField, self).prepare()
+
+        if value:
+            setattr(self, 'value', value)

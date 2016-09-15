@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import json
 from slugify import slugify
 
 import tw2.core as twc
@@ -9,6 +10,7 @@ from tw2.core.validation import ValidationError
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyjobsweb.model import CompanyAlchemy
+from pyjobsweb.forms.custom_widgets import GeocompleteField
 from pyjobsweb.forms.custom_widgets import PersistentSelect2MultipleSelect
 
 french_validation_messages = {
@@ -173,6 +175,29 @@ class EmptyHoneyPotValidator(twc.Validator):
         return value
 
 
+class GeocompleteFieldValidator(twc.Validator):
+    def __init__(self, **kwargs):
+        super(GeocompleteFieldValidator, self).__init__(**kwargs)
+        self.msgs = dict(french_validation_messages)
+        self.msgs['badformat'] = u'Format invalide'
+
+    def _validate_python(self, value, state=None):
+        expected_keys = [
+            'name', 'complement', 'country', 'postal_code', 'coordinates']
+        sub_keys = {'lat': 'coordinates', 'lon': 'coordinates'}
+
+        try:
+            city_dict = json.loads(value)
+
+            for key in expected_keys:
+                city_dict[key] = city_dict[key]
+
+            for sub_key, main_key in sub_keys.iteritems():
+                city_dict[main_key][sub_key] = city_dict[main_key][sub_key]
+        except (Exception, KeyError):
+            raise ValidationError('badformat', self)
+
+
 class NewCompanyForm(twf.Form):
     def __init__(self, **kwargs):
         super(NewCompanyForm, self).__init__(**kwargs)
@@ -268,16 +293,23 @@ class NewCompanyForm(twf.Form):
         #     validator=SirenValidator(required=True)
         # )
 
-        # TODO: split this field into several subfields for validation
-        # TODO: and formatting purposes
-        company_address = twf.TextField(
-            id='company_address',
-            label=u"Adresse de l'entreprise:",
-            placeholder=u"Adresse de l'entreprise",
-            help_text=u"L'adresse de l'entreprise",
+        company_street = twf.TextField(
+            id='company_street',
+            label=u"Rue:",
+            placeholder=u"Numéro et nom de rue",
+            help_text=u"Numéro et nom de rue",
             maxlength=1024,
             css_class='form-control',
             validator=RequiredValidator
+        )
+
+        company_city = GeocompleteField(
+            name='company_city',
+            label=u'Ville:',
+            value='',
+            placeholder=u'Nom ville ou CP...',
+            attrs=dict(style='width: 100%;'),
+            validator=GeocompleteFieldValidator(required=True)
         )
 
         company_url = twf.TextField(

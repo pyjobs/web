@@ -42,6 +42,10 @@ class NewCompanyController(BaseController):
     def _parse_technologies(technologies):
         return technologies[0].replace(',', ', ')
 
+    @staticmethod
+    def _format_address(street, city, country):
+        return ', '.join([street, city, country])
+
     def _build_company_obj(self, **kwargs):
         company = CompanyAlchemy()
 
@@ -54,8 +58,11 @@ class NewCompanyController(BaseController):
         company.technologies = self._parse_technologies(
             kwargs['company_technologies'])
 
-        company.address = kwargs['company_address']
+        city_dict = json.loads(kwargs['company_city'])
+        company.address = self._format_address(
+            kwargs['company_street'], city_dict['name'], city_dict['country'])
         company.address_is_valid = True
+
         company.email = kwargs['company_email']
         company.phone = kwargs['company_phone']
 
