@@ -15,6 +15,9 @@ from pyjobsweb.commands import AppContextCommand
 
 
 class PopulateESCommand(AppContextCommand):
+    """
+    Populate (or synchronize) Elasticsearch indixes
+    """
     def __init__(self, *args, **kwargs):
         super(PopulateESCommand, self).__init__(args, kwargs)
         self._logger = logging.getLogger(__name__)

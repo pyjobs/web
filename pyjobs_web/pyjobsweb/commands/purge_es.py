@@ -10,6 +10,9 @@ from pyjobsweb.lib.lock import acquire_inter_process_lock
 
 
 class PurgeESCommand(AppContextCommand):
+    """
+    Purge Elasticsearch indixes by dropping and re-creating them
+    """
     def __init__(self, *args, **kwargs):
         super(PurgeESCommand, self).__init__(args, kwargs)
         self._logger = logging.getLogger(__name__)

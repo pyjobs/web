@@ -83,12 +83,11 @@ setup(
             'turbogears-devtools = tg.devtools'
         ],
         'gearbox.commands': [
-            'crawl = pyjobsweb.commands.crawl:CrawlCommand',
-            'crawl-dry = pyjobsweb.commands.crawl_dry:DryRunCrawlCommand',
-            'bots = pyjobsweb.commands.bots:BotsCommand',
-            'populate-es = pyjobsweb.commands.populate_es:PopulateESCommand',
-            'purge-es = pyjobsweb.commands.purge_es:PurgeESCommand',
-            'geocode = pyjobsweb.commands.geocode:GeocodeCommand'
+            'crawl-job-boards = pyjobsweb.commands.crawl:CrawlCommand',
+            'run-publication-bots = pyjobsweb.commands.bots:BotsCommand',
+            'populate-elasticsearch = pyjobsweb.commands.populate_es:PopulateESCommand',
+            'purge-elasticsearch = pyjobsweb.commands.purge_es:PurgeESCommand',
+            'geotag-jobs-and-companies = pyjobsweb.commands.geocode:GeocodeCommand'
         ]
     },
     zip_safe=False,

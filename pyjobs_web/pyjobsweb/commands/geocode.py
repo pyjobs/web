@@ -8,6 +8,9 @@ from pyjobsweb.lib.lock import acquire_inter_process_lock
 
 
 class GeocodeCommand(AppContextCommand):
+    """
+    Start geotagging operations for job offers and/or companies
+    """
     def __init__(self, *args, **kwargs):
         super(GeocodeCommand, self).__init__(args, kwargs)
         self._geolocator = geolocation.Geolocator()

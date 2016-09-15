@@ -6,7 +6,9 @@ from pyjobsweb.commands import AppContextCommand
 
 
 class CrawlCommand(AppContextCommand):
-
+    """
+    Start job boards crawlers to feed the PostgreSQL database
+    """
     def get_parser(self, prog_name):
         parser = super(CrawlCommand, self).get_parser(prog_name)
 

@@ -8,6 +8,9 @@ from pyjobsweb.commands import AppContextCommand
 
 
 class BotsCommand(AppContextCommand):
+    """
+    Run pyjobs' publication bots
+    """
     def __init__(self, *args, **kwargs):
         super(BotsCommand, self).__init__(args, kwargs)
         self._logger = logging.getLogger(__name__)
