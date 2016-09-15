@@ -24,7 +24,7 @@ class GitHubBot(object):
     # TODO - B.S. - 20160118: from config
     #REPOSITORY_ADDRESS = 'git@github.com:pyjobs/annonces.git'
     #REPOSITORY_ADDRESS = 'git@github.com:algoo/annonces.git'
-    REPOSITORY_ADDRESS = 'git@github.com:BenoitEchernier/annonces.git'
+    REPOSITORY_ADDRESS = 'git@github.com:pyjobs/annonces.git'
 
     # TODO - B.S. - 20160118: from config ... tout ça
     _repository_path = home + '/.pyjobs_web/bot/github'
