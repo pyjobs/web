@@ -51,7 +51,7 @@ class PurgeESCommand(AppContextCommand):
         index.doc_type(doc_type_class)
 
         try:
-            index.delete()
+            index.delete(ignore=404)
             index.create()
         except elasticsearch.exceptions.ElasticsearchException as e:
             log_msg = 'Error while dropping %s index: %s.' % (index_name, e)
