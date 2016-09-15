@@ -118,7 +118,7 @@ class SearchCompaniesController(BaseController):
             fields=search_on['description'],
             fuzziness='AUTO',
             operator='or',
-            minimum_should_match='1<1 2<2 3<2 4<3 5<3 6<4 7<4 8<4 9<4',
+            minimum_should_match='1<2 2<2 3<3 4<3 5<4 6<5 7<5 8<6 9<6',
             boost=len(terms.split(','))
         )
         queries.append(description_query)
@@ -130,7 +130,7 @@ class SearchCompaniesController(BaseController):
             fields=search_on['technologies'],
             fuzziness='AUTO',
             operator='or',
-            minimum_should_match='1<1 2<2 3<2 4<3 5<3 6<4 7<4 8<4 9<4',
+            minimum_should_match='1<2 2<2 3<3 4<3 5<4 6<5 7<5 8<6 9<6',
             boost=20
         )
         queries.append(technologies_query)
@@ -147,12 +147,23 @@ class SearchCompaniesController(BaseController):
         )
         queries.append(company_name_query)
 
-        minimum_should_match = int(float(1.0 / len(search_on)) * 100)
-
         keyword_queries = Q(
             'bool',
-            should=queries,
-            minimum_should_match='%s%%' % minimum_should_match
+            must=[
+                company_name_query
+            ],
+            should=[
+                description_query,
+                technologies_query
+            ]
+        ) | Q(
+            'bool',
+            should=[
+                description_query,
+                company_name_query,
+                technologies_query
+            ],
+            minimum_should_match='33%'
         )
 
         return keyword_queries

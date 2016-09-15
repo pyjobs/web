@@ -23,49 +23,70 @@ class SearchJobsController(BaseController):
 
     @staticmethod
     def _compute_keyword_queries(terms):
-        queries = list()
-
-        search_on = ['description', 'title', 'company']
+        search_on = dict(
+            description=[
+                'description',
+                'description.technologies'
+            ],
+            title=[
+                'title',
+                'title.technologies'
+             ],
+            company=['company']
+        )
 
         description_query = Q(
             'multi_match',
+            type='most_fields',
             query=terms,
-            fields=[search_on[0]],
+            fields=search_on['description'],
             fuzziness='AUTO',
             operator='or',
-            minimum_should_match='1<2 2<3 3<3 4<4 5<4 6<5 7<5 8<5 9<5',
-            boost=len(terms)
+            minimum_should_match='1<2 2<2 3<3 4<3 5<4 6<5 7<5 8<6 9<6',
+            boost=len(terms.split(','))
         )
-        queries.append(description_query)
 
         title_query = Q(
             'multi_match',
+            type='most_fields',
             query=terms,
-            fields=[search_on[1]],
+            fields=search_on['title'],
             fuzziness='AUTO',
             operator='or',
             minimum_should_match='1<1',
-            boost=10 - len(terms) + 1
+            boost=20 - len(terms.split(',')) + 1
         )
-        queries.append(title_query)
 
         company_name_query = Q(
             'multi_match',
+            type='best_fields',
             query=terms,
-            fields=[search_on[2]],
+            fields=search_on['company'],
             fuzziness='AUTO',
             operator='or',
             minimum_should_match='1<1',
             boost=50
         )
-        queries.append(company_name_query)
-
-        minimum_should_match = '66%'
 
         keyword_queries = Q(
             'bool',
-            should=queries,
-            minimum_should_match=minimum_should_match
+            must=[
+                company_name_query
+            ],
+            should=[
+                title_query,
+                description_query
+            ]
+        ) | Q(
+            'bool',
+            must=[
+                description_query
+            ],
+            should=[
+                title_query,
+                company_name_query
+            ],
+            minimum_should_match='50%'
         )
         return keyword_queries
 

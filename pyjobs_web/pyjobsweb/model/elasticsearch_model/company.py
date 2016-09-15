@@ -85,6 +85,15 @@ class Company(es.DocType):
         ]
     )
 
+    company_name_analyzer = es.analyzer(
+        'company_name_analyzer',
+        tokenizer='standard',
+        filter=[
+            'lowercase',
+            'asciifolding'
+        ]
+    )
+
     id = es.String(index='no')
 
     name = es.String(analyzer=french_analyzer)
