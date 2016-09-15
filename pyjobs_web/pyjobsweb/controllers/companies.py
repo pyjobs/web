@@ -102,16 +102,24 @@ class SearchCompaniesController(BaseController):
     def _compute_keyword_queries(terms):
         queries = list()
 
-        search_on = ['description', 'technologies', 'name']
+        search_on = dict(
+            description=[
+                'description',
+                'description.technologies'
+            ],
+            technologies=['technologies'],
+            name=['name']
+        )
 
         description_query = Q(
             'multi_match',
-            type='best_fields',
+            type='most_fields',
             query=terms,
-            fields=[search_on[0]],
+            fields=search_on['description'],
             fuzziness='AUTO',
             operator='or',
-            minimum_should_match='50%'
+            minimum_should_match='1<1 2<2 3<2 4<3 5<3 6<4 7<4 8<4 9<4',
+            boost=len(terms.split(','))
         )
         queries.append(description_query)
 
@@ -119,11 +127,11 @@ class SearchCompaniesController(BaseController):
             'multi_match',
             type='best_fields',
             query=terms,
-            fields=[search_on[1]],
+            fields=search_on['technologies'],
             fuzziness='AUTO',
             operator='or',
-            minimum_should_match='33%',
-            boost=10
+            minimum_should_match='1<1 2<2 3<2 4<3 5<3 6<4 7<4 8<4 9<4',
+            boost=20
         )
         queries.append(technologies_query)
 
@@ -131,11 +139,11 @@ class SearchCompaniesController(BaseController):
             'multi_match',
             type='best_fields',
             query=terms,
-            fields=[search_on[2]],
+            fields=search_on['name'],
             fuzziness='AUTO',
             operator='or',
             minimum_should_match='1<1',
-            boost=50
+            boost=100
         )
         queries.append(company_name_query)
 

@@ -20,28 +20,23 @@ class Company(es.DocType):
         ]
     )
 
-    french_stopwords = es.token_filter('french_stopwords',
-                                       type='stop', stopwords='_french_')
+    french_stopwords = es.token_filter(
+        'french_stopwords',
+        type='stop',
+        stopwords='_french_'
+    )
 
     # Do not include this filter if keywords is empty
-    french_keywords = es.token_filter('french_keywords',
-                                      type='keyword_marker', keywords=[])
+    french_keywords = es.token_filter(
+        'french_keywords',
+        type='keyword_marker',
+        keywords=[]
+    )
 
-    french_stemmer = es.token_filter('french_stemmer',
-                                     type='stemmer', language='light_french')
-
-    technologies_synonyms_filter = es.token_filter(
-        'technologies_synonyms',
-        type='synonym',
-        synonyms=[
-            'c => c_language',
-            'c++, c ++, cpp => cpp_language',
-            'c/c++, c/c ++, c / c++, c / c ++, c/cpp, c / cpp => c_language',
-            'c/c++, c/c ++, c / c++, c / c ++, c/cpp, c / cpp => cpp_language',
-            'c#, c #, c♯, c ♯, csharp => csharp_language',
-            'f#, f #, f♯, f ♯, fsharp => fsharp_language',
-            '.net => dotnet'
-        ]
+    french_stemmer = es.token_filter(
+        'french_stemmer',
+        type='stemmer',
+        language='light_french'
     )
 
     french_analyzer = es.analyzer(
@@ -51,7 +46,6 @@ class Company(es.DocType):
             'lowercase',
             'asciifolding',
             french_elision,
-            technologies_synonyms_filter,
             french_stopwords,
             # french_keywords,
             french_stemmer
@@ -62,8 +56,25 @@ class Company(es.DocType):
     technologies_tokenizer = es.tokenizer(
         'comma_tokenizer',
         type='pattern',
-        pattern=', '
+        pattern=' |,|, '
     )
+
+    technologies_synonyms_filter = es.token_filter(
+        'technologies_synonyms',
+        type='synonym',
+        synonyms=[
+            'c => c_language',
+            'c++, cpp => cpp_language',
+            'c/c++, c/cpp => c_language',
+            'c/c++, c/cpp => cpp_language',
+            'c#, c♯, csharp => csharp_language',
+            'f#, f♯, fsharp => fsharp_language',
+            'c#, c♯, csharp => dotnet',
+            'f#, f♯, fsharp => dotnet',
+            '.net => dotnet'
+        ]
+    )
+
     technologies_analyzer = es.analyzer(
         'technologies_analyzer',
         tokenizer=technologies_tokenizer,
@@ -77,9 +88,15 @@ class Company(es.DocType):
     id = es.String(index='no')
 
     name = es.String(analyzer=french_analyzer)
-    description = es.String(analyzer=french_analyzer)
-    technologies = es.String(
-        analyzer=technologies_analyzer, search_analyzer=french_analyzer)
+
+    description = es.String(
+        analyzer=french_analyzer,
+        fields={
+            'technologies': es.String(analyzer=technologies_analyzer)
+        }
+    )
+
+    technologies = es.String(analyzer=technologies_analyzer)
 
     url = es.String(index='no')
     logo_url = es.String(index='no')
