@@ -85,8 +85,7 @@ class SearchJobsController(BaseController):
             should=[
                 title_query,
                 company_name_query
-            ],
-            minimum_should_match='50%'
+            ]
         )
         return keyword_queries
 
