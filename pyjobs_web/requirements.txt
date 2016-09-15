@@ -40,7 +40,7 @@ pyasn1==0.1.9
 pyasn1-modules==0.0.8
 pycparser==2.14
 # pyjobs_crawlers
-git+https://github.com/BenoitEchernier/crawlers.git@master
+git+https://github.com/pyjobs/crawlers.git@master
 pyOpenSSL==0.15.1
 pyparsing==2.0.3
 python-dateutil==2.4.2
