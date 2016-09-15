@@ -16,7 +16,7 @@ from pyjobsweb.commands import AppContextCommand
 
 class PopulateESCommand(AppContextCommand):
     """
-    Populate (or synchronize) Elasticsearch indixes
+    Populate (or synchronize) Elasticsearch indexes
     """
     def __init__(self, *args, **kwargs):
         super(PopulateESCommand, self).__init__(args, kwargs)
