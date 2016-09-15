@@ -87,7 +87,7 @@ ${job_pagination()}
                             <span style="color: #999;">
                                 <i class="fa fa-fw fa-building-o"></i> ${job.company}
                                 <br/>
-                                <a class="inside-link" href="http://nominatim.openstreetmap.org/search.php?q=${job.address}">
+                                <a class="inside-link" href="http://nominatim.openstreetmap.org/search.php?q=${job.address}" target="_blank">
                                     <i class="fa fa-fw fa-map-marker"></i>
                                     ${job.address}
                                 </a>
@@ -106,7 +106,7 @@ ${job_pagination()}
                                 % endif
                             </span>
                         <br/>
-                        <a class="inside-link" href="${sources[job.source].url}" style="color: #AAA; font-weight: bold;">
+                        <a class="inside-link" href="${sources[job.source].url}" style="color: #AAA; font-weight: bold;" target="_blank">
                             ${sources[job.source].label}<br/>
                             <img style="max-height: 32px;" src="${sources[job.source].logo_url}"
                                  alt="${sources[job.source].label}"/>
