@@ -1,4 +1,4 @@
-APP_CONFIG = "/srv/www/pyjobs.dev.algoo.fr/pyjobs_web/development.ini"
+APP_CONFIG = "/srv/www/pyjobs.fr/pyjobs_web/production.ini"
 
 #Setup logging
 # import logging
