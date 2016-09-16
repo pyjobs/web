@@ -135,6 +135,7 @@ class SearchJobsController(BaseController):
             redirect('/jobs')
 
         search_query = JobElastic().search()
+        relevance_sort = sort_by == 'scores'
 
         if query:
             keyword_queries = self._compute_keyword_queries(query)
@@ -145,6 +146,8 @@ class SearchJobsController(BaseController):
                 query=keyword_queries,
                 functions=decay_functions
             )
+        else:
+            relevance_sort = False
 
         try:
             geoloc_query = json.loads(center)
@@ -161,7 +164,9 @@ class SearchJobsController(BaseController):
             search_query = self._apply_geolocation_filters(
                 search_query, (lat, lon), radius if radius else 5.0)
 
-        if sort_by == 'dates':
+        date_sort = not relevance_sort
+
+        if date_sort:
             search_query = self._apply_date_sort(search_query)
 
         return dict(sources=SOURCES, jobs=PaginatedSearch(search_query),
