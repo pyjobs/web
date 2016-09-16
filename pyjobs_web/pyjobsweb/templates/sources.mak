@@ -8,13 +8,12 @@
 <%def name="page_header()">
     <header class="page-header">
         <h1>Liste des sources aggrégées par pyjobs</h1>
-        pyjobs agrège les données à partir de différents jobboard — ce qu'on appelle « sources ».
-        <br>Si une source manque, vous pouvez l'ajouter.
-        <a href="https://github.com/pyjobs/crawlers#ajouter-une-source-dannonces">C'est facile et tout est expliqué sur
-            le
-            dépôt github </a>.
-        <br>Alors n'hésitez pas à contribuer !
-        <hr>
+        <p>pyjobs agrège les annonces concernant la technologie python à partir de différents jobboards. Vous trouverez ci-dessous la liste des différents jobboards pris en charge par pyjobs, ainsi que le niveau de détail des informations prises en charge.</p>
+        <p>Un site manque ? Ce n'est pas un problème. pyjobs est un logiciel libre auquel vous êtes invités à
+
+        <a href="https://github.com/pyjobs/crawlers#ajouter-une-source-dannonces">contribuer</a>
+        :)
+        </p>
     </header>
 </%def>
 
