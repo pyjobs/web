@@ -7,7 +7,7 @@
 
 <%def name="page_header()">
     <header class="page-header">
-        <h1>Liste des sources aggrégées par pyjobs</h1>
+        <h1>Origine des annonces diffusées sur pyjobs</h1>
         <p>pyjobs agrège les annonces concernant la technologie python à partir de différents jobboards. Vous trouverez ci-dessous la liste des différents jobboards pris en charge par pyjobs, ainsi que le niveau de détail des informations prises en charge.</p>
         <p>Un site manque ? Ce n'est pas un problème. pyjobs est un logiciel libre auquel vous êtes invités à
 
