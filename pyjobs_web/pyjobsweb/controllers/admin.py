@@ -34,15 +34,16 @@ class JobGeocodingController(EasyCrudRestController):
     }
 
     __form_options__ = {
-        '__hide_fields__': ['description', 'company', 'company_url', 'tags',
-                            'publication_datetime',
-                            'title', 'publication_datetime_is_fake',
-                            'crawl_datetime', 'last_modified', 'last_sync',
-                            'url', 'id', 'source', 'address_is_valid',
-                            'geolocation_is_valid', 'latitude', 'longitude',
-                            'pushed_on_twitter'],
-        '__omit_fields__': ['last_modified', 'last_sync'],
-        '__field_widget_types__': {'address': TextField}
+        '__hide_fields__': ['id', 'address_is_valid'],
+        '__omit_fields__': [
+            'description', 'company', 'company_url', 'tags',
+            'publication_datetime', 'title', 'publication_datetime_is_fake',
+            'crawl_datetime', 'last_modified', 'last_sync', 'url', 'source',
+            'geolocation_is_valid', 'latitude', 'longitude', 'pushed_on_twitter'
+        ],
+        '__field_widget_types__': {
+            'address': TextField
+        }
     }
 
     def __init__(self, session, menu_items=None):
@@ -84,11 +85,6 @@ class JobGeocodingController(EasyCrudRestController):
 
     @expose(inherit=True)
     def put(self, *args, **kw):
-        # TODO: Could this test be removed if 'publication_datetime_is_fake'
-        # TODO: was False by default and un-nullable
-        if not kw['publication_datetime_is_fake']:
-            kw['publication_datetime_is_fake'] = False
-
         new_model = kw_to_sqlalchemy(model.JobAlchemy, kw)
 
         prepare_job_for_address_update(new_model)
@@ -114,11 +110,12 @@ class CompanyGeocodingController(EasyCrudRestController):
     }
 
     __form_options__ = {
-        '__hide_fields__': ['id', 'name', 'logo_url', 'description', 'url',
-                            'technologies', 'address_is_valid', 'email',
-                            'phone', 'latitude', 'longitude',
-                            'geolocation_is_valid', 'validated', 'last_modified', 'last_sync'],
-        '__omit_fields__': ['last_modified', 'last_sync'],
+        '__hide_fields__': ['id', 'address_is_valid'],
+        '__omit_fields__': [
+            'last_modified', 'last_sync', 'name', 'logo_url', 'description',
+            'url', 'technologies', 'email', 'phone', 'latitude', 'longitude',
+            'geolocation_is_valid', 'validated'
+        ],
         '__field_widget_types__': {'address': TextField}
     }
 
@@ -177,8 +174,10 @@ class CompanyModerationController(EasyCrudRestController):
     }
 
     __form_options__ = {
-        '__hide_fields__': ['address_is_valid', 'latitude', 'longitude',
-                            'geolocation_is_valid', 'validated', 'last_modified', 'last_sync'],
+        '__hide_fields__': [
+            'address_is_valid', 'latitude', 'longitude',
+            'geolocation_is_valid', 'validated'
+        ],
         '__omit_fields__': ['last_modified', 'last_sync'],
         '__field_widget_types__': {
             'id': TextField,
