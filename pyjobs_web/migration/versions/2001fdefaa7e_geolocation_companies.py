@@ -12,6 +12,50 @@ down_revision = '84ae0c957a5'
 
 from alembic import op
 import sqlalchemy as sa
+from datetime import datetime
+
+
+def create_nullable_columns():
+    op.add_column(u'jobs', sa.Column('address_is_valid', sa.Boolean(), nullable=True))
+    op.add_column(u'jobs', sa.Column('geolocation_is_valid', sa.Boolean(), nullable=True))
+    op.add_column(u'jobs', sa.Column('last_sync', sa.DateTime(timezone=True), nullable=True))
+    op.add_column(u'jobs', sa.Column('latitude', sa.Float(), nullable=True))
+    op.add_column(u'jobs', sa.Column('longitude', sa.Float(), nullable=True))
+    op.add_column(u'jobs', sa.Column('pushed_on_twitter', sa.Boolean(), nullable=True))
+
+
+def set_nullable_columns_default_values():
+    role = sa.table(u'jobs', sa.column(u'address_is_valid'))
+    op.execute(role.update().values(address_is_valid=True))
+
+    role = sa.table(u'jobs', sa.column(u'geolocation_is_valid'))
+    op.execute(role.update().values(geolocation_is_valid=True))
+
+    role = sa.table(u'jobs', sa.column(u'last_sync'))
+    op.execute(role.update().values(last_sync=datetime(1970, 1, 1)))
+    role = sa.table(u'jobs', sa.column(u'latitude'))
+    op.execute(role.update().values(latitude=0.0))
+    role = sa.table(u'jobs', sa.column(u'longitude'))
+    op.execute(role.update().values(longitude=0.0))
+
+    role = sa.table(u'jobs', sa.column(u'pushed_on_twitter'))
+    op.execute(role.update().values(pushed_on_twitter=True))
+
+    role = sa.table(u'jobs', sa.column(u'publication_datetime_is_fake'))
+    op.execute(role.update()
+               .where(role.c.publication_datetime_is_fake == None)
+               .values(publication_datetime_is_fake=False))
+
+
+def set_nullable_columns():
+    op.alter_column(u'jobs', u'address_is_valid', nullable=False)
+    op.alter_column(u'jobs', u'geolocation_is_valid', nullable=False)
+    op.alter_column(u'jobs', u'last_sync', nullable=False)
+    op.alter_column(u'jobs', u'latitude', nullable=False)
+    op.alter_column(u'jobs', u'longitude', nullable=False)
+    op.alter_column(u'jobs', u'pushed_on_twitter', nullable=False)
+
+    op.alter_column(u'jobs', u'publication_datetime_is_fake', nullable=False)
 
 
 def upgrade():
@@ -35,16 +79,12 @@ def upgrade():
     sa.Column('last_sync', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.add_column(u'jobs', sa.Column('address_is_valid', sa.Boolean(), nullable=False))
-    op.add_column(u'jobs', sa.Column('geolocation_is_valid', sa.Boolean(), nullable=False))
+
+    create_nullable_columns()
+    set_nullable_columns_default_values()
+    set_nullable_columns()
+
     op.add_column(u'jobs', sa.Column('last_modified', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=False))
-    op.add_column(u'jobs', sa.Column('last_sync', sa.DateTime(timezone=True), nullable=False))
-    op.add_column(u'jobs', sa.Column('latitude', sa.Float(), nullable=False))
-    op.add_column(u'jobs', sa.Column('longitude', sa.Float(), nullable=False))
-    op.add_column(u'jobs', sa.Column('pushed_on_twitter', sa.Boolean(), nullable=False))
-    op.alter_column(u'jobs', 'publication_datetime_is_fake',
-               existing_type=sa.BOOLEAN(),
-               nullable=False)
     ### end Alembic commands ###
 
 
