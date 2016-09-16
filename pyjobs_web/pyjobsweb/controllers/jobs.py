@@ -135,7 +135,7 @@ class SearchJobsController(BaseController):
             redirect('/jobs')
 
         search_query = JobElastic().search()
-        relevance_sort = sort_by == 'score'
+        relevance_sort = sort_by == 'scores'
 
         if query:
             keyword_queries = self._compute_keyword_queries(query)
