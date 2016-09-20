@@ -51,8 +51,14 @@ class TwitterBot(object):
         # The Twitter API automatically shrinks URLs to 23 characters
         url = get_job_url(job_id, job_title, absolute=True)
 
+        job_title = job_title.lower()
+        job_title = job_title.replace('adminsys', '#sysadmin')
+        job_title = job_title.replace('administrateur', '#sysadmin')
+        for hashword in ('devops', 'developpeur', 'developpeuse', 'startup', 'cdd', 'cdi', 'stage', 'sysadmin', 'django', 'flask', 'python') :
+            job_title = job_title.replace(hashword, '#%s' % hashword)
+
         # Tweet format string
-        tweet_format = u'%s. %s'
+        tweet_format = u'Recrutement %s %s #emploi'
 
         # The number of punctuation characters in the tweet string format
         punctuation = len(tweet_format.replace(u'%s', u''))
