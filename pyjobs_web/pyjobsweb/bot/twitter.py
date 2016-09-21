@@ -54,7 +54,7 @@ class TwitterBot(object):
         job_title = job_title.lower()
         job_title = job_title.replace('adminsys', '#sysadmin')
         job_title = job_title.replace('administrateur', '#sysadmin')
-        for hashword in ('devops', 'developpeur', 'developpeuse', 'startup', 'cdd', 'cdi', 'stage', 'sysadmin', 'django', 'flask', 'python') :
+        for hashword in ('devops', 'développeur', 'développeuse', 'startup', 'cdd', 'cdi', 'stage', 'sysadmin', 'django', 'flask', 'python') :
             job_title = job_title.replace(hashword, '#%s' % hashword)
 
         # Tweet format string
