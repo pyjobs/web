@@ -82,10 +82,10 @@ class BotsCommand(AppContextCommand):
                 credentials_json = credentials_file.read()
                 credentials = json.loads(credentials_json)
         except ValueError as exc:
-            err_msg = 'Malformed credentials file: %s.' % exc
+            err_msg = u'Malformed credentials file: %s.' % exc
             exception = exc
         except Exception as exc:
-            err_msg = 'An error occurred while parsing credentials: %s.' % exc
+            err_msg = u'An error occurred while parsing credentials: %s.' % exc
             exception = exc
 
         if err_msg:
@@ -100,10 +100,12 @@ class BotsCommand(AppContextCommand):
             credentials = self._get_twitter_credentials(credentials_path)
             twitter_bot = TwitterBot(credentials)
             twitter_bot.run(num_tweets)
-        except Exception:
-            err_msg = 'A critical error occurred while ' \
-                      'configuring/running the Twitter bot. Aborting now.'
+        except Exception as e:
+            err_msg = u'A critical error occurred while ' \
+                      u'configuring/running the Twitter bot. Aborting now. ' \
+                      u'The error is %s' % e.__str__()
             self._logging(logging.ERROR, err_msg)
+
             return
 
     @staticmethod
