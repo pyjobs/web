@@ -52,11 +52,17 @@ class TwitterBot(object):
         url = get_job_url(job_id, job_title, absolute=True)
 
         job_title = job_title.lower()
-        job_title = job_title.replace('adminsys', '#sysadmin')
-        job_title = job_title.replace('administrateur', '#sysadmin')
-        for hashword in ('devops', 'développeur', 'développeuse', 'startup', 'cdd', 'cdi', 'stage', 'sysadmin', 'django', 'flask', 'python') :
-            job_title = job_title.replace(hashword, '#%s' % hashword)
-
+        for hashword in (u'devops', u'développeur', u'développeuse', u'startup', u'cdd', u'cdi', u'stage', u'sysadmin', u'django', u'flask', u'python') :
+            job_title = job_title.replace(hashword, u'#%s' % hashword)
+        job_title = job_title.replace(u'adminsys', u'#sysadmin')
+        job_title = job_title.replace(u'administrateur système', u'#sysadmin')
+        job_title = job_title.replace(u'administrateur', u'#sysadmin')
+        job_title = job_title.replace(u'start-up', u'#startup')
+        job_title = job_title.replace(u'data science', u'#DataScience')
+        job_title = job_title.replace(u'data scientist', u'#datascientists')
+        for hashword in (u'nantes', u'lyon', u'paris', u'grenoble', u'toulouse', u'bordeaux', u'marseille', u'lille', u'rennes', u'strasbourg') :
+            job_title = job_title.replace(hashword, u'#%s' % hashword)
+  
         # Tweet format string
         tweet_format = u'Recrutement %s %s #emploi'
 
