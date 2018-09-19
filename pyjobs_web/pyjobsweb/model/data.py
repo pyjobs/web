@@ -11,9 +11,15 @@ class Source(object):
     AFPY_JOBS = 'afpy-jobs'
     REMIXJOBS_PYTHON = 'remixjobs-python'
 
+class FakeSource(object):
+    def __init__(self, slug, url, logo_url, label):
+        self.name = slug
+        self.url = url
+        self.logo_url = logo_url
+        self.label = label
 
 SOURCES = get_sources()
-
+SOURCES['pyjobs'] = FakeSource('pyjobs', 'http://pyjobs.fr/', 'http://pyjobs.fr/img/pyjobs_logo_square.png', 'pyjobs')
 
 class Tag2(object):
     def __init__(self, tag, weight=1, css=''):
