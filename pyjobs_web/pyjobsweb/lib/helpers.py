@@ -11,7 +11,7 @@ from tg import config
 
 log = logging.getLogger(__name__)
 jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
-mois = ["Janvier", u"Février", "Mars", "Avril", "Mai", "Juin", "Juillet", u"Août", "Septembtre", "Octobre"]
+mois = ["Janvier", u"Février", "Mars", "Avril", "Mai", "Juin", "Juillet", u"Août", "Septembtre", "Octobre", "Novembre", u"Décembre"]
 
 
 def current_year():
@@ -36,6 +36,8 @@ def french_day(day_number):
 
 
 def french_month(month_number):
+    if month_number == 1:
+        return mois[11]
     return mois[month_number-1]
 
 
