@@ -90,7 +90,7 @@
         <h3>
             Description
         </h3>
-        ${company.description|n}
+        <div style="white-space: pre;">${company.description|n}</div>
         <br/>
     </div>
 
