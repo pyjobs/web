@@ -202,7 +202,7 @@ class NewCompanyForm(twf.Form):
     def __init__(self, **kwargs):
         super(NewCompanyForm, self).__init__(**kwargs)
         self.submit = None
-        self.method = 'GET'
+        self.method = 'POST'
         self.attrs = {'enctype': 'application/x-www-form-urlencoded'}
         self.action = '/societes-qui-recrutent/new/submit'
 
@@ -338,11 +338,11 @@ class NewCompanyForm(twf.Form):
             label=u"Numéro de téléphone:",
             placeholder=u"0X.XX.XX.XX.XX",
             help_text=u"Le numéro de téléphone de contact de l'entreprise pour "
-                      u"les personnes souhaitant candidater au format "
-                      u"0X.XX.XX.XX.XX",
+                      u"les personnes souhaitant candidater.",
             maxlength=14,
             css_class='form-control',
-            validator=PhoneNumberValidator(required=True)
+            validator=RequiredValidator
+            # validator=PhoneNumberValidator(required=True)
         )
 
         company_logo = twf.TextField(
