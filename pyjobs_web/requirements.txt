@@ -72,7 +72,7 @@ tw2.core==2.2.3
 tw2.forms==2.2.3
 tw2.jqplugins.select2==0.1.6
 tw2.jquery==2.2.0.2
-Twisted==15.4.0
+Twisted==20.3.0
 tzlocal==1.2.2
 unicodecsv==0.14.1
 Unidecode==0.4.19
