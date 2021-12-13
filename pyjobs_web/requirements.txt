@@ -27,7 +27,7 @@ gitdb==0.6.4
 GitPython==1.0.1
 idna==2.0
 ipaddress==1.0.14
-lxml==3.4.4
+lxml==4.6.5
 Mako==1.0.2
 MarkupSafe==0.23
 monotonic==1.2
