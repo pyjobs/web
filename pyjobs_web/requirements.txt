@@ -54,7 +54,7 @@ repoze.lru==0.6
 repoze.who==2.2
 requests==2.8.1
 requests-oauthlib==0.6.2
-Scrapy==1.0.3
+Scrapy==2.6.2
 service-identity==14.0.0
 six==1.10.0
 smmap==0.9.0
