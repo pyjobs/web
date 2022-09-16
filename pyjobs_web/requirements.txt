@@ -28,7 +28,7 @@ GitPython==1.0.1
 idna==2.0
 ipaddress==1.0.14
 lxml==3.4.4
-Mako==1.0.2
+Mako==1.2.2
 MarkupSafe==0.23
 monotonic==1.2
 oauthlib==1.1.2
